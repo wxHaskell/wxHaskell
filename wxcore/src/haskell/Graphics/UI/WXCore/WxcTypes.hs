@@ -59,8 +59,8 @@ module Graphics.UI.WXCore.WxcTypes(
             , withVectorDoubleResult, toCDoubleVectorX, toCDoubleVectorY, fromCVectorDouble, withCVectorDouble
             , withRectResult, withWxRectResult, withWxRectPtr, toCIntRectX, toCIntRectY, toCIntRectW, toCIntRectH, fromCRect, withCRect
             , withRectDoubleResult, toCDoubleRectX, toCDoubleRectY, toCDoubleRectW, toCDoubleRectH, fromCRectDouble, withCRectDouble
-            , withArray, withArrayString, withArrayWString, withArrayInt, withArrayObject
-            , withArrayIntResult, withArrayStringResult, withArrayWStringResult, withArrayObjectResult
+            , withArray, withArrayString, withArrayWString, withArrayInt, withArrayIntPtr, withArrayObject
+            , withArrayIntResult, withArrayIntPtrResult, withArrayStringResult, withArrayWStringResult, withArrayObjectResult
 
             , colourFromColor, colorFromColour
             , colourCreate, colourSafeDelete -- , colourCreateRGB, colourRed, colourGreen, colourBlue colourAlpha
@@ -91,27 +91,31 @@ module Graphics.UI.WXCore.WxcTypes(
 
             -- ** Primitive types
             -- *** CString
-            , CString, withCString, withStringResult
-            , CWString, withCWString, withWStringResult
+            , CString(..), withCString, withStringResult
+            , CWString(..), withCWString, withWStringResult
             -- *** ByteString
             , withByteStringResult, withLazyByteStringResult
             -- *** CInt
-            , CInt, toCInt, fromCInt, withIntResult
+            , CInt(..), toCInt, fromCInt, withIntResult
+            -- *** IntPtr
+            , IntPtr(..)
+            -- *** CIntPtr
+            , CIntPtr(..), toCIntPtr, fromCIntPtr, withIntPtrResult
             -- *** Word
-            , Word
+            , Word(..)
             -- *** 8 bit Word
-            , Word8
+            , Word8(..)
             -- *** 64 bit Integer
-            , Int64
+            , Int64(..)
             -- *** CDouble
-            , CDouble, toCDouble, fromCDouble, withDoubleResult
+            , CDouble(..), toCDouble, fromCDouble, withDoubleResult
             -- *** CChar
-            , CChar, toCChar, fromCChar, withCharResult
-            , CWchar, toCWchar
+            , CChar(..), toCChar, fromCChar, withCharResult
+            , CWchar(..), toCWchar
             -- *** CBool
-            , CBool, toCBool, fromCBool, withBoolResult
+            , CBool(..), toCBool, fromCBool, withBoolResult
             -- ** Pointers
-            , Ptr, ptrNull, ptrIsNull, ptrCast, ForeignPtr, FunPtr, toCFunPtr
+            , Ptr(..), ptrNull, ptrIsNull, ptrCast, ForeignPtr, FunPtr, toCFunPtr
             ) where
 
 import Control.Exception 
@@ -680,6 +684,21 @@ fromCInt ci
   = fromIntegral ci
 
 {-----------------------------------------------------------------------------------------
+  CIntPtr
+-----------------------------------------------------------------------------------------}
+withIntPtrResult :: IO CIntPtr -> IO IntPtr
+withIntPtrResult io
+  = do x <- io
+       return (fromCIntPtr x)
+
+toCIntPtr :: IntPtr -> CIntPtr
+toCIntPtr i = fromIntegral i
+
+fromCIntPtr :: CIntPtr -> IntPtr
+fromCIntPtr ci
+  = fromIntegral ci
+
+{-----------------------------------------------------------------------------------------
   CDouble
 -----------------------------------------------------------------------------------------}
 withDoubleResult :: IO CDouble -> IO Double
@@ -791,6 +810,17 @@ withArrayIntResult f
                 xs <- peekArray len carr
                 return (map fromCInt xs)
 
+withArrayIntPtrResult :: (Ptr CIntPtr -> IO CInt) -> IO [IntPtr]
+withArrayIntPtrResult f
+  = do clen <- f nullPtr
+       let len = fromCInt clen
+       if (len <= 0)
+        then return []
+        else allocaArray len $ \carr ->
+             do f carr
+                xs <- peekArray len carr
+                return (map fromCIntPtr xs)
+
 withArrayObjectResult :: (Ptr (Ptr a) -> IO CInt) -> IO [Object a]
 withArrayObjectResult f
   = do clen <- f nullPtr
@@ -835,6 +865,11 @@ withArrayWString xs f
 withArrayInt :: [Int] -> (CInt -> Ptr CInt -> IO a) -> IO a
 withArrayInt xs f
   = withArray0 0 (map toCInt xs) $ \carr ->
+    f (toCInt (length xs)) carr
+
+withArrayIntPtr :: [IntPtr] -> (CInt -> Ptr CIntPtr -> IO a) -> IO a
+withArrayIntPtr xs f
+  = withArray0 0 (map toCIntPtr xs) $ \carr ->
     f (toCInt (length xs)) carr
 
 withArrayObject :: [Ptr a] -> (CInt -> Ptr (Ptr a) -> IO b) -> IO b
@@ -1140,7 +1175,7 @@ foreign import ccall "wxGridCellCoordsArray_Create" wxGridCellCoordsArray_Create
 -----------------------------------------------------------------------------------------}
 -- | Identifies tree items. Note: Replaces the @TreeItemId@ object and takes automatically
 -- care of allocation issues.
-newtype TreeItem  = TreeItem Int
+newtype TreeItem  = TreeItem IntPtr
                   deriving (Eq,Show,Read)
 
 -- | Invalid tree item.
@@ -1152,7 +1187,7 @@ treeItemIsOk :: TreeItem -> Bool
 treeItemIsOk (TreeItem val)
   = (val /= 0)
 
-treeItemFromInt :: Int -> TreeItem
+treeItemFromInt :: IntPtr -> TreeItem
 treeItemFromInt i
   = TreeItem i
 
@@ -1161,7 +1196,7 @@ withRefTreeItemId f
   = do item <- assignRefPtr treeItemIdCreate f
        val  <- treeItemIdGetValue item
        treeItemIdDelete item
-       return (TreeItem val)
+       return (TreeItem (fromCIntPtr val))
 
 withTreeItemIdRef :: String -> TreeItem -> (Ptr (TTreeItemId a) -> IO b) -> IO b
 withTreeItemIdRef msg t f
@@ -1169,7 +1204,7 @@ withTreeItemIdRef msg t f
 
 withTreeItemIdPtr :: TreeItem -> (Ptr (TTreeItemId a) -> IO b) -> IO b
 withTreeItemIdPtr (TreeItem val) f 
-  = do item <- treeItemIdCreateFromValue val
+  = do item <- treeItemIdCreateFromValue (toCIntPtr val)
        x    <- f item
        treeItemIdDelete item
        return x
@@ -1179,11 +1214,11 @@ withManagedTreeItemIdResult io
   = do item <- io
        val  <- treeItemIdGetValue item
        treeItemIdDelete item
-       return (TreeItem val)
+       return (TreeItem (fromCIntPtr val))
 
 foreign import ccall "wxTreeItemId_Create" treeItemIdCreate :: IO (Ptr (TTreeItemId a))
-foreign import ccall "wxTreeItemId_GetValue" treeItemIdGetValue :: Ptr (TTreeItemId a) -> IO Int
-foreign import ccall "wxTreeItemId_CreateFromValue" treeItemIdCreateFromValue :: Int -> IO (Ptr (TTreeItemId a))
+foreign import ccall "wxTreeItemId_GetValue" treeItemIdGetValue :: Ptr (TTreeItemId a) -> IO CIntPtr
+foreign import ccall "wxTreeItemId_CreateFromValue" treeItemIdCreateFromValue :: CIntPtr -> IO (Ptr (TTreeItemId a))
 foreign import ccall "wxTreeItemId_Delete" treeItemIdDelete :: Ptr (TTreeItemId a) -> IO ()
 
 {-----------------------------------------------------------------------------------------

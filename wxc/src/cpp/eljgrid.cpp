@@ -56,10 +56,17 @@ EWXWEXPORT(void,wxGridCellEditor_Show)(wxGridCellEditor* self,bool show,void* at
 	self->Show(show, (wxGridCellAttr*)attr);
 }
 	
+#if wxCHECK_VERSION(2,9,5) // (wxVERSION_NUMBER >= 2905)
+EWXWEXPORT(void,wxGridCellEditor_PaintBackground)(wxGridCellEditor* self,wxDC* dc,int x,int y,int w,int h,wxGridCellAttr* attr)
+{
+	self->PaintBackground(*dc, wxRect(x, y, w, h), *attr);
+}
+#else
 EWXWEXPORT(void,wxGridCellEditor_PaintBackground)(wxGridCellEditor* self,int x,int y,int w,int h,void* attr)
 {
 	self->PaintBackground(wxRect(x, y, w, h), (wxGridCellAttr*)attr);
 }
+#endif
 	
 EWXWEXPORT(void,wxGridCellEditor_BeginEdit)(wxGridCellEditor* self,int row,int col,void* grid)
 {

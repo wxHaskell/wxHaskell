@@ -15,6 +15,7 @@
 #undef TChar
 #undef TUInt8
 #undef TInt64
+#undef TIntPtr
 #undef TBool
 #undef TBoolInt
 #undef TClass
@@ -41,10 +42,13 @@
 #undef TRectOutVoid
 #undef TArrayString
 #undef TArrayInt
+#undef TArrayIntPtr
 #undef TArrayObject
 #undef TArrayLen
 #undef TArrayIntOut
 #undef TArrayIntOutVoid
+#undef TArrayIntPtrOut
+#undef TArrayIntPtrOutVoid
 #undef TArrayStringOut
 #undef TArrayStringOutVoid
 #undef TArrayObjectOut
@@ -72,6 +76,9 @@
 #else
 #define TChar             char
 #endif
+
+/* integer which can hold a pointer */
+#define TIntPtr           intptr_t
 
 /* 64 bit integer */
 #define TInt64            int64_t
@@ -121,11 +128,13 @@
 /* arrays */
 #define TArrayLen               int
 #define TArrayIntOut            intptr_t*
+#define TArrayIntPtrOut         intptr_t*
 #define TArrayStringOut         TString*
 #define TArrayObjectOut(tp)     TClass(tp)*
 
 #define TArrayString(n,p)       int n, TString* p
 #define TArrayInt(n,p)          int n, int* p
+#define TArrayIntPtr(n,p)       int n, intptr_t* p
 #define TArrayObject(n,tp,p)    int n, TClass(tp)* p
 
 /* Define "Void" variants for void* declared signatures.
@@ -138,6 +147,7 @@
 # define TSizeOutVoid(w,h)       TSizeOut(w,h)
 # define TRectOutVoid(x,y,w,h)   TRectOut(x,y,w,h)
 # define TArrayIntOutVoid        TArrayIntOut
+# define TArrayIntPtrOutVoid     TArrayIntPtrOut
 # define TArrayStringOutVoid     TArrayStringOut
 # define TArrayObjectOutVoid(tp) TArrayObjectOut(tp)
 #else
@@ -148,6 +158,7 @@
 # define TSizeOutVoid(w,h)     void* w, void* h
 # define TRectOutVoid(x,y,w,h) void* x, void* y, void* w, void* h
 # define TArrayIntOutVoid        void*
+# define TArrayIntPtrOutVoid     void*
 # define TArrayStringOutVoid     void*
 # define TArrayObjectOutVoid(tp) void*
 #endif

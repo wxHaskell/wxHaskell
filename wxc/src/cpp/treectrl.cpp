@@ -74,7 +74,7 @@ EWXWEXPORT(wxTreeItemId*,wxTreeItemId_Clone)(wxTreeItemId* self)
 //
 // So we must remove this function and replace treeItemId implementation in the
 // funture.
-EWXWEXPORT(wxTreeItemId*,wxTreeItemId_CreateFromValue)(int value)
+EWXWEXPORT(wxTreeItemId*,wxTreeItemId_CreateFromValue)(intptr_t value)
 {
 #if wxVERSION_NUMBER < 2800
 	return new wxTreeItemId( value );
@@ -86,9 +86,9 @@ EWXWEXPORT(wxTreeItemId*,wxTreeItemId_CreateFromValue)(int value)
 #endif
 }
 
-EWXWEXPORT(int,wxTreeItemId_GetValue)(wxTreeItemId* self)
+EWXWEXPORT(intptr_t,wxTreeItemId_GetValue)(wxTreeItemId* self)
 {
-	return (long)(self->m_pItem);
+	return (intptr_t)(self->m_pItem);
 }
 
 

@@ -307,6 +307,7 @@ haskellToCResult decl tp call
       EventId -> "withIntResult $" ++ nl ++ call
       Id    -> "withIntResult $" ++ nl ++ call
       Int _ -> "withIntResult $" ++ nl ++ call
+      IntPtr-> "withIntPtrResult $" ++ nl ++ call
       Bool  -> "withBoolResult $" ++ nl ++ call
       Char  -> "withCharResult $" ++ nl ++ call
       Object obj -> withResult (classInfo obj)  ++ " $" ++ nl ++ call
@@ -327,6 +328,7 @@ haskellToCResult decl tp call
                           ""     -> errorMsgDecl decl "illegal reference object" 
                           action -> action ++ " $ \\pref -> " ++ nl ++ call ++ " pref"  -- always last argument!
       ArrayInt _    -> "withArrayIntResult $ \\arr -> " ++ nl ++ call ++ " arr" -- always last
+      ArrayIntPtr _ -> "withArrayIntPtrResult $ \\arr -> " ++ nl ++ call ++ " arr" -- always last
       ArrayString _ -> "withArrayWStringResult $ \\arr -> " ++ nl ++ call ++ " arr" -- always last
       ArrayObject name _ -> "withArrayObjectResult $ \\arr -> " ++ nl ++ call ++ " arr" -- always last
       other -> call
@@ -364,6 +366,10 @@ haskellToCArgIO methodName isSelf arg
                   -> "withArrayInt " ++ haskellName (argName arg)
                      ++ " $ \\" ++ haskellArrayLenName (argName arg) ++ " " ++ haskellArrayName (argName arg)
                      ++ " -> " ++ nl
+      ArrayIntPtr _
+                  -> "withArrayIntPtr " ++ haskellName (argName arg)
+                     ++ " $ \\" ++ haskellArrayLenName (argName arg) ++ " " ++ haskellArrayName (argName arg)
+                     ++ " -> " ++ nl
       Object obj  -> (if isSelf then withSelf (classInfo obj) ("\"" ++ methodName ++ "\"") 
                                 else withPtr (classInfo obj)) ++ " "
                      ++ haskellName (argName arg)
@@ -379,6 +385,7 @@ haskellToCArg decl arg
       EventId        -> traceError "event id as argument" decl $ name
       Id             -> traceError "id as argument" decl $ name
       Int _ -> pparens ("toCInt " ++ name)
+      IntPtr-> pparens ("toCIntPtr " ++ name)
       Char  -> pparens ("toCWchar " ++ name)
       Bool  -> pparens ("toCBool " ++ name)
       Fun f -> pparens ("toCFunPtr " ++ name)
@@ -404,6 +411,7 @@ haskellToCArg decl arg
       ArrayString _     -> haskellArrayLenName name ++ " " ++ haskellArrayName name
       ArrayObject tp _  -> haskellArrayLenName name ++ " " ++ haskellArrayName name
       ArrayInt _        -> haskellArrayLenName name ++ " " ++ haskellArrayName name
+      ArrayIntPtr _     -> haskellArrayLenName name ++ " " ++ haskellArrayName name
 
       other -> name
   where
@@ -485,6 +493,7 @@ haskellType i tp
   = case tp of
       Bool   -> "Bool"
       Int _  -> "Int"
+      IntPtr -> "IntPtr"
       Int64  -> "Int64"
       Word   -> "Word"
       Word8  -> "Word8"
@@ -508,6 +517,7 @@ haskellType i tp
       ByteString _ -> "B.ByteString"
       ArrayString _ -> "[String]"
       ArrayInt _    -> "[Int]"
+      ArrayIntPtr _ -> "[IntPtr]"
       ArrayObject name _ -> "[" ++ haskellTypeName name ++ typeVar i ++ "]"
       Rect CDouble   -> "(Rect2D Double)"
       Rect _   -> "Rect"
@@ -545,6 +555,7 @@ foreignArg decl i arg
 foreignResultType tp
   = case tp of
       ArrayInt _    -> "Ptr CInt -> IO CInt"
+      ArrayIntPtr _ -> "Ptr CIntPtr -> IO CInt"
       ArrayString _ -> "Ptr (Ptr CWchar) -> IO CInt"
       ArrayObject name _ -> "Ptr " ++ foreignTypePar 0 (Object name) ++ " -> IO CInt"
       String _ -> "Ptr CWchar -> IO CInt"
@@ -570,6 +581,7 @@ foreignType i tp
       Bool   -> "CBool"
       Int _  -> "CInt"
       Int64  -> "Int64"
+      IntPtr -> "CIntPtr"
       Word   -> "Word"
       Word8  -> "Word8"
       Word32 -> "Word32"
@@ -596,6 +608,7 @@ foreignType i tp
       ArrayObject name _ -> "CInt -> Ptr " ++ foreignTypePar i (Object name)
       ArrayString _      -> "CInt -> Ptr (Ptr CWchar)"
       ArrayInt _         -> "CInt -> Ptr CInt"
+      ArrayIntPtr _      -> "CInt -> Ptr CIntPtr"
       RefObject name -> "Ptr (T" ++ haskellTypeName name ++ typeVar i ++ ")"
       Object name    -> "Ptr (T" ++ haskellTypeName name ++ typeVar i ++ ")"
 

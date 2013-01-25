@@ -134,6 +134,7 @@ patomtype
   <|> do reserved "float";  return Float
   <|> do reserved "size_t"; return (Int SizeT)
   <|> do reserved "time_t"; return (Int TimeT)
+  <|> do reserved "TIntPtr";  return IntPtr
   <|> do reserved "TInt64"; return Int64
   <|> do reserved "TUInt"; return Word
   <|> do reserved "TUInt8"; return Word8
@@ -154,7 +155,9 @@ patomtype
   <|> do reserved "TArrayStringOut"; return (ArrayStringOut CChar)
   <|> do reserved "TArrayStringOutVoid"; return (ArrayStringOut CVoid)
   <|> do reserved "TArrayIntOut"; return (ArrayIntOut CInt)
+  <|> do reserved "TArrayIntPtrOut"; return (ArrayIntPtrOut CInt)
   <|> do reserved "TArrayIntOutVoid"; return (ArrayIntOut CVoid)
+  <|> do reserved "TArrayIntPtrOutVoid"; return (ArrayIntPtrOut CVoid)
   <|> do reserved "TClosureFun"; return (Fun "Ptr fun -> Ptr state -> Ptr (TEvent evt) -> IO ()")
   <|> do reserved "TClass"
          name <- parens identifier
@@ -239,6 +242,7 @@ pargType2
   <|> do reserved "TVectorOutVoid"; return (VectorOut CVoid)
   <|> do reserved "TArrayString"; return (ArrayString CChar)
   <|> do reserved "TArrayInt"; return (ArrayInt CInt)
+  <|> do reserved "TArrayIntPtr"; return (ArrayIntPtr CInt)
   <|> do reserved "TByteString"; return (ByteString Strict)
   <|> do reserved "TByteStringLazy"; return (ByteString Lazy)
 
@@ -269,6 +273,7 @@ lexer
     , caseSensitive = True
     , reservedNames = ["void","int","long","float","double","char","size_t","time_t","_stdcall","__cdecl"
                       ,"TChar","TBool"
+                      ,"TIntPtr"
                       ,"TClass","TSelf","TClassRef"
                       ,"TByteData","TByteString","TByteStringOut","TByteStringLen"
                       ,"TString","TStringOut","TStringLen", "TStringVoid"

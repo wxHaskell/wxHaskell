@@ -79,6 +79,7 @@ argName arg
   = concat (argNames arg)
 
 data Type = Int CBaseType
+          | IntPtr
           | Int64
           | Word
           | Word8
@@ -104,11 +105,13 @@ data Type = Int CBaseType
           | ArrayLen
           | ArrayStringOut CBaseType
           | ArrayIntOut CBaseType
+          | ArrayIntPtrOut CBaseType
           | ArrayObjectOut String CBaseType
           -- derived types
           | Object String
           | String CBaseType
           | ArrayInt    CBaseType
+          | ArrayIntPtr    CBaseType
           | ArrayString CBaseType
           | ArrayObject String CBaseType
           | Bool

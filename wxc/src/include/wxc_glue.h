@@ -2538,7 +2538,12 @@ TClass(wxControl) wxGridCellEditor_GetControl( TSelf(wxGridCellEditor) _obj );
 void       wxGridCellEditor_HandleReturn( TSelf(wxGridCellEditor) _obj, TClass(wxEvent) event );
 TBool      wxGridCellEditor_IsAcceptedKey( TSelf(wxGridCellEditor) _obj, TClass(wxEvent) event );
 TBool      wxGridCellEditor_IsCreated( TSelf(wxGridCellEditor) _obj );
+void       wxGridCellEditor_PaintBackground( TSelf(wxGridCellEditor) _obj, TClass(wxDC) dc, TRect(x,y,w,h), TClass(wxGridCellAttr) attr );
+#if wxCHECK_VERSION(2,9,5) // (wxVERSION_NUMBER >= 2905)
+void       wxGridCellEditor_PaintBackground( TSelf(wxGridCellEditor) _obj, TClass(wxDC) dc, TRect(x,y,w,h), TClass(wxGridCellAttr) attr );
+#else
 void       wxGridCellEditor_PaintBackground( TSelf(wxGridCellEditor) _obj, TRect(x,y,w,h), TClass(wxGridCellAttr) attr );
+#endif
 void       wxGridCellEditor_Reset( TSelf(wxGridCellEditor) _obj );
 void       wxGridCellEditor_SetControl( TSelf(wxGridCellEditor) _obj, TClass(wxControl) control );
 void       wxGridCellEditor_SetParameters( TSelf(wxGridCellEditor) _obj, TClass(wxString) params );
@@ -4236,8 +4241,10 @@ void       wxSizer_AddWindow( TSelf(wxSizer) _obj, TClass(wxWindow) window, int 
 TClass(wxSize) wxSizer_CalcMin( TSelf(wxSizer) _obj );
 void       wxSizer_Fit( TSelf(wxSizer) _obj, TClass(wxWindow) window );
 int        wxSizer_GetChildren( TSelf(wxSizer) _obj, void* _res, int _cnt );
-TClass(wxSize) wxSizer_GetMinSize( TSelf(wxSizer) _obj );
-TClass(wxPoint) wxSizer_GetPosition( TSelf(wxSizer) _obj );
+TClass(wxSize) wxSizer_GetMinSize( TSelf(wxSizer) _obj );
+
+TClass(wxPoint) wxSizer_GetPosition( TSelf(wxSizer) _obj );
+
 TClass(wxSize) wxSizer_GetSize( TSelf(wxSizer) _obj );
 void       wxSizer_Insert( TSelf(wxSizer) _obj, int before, TSize(width,height), int option, int flag, int border, void* userData );
 void       wxSizer_InsertSizer( TSelf(wxSizer) _obj, int before, TClass(wxSizer) sizer, int option, int flag, int border, void* userData );
@@ -4785,7 +4792,7 @@ void       wxTreeCtrl_GetPrevSibling( TSelf(wxTreeCtrl) _obj, TClass(wxTreeItemI
 void       wxTreeCtrl_GetPrevVisible( TSelf(wxTreeCtrl) _obj, TClass(wxTreeItemId) item, TClassRef(wxTreeItemId) _item );
 void       wxTreeCtrl_GetRootItem( TSelf(wxTreeCtrl) _obj, TClassRef(wxTreeItemId) _item );
 void       wxTreeCtrl_GetSelection( TSelf(wxTreeCtrl) _obj, TClassRef(wxTreeItemId) _item );
-TArrayLen  wxTreeCtrl_GetSelections( TSelf(wxTreeCtrl) _obj, TArrayIntOutVoid selections );
+TArrayLen  wxTreeCtrl_GetSelections( TSelf(wxTreeCtrl) _obj, TArrayIntPtrOutVoid selections );
 int        wxTreeCtrl_GetSpacing( TSelf(wxTreeCtrl) _obj );
 TClass(wxImageList)  wxTreeCtrl_GetStateImageList( TSelf(wxTreeCtrl) _obj );
 void       wxTreeCtrl_HitTest( TSelf(wxTreeCtrl) _obj, TPoint(_x,_y), int* flags, TClassRef(wxTreeItemId) _item );

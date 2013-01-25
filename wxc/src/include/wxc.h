@@ -7,18 +7,29 @@
 #endif
 
 #define _stdcall
+
 #define EXPORT
 
+
 /*-----------------------------------------------------------------------------
+
   Standard includes
+
 -----------------------------------------------------------------------------*/
+
 #include "wxc_types.h"
 #include "wxc_glue.h"
 
 
+
+
+
 /*-----------------------------------------------------------------------------
+
   Modular extra exports
+
 -----------------------------------------------------------------------------*/
+
 #include "dragimage.h"
 #include "graphicscontext.h"
 #include "glcanvas.h"
@@ -51,23 +62,37 @@ TClass(wxClosure)  wxObject_GetClientClosure( TSelf(wxObject) _obj );
 /** Set the reference data of an object as a closure. The closure data contains the data while the function is called on deletion. Returns 'True' on success. Only works if the reference data is unused by wxWindows! */
 void               wxObject_SetClientClosure( TSelf(wxObject) _obj, TClass(wxClosure) closure );
 
+
 /* extra class definitions for classInfo */
+
 TClassDefExtend(wxGauge95,wxGauge)
+
 TClassDefExtend(wxGaugeMSW,wxGauge)
+
 TClassDefExtend(wxSlider95,wxSlider)
+
 TClassDefExtend(wxSliderMSW,wxSlider)
 
 
+
+
+
 /* Object */
+
 void wxObject_Delete( TSelf(wxObject) obj );
+
 
 /* Frame */
 TClass(wxString) wxFrame_GetTitle( TSelf(wxFrame) _obj );
 void        wxFrame_SetTitle( TSelf(wxFrame) _frame, TClass(wxString) _txt );
 TBool       wxFrame_SetShape( TSelf(wxFrame) self, TClass(wxRegion) region);
+
 TBool       wxFrame_ShowFullScreen( TSelf(wxFrame) self, TBool show, int style);
+
 TBool       wxFrame_IsFullScreen( TSelf(wxFrame) self );
+
 void        wxFrame_Centre( TSelf(wxFrame) self, int orientation );
+
 
 /* Create/Delete */
 void   wxCursor_Delete( TSelf(wxCursor) _obj );
@@ -78,71 +103,132 @@ int   wxMouseEvent_GetWheelDelta( TSelf(wxMouseEvent) _obj );
 int   wxMouseEvent_GetWheelRotation( TSelf(wxMouseEvent) _obj );
 int   wxMouseEvent_GetButton( TSelf(wxMouseEvent) _obj );
 
+
 TClass(wxPoint) wxcGetMousePosition( );
 
 
+
+
+
 /* wxDC */
+
 double wxDC_GetUserScaleX( TSelf(wxDC) dc );
+
 double wxDC_GetUserScaleY( TSelf(wxDC) dc );
+
 
 /* wxWindow */
 TClass(wxPoint) wxWindow_ConvertDialogToPixelsEx( TSelf(wxWindow) _obj );
+
 TClass(wxPoint) wxWindow_ConvertPixelsToDialogEx( TSelf(wxWindow) _obj );
+
 TClass(wxPoint) wxWindow_ScreenToClient2( TSelf(wxWindow) _obj, TPoint(x,y) );
 
+
+
 /* wxString helpers */
+
 TClass(wxString) wxString_Create( TString buffer );
+
 TClass(wxString) wxString_CreateLen( TString buffer, int len );
+
 void             wxString_Delete( TSelf(wxString) s );
+
 TStringLen       wxString_GetString( TSelf(wxString) s, TStringOut buffer );
+
 size_t           wxString_Length( TSelf(wxString) s );
+
 
 
 /* menu */
 TClass(wxMenuBar) wxMenu_GetMenuBar( TSelf(wxMenu) _obj );
+
 TClass(wxFrame)   wxMenuBar_GetFrame( TSelf(wxMenuBar) _obj );
 
+
+
 int wxListEvent_GetCacheFrom( TSelf(wxListEvent) _obj);
+
 int wxListEvent_GetCacheTo( TSelf(wxListEvent) _obj);
 
+
+
 void wxListCtrl_AssignImageList( TSelf(wxListCtrl) _obj, TClass(wxImageList) images, int which );
+
 void wxListCtrl_GetColumn2( TSelf(wxListCtrl) _obj, int col, TClassRef(wxListItem) item);
+
 void wxListCtrl_GetItem2( TSelf(wxListCtrl) _obj, TClassRef(wxListItem) info);
+
 TClass(wxPoint) wxListCtrl_GetItemPosition2( TSelf(wxListCtrl) _obj, int item );
+
 /** Sort items in a list control. Takes a closure that is called with a 'CommandEvent' where the @Int@ is the item data of the first item and the @ExtraLong@ the item data of the second item. The event handler should set the @Int@ to 0 when the items are equal, -1 when the first is less, and 1 when the second is less. */
+
 TBool wxListCtrl_SortItems2(TSelf(wxListCtrl) _obj, TClass(wxClosure) closure );
 
+
+
 /* tree ctrl */
+
 TClassDefExtend(wxcTreeItemData,wxTreeItemData)
 
+
+
 /** Create tree item data with a closure. The closure data contains the data while the function is called on deletion. */
+
 TClass(wxcTreeItemData) wxcTreeItemData_Create( TClass(wxClosure) closure );
+
 /** Get the client data in the form of a closure. Use 'closureGetData' to get to the actual data.*/
+
 TClass(wxClosure) wxcTreeItemData_GetClientClosure( TSelf(wxcTreeItemData) self );
+
 /** Set the tree item data with a closure. The closure data contains the data while the function is called on deletion. */
+
 void  wxcTreeItemData_SetClientClosure( TSelf(wxcTreeItemData) self, TClass(wxClosure) closure );
 
+
+
 TClass(wxTreeItemId) wxTreeItemId_Clone( TSelf(wxTreeItemId) _obj);
-TClass(wxTreeItemId) wxTreeItemId_CreateFromValue(int value);
-int wxTreeItemId_GetValue( TSelf(wxTreeItemId) _obj);
+
+TClass(wxTreeItemId) wxTreeItemId_CreateFromValue(TIntPtr value);
+
+TIntPtr wxTreeItemId_GetValue( TSelf(wxTreeItemId) _obj);
+
+
+
 
 
 TClass(wxKeyEvent) wxTreeEvent_GetKeyEvent( TSelf(wxTreeEvent) _obj);
+
 int    wxTreeEvent_IsEditCancelled( TSelf(wxTreeEvent) _obj);
+
 void   wxTreeEvent_Allow( TSelf(wxTreeEvent) _obj);
 
+
+
 TClass(wxTreeCtrl) wxTreeCtrl_Create2( TClass(wxWindow) _prt, int _id, TRect(_lft,_top,_wdt,_hgt), int _stl );
+
 void   wxTreeCtrl_InsertItem2( TSelf(wxTreeCtrl) _obj, TClass(wxWindow) parent, TClass(wxTreeItemId) idPrevious, TClass(wxString) text, int image, int selectedImage, TClass(wxClosure) closure, TClassRef(wxTreeItemId) _item );
+
 void   wxTreeCtrl_InsertItemByIndex2( TSelf(wxTreeCtrl) _obj, TClass(wxWindow) parent, int index, TClass(wxString) text, int image, int selectedImage, TClass(wxClosure) closure, TClassRef(wxTreeItemId) _item );
+
 TClass(wxClosure)  wxTreeCtrl_GetItemClientClosure( TSelf(wxTreeCtrl) _obj, TClass(wxTreeItemId) item );
+
 void   wxTreeCtrl_SetItemClientClosure( TSelf(wxTreeCtrl) _obj, TClass(wxTreeItemId) item, TClass(wxClosure) closure );
+
 void   wxTreeCtrl_AssignImageList(TSelf(wxTreeCtrl) _obj, TClass(wxImageList) imageList );
+
 void   wxTreeCtrl_AssignStateImageList(TSelf(wxTreeCtrl) _obj, TClass(wxImageList) imageList );
 
 
+
+
+
 /* dc */
+
 /** Get the color of pixel. Note: this is not a portable method at the moment and its use is discouraged. */
+
 void wxDC_GetPixel2( TSelf(wxDC) _obj, TPoint(x,y), TClassRef(wxColour) col);
+
 
 
 /* scrolledwindow */
@@ -175,15 +261,22 @@ TClass(wxTimerEx)  wxTimerEx_Create(  );
 TClass(wxClosure)  wxTimerEx_GetClosure( TSelf(wxTimerEx) _obj );
 
 /* Menu */
+
 void  wxMenu_AppendRadioItem( TSelf(wxMenu) self, int id, TClass(wxString) text, TClass(wxString) help);
+
+
+
 
 
 /* Menu Item */
 TClass(wxMenuItem)  wxMenuItem_CreateSeparator();
 TClass(wxMenuItem)  wxMenuItem_CreateEx(int id, TClass(wxString) label, TClass(wxString) help, int itemkind, TClass(wxMenu) submenu);
 
+
 /* Toolbar */
+
 void wxToolBar_AddTool2( TSelf(wxToolBar) _obj, int toolId, TClass(wxString) label, TClass(wxBitmap) bmp, TClass(wxBitmap) bmpDisabled, int itemKind, TClass(wxString) shortHelp, TClass(wxString) longHelp );
+
 
 /* Progress dialog */
 TClass(wxProgressDialog) wxProgressDialog_Create( TClass(wxString) title, TClass(wxString) message, int max, TClass(wxWindow) parent, int style );
@@ -222,8 +315,11 @@ TClassDefExtend(wxcHtmlEvent,wxCommandEvent)
 
 TClass(wxMouseEvent) wxcHtmlEvent_GetMouseEvent( TSelf(wxcHtmlEvent) self );
 TClass(wxHtmlCell)   wxcHtmlEvent_GetHtmlCell( TSelf(wxcHtmlEvent) self );
+
 /** Return the /id/ attribute of the associated html cell (if applicable) */
+
 TClass(wxString)     wxcHtmlEvent_GetHtmlCellId( TSelf(wxcHtmlEvent) self );
+
 /** Return the /href/ attribute of the associated html anchor (if applicable) */
 TClass(wxString)     wxcHtmlEvent_GetHref( TSelf(wxcHtmlEvent) self );
 TClass(wxString)     wxcHtmlEvent_GetTarget( TSelf(wxcHtmlEvent) self );
@@ -255,8 +351,12 @@ void                 wxHtmlWindow_SetRelatedStatusBar( TSelf(wxHtmlWindow) _obj,
 void                 wxHtmlWindow_WriteCustomization( TSelf(wxHtmlWindow) _obj, TClass(wxConfigBase) cfg, TClass(wxString) path );
 
 /* wxGridCellTextEnterEditor */
+
 TClassDefExtend(wxGridCellTextEnterEditor,wxGridCellTextEditor)
+
 TClass(wxGridCellTextEnterEditor) wxGridCellTextEnterEditor_Ctor();
+
+
 
 /* logger */
 TClass(wxLogStderr)   wxLogStderr_Create();
@@ -343,58 +443,111 @@ void      wxTextAttr_SetTextColour(TSelf(wxTextAttr) _obj, TClass(wxColour) colo
 void      wxTextAttr_SetBackgroundColour(TSelf(wxTextAttr) _obj, TClass(wxColour) colour );
 void      wxTextAttr_SetFont(TSelf(wxTextAttr) _obj, TClass(wxFont) font );
 
+
 /* ConfigBase */
+
 TClassDefExtend(wxFileConfig,wxConfigBase)
 
+
+
 TClass(wxConfigBase) wxConfigBase_Get();
+
 void                 wxConfigBase_Set( TClass(wxConfigBase) self );
+
 TClass(wxFileConfig) wxFileConfig_Create( TClass(wxInputStream) inp );
 
+
+
 /* Image.cpp */
+
 TClass(wxBitmap) wxBitmap_CreateFromImage( TClass(wxImage) image, int depth );
+
 TClass(wxImage) wxImage_CreateFromDataEx( TSize(width,height), void* data, TBoolInt isStaticData);
+
 void wxImage_Delete( TSelf(wxImage) image );
 
+
+
 /** Create from rgb int. */
+
 TClass(wxColour) wxColour_CreateFromInt(int rgb);
+
 /** Return colors as an rgb int. */
+
 int wxColour_GetInt( TSelf(wxColour) colour);
+
 /** Create from rgba unsigned int. */
+
 TClass(wxColour) wxColour_CreateFromUnsignedInt(TUInt rgba);
+
 /** Return colors as an rgba unsigned int. */
+
 TUInt wxColour_GetUnsignedInt( TSelf(wxColour) colour);
 
+
+
 /** Create from system colour. */
+
 TClass(wxColour) wxcSystemSettingsGetColour( int systemColour );
 
 
+
+
+
 /* basic pixel manipulation */
+
 void wxcSetPixelRGB( TUInt8* buffer, int width, TPoint(x,y), int rgb  );
+
 int  wxcGetPixelRGB( TUInt8* buffer, int width, TPoint(x,y) );
+
 void wxcSetPixelRowRGB( TUInt8* buffer, int width, TPoint(x,y), int rgbStart, int rgbEnd, int count );
+
 void wxcInitPixelsRGB( TUInt8* buffer, TSize(width,height), int rgba );
+
 void wxcSetPixelRGBA( TUInt8* buffer, int width, TPoint(x,y), TUInt rgba  );
+
 TUInt  wxcGetPixelRGBA( TUInt8* buffer, int width, TPoint(x,y) );
+
 void wxcSetPixelRowRGBA( TUInt8* buffer, int width, TPoint(x,y), int rgbaStart, int rgbEnd, TUInt count );
+
 void wxcInitPixelsRGBA( TUInt8* buffer, TSize(width,height), TUInt rgba );
 
+
+
 /* malloc/free */
+
 void* wxcMalloc(int size );
+
 void  wxcFree( void* p );
 
+
+
 /* wakeup idle */
+
 void wxcWakeUpIdle();
 
+
+
 /* application directory */
+
 /** Return the directory of the application. On unix systems (except MacOS X), it is not always possible to determine this correctly. Therefore, the APPDIR environment variable is returned first if it is defined. */
+
 TClass(wxString) wxGetApplicationDir();
+
 /** Return the full path of the application. On unix systems (except MacOS X), it is not always possible to determine this correctly. */
+
 TClass(wxString) wxGetApplicationPath();
+
+
 
 /* ELJApp */
 void  ELJApp_InitializeC( TClass(wxClosure) closure, int _argc, TChar** _argv );
+
 int   ELJApp_GetIdleInterval();
+
 void  ELJApp_SetIdleInterval( int interval );
+
+
 
 
 #endif /* wxc_h */

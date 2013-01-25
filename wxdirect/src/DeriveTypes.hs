@@ -399,6 +399,9 @@ deriveOutTypes decl
       -- int array
       (ArrayLen,Arg name (ArrayIntOut ctp) :args)
           -> decl{ declRet = ArrayInt ctp, declArgs = reverse args }
+      -- intptr array
+      (ArrayLen,Arg name (ArrayIntPtrOut ctp) :args)
+          -> decl{ declRet = ArrayIntPtr ctp, declArgs = reverse args }
       -- string array
       (ArrayLen,Arg name (ArrayStringOut ctp) :args)
           -> decl{ declRet = ArrayString ctp, declArgs = reverse args }
