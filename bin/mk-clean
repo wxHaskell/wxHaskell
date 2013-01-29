@@ -1,0 +1,5 @@
+#!/bin/sh
+
+# cleanup cabal-devl local build
+
+rm -rf cabal-dev wxdirect/dist wxc/dist wxcore/dist wx/dist

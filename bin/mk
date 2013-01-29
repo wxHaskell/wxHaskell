@@ -1,0 +1,8 @@
+#!/bin/sh
+
+# build using cabal-dev
+
+#cabal-dev install ./wx ./wxcore ./wxdirect
+cabal-dev install  ./wxdirect ./wxc ./wxcore ./wx
+#cabal-dev clean  ./wxdirect ./wxc ./wxcore ./wx
+#cabal-dev install ./wxc

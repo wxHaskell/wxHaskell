@@ -21,6 +21,9 @@ WxcClassesMZ.hs
 # Dist directory
 dist/
 
+# generated config files
+config/
+
 # OS Generated files
 .DS_Store*
 Thumbs.db
