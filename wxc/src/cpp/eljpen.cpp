@@ -156,7 +156,7 @@ EWXWEXPORT(int,wxPen_GetDashes)(void* self,void* ptr)
 EWXWEXPORT(void,wxPen_GetStipple)(void* self,wxBitmap* _ref)
 {
 #if defined(__WXGTK__)
-    *_ref = NULL;
+    *_ref = (GdkPixbuf*)NULL;
 #else
     *_ref = *(((wxPen*)self)->GetStipple());
 #endif
