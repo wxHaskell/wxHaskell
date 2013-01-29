@@ -147,6 +147,17 @@ EWXWEXPORT(void*,wxGridCellChoiceEditor_Ctor)(int count,void* choices,bool allow
 	return (void*)new wxGridCellChoiceEditor (count, items, allowOthers);
 }
 
+EWXWEXPORT(void*,wxGridCellNumberRenderer_Ctor)()
+{
+	return (void*)new wxGridCellNumberRenderer();
+}
+
+EWXWEXPORT(void*,wxGridCellAutoWrapStringRenderer_Ctor)()
+{
+	return (void*)new wxGridCellAutoWrapStringRenderer();
+}
+
+
 EWXWEXPORT(void*,wxGridCellAttr_Ctor)()
 {
 	return (void*)new wxGridCellAttr();
@@ -1164,6 +1175,12 @@ EWXWEXPORT(int,wxGrid_GetSelectedCols)(wxGrid* self,void* _arr)
 	return arr.GetCount();
 }
 	
+EWXWEXPORT(void,wxGrid_GetCellSize)(wxGrid* self,int r, int c, int* sr, int* sc){
+	self->GetCellSize(r,c,sr,sc);
+}
+EWXWEXPORT(void,wxGrid_SetCellSize)(wxGrid* self,int r, int c, int sr, int sc){
+	self->SetCellSize(r,c,sr,sc);
+}
 
 
 EWXWEXPORT(void*,ELJGridTable_Create)(void* self,void* _EifGetNumberRows,void* _EifGetNumberCols,void* _EifGetValue,void* _EifSetValue,void* _EifIsEmptyCell,void* _EifClear,void* _EifInsertRows,void* _EifAppendRows,void* _EifDeleteRows,void* _EifInsertCols,void* _EifAppendCols,void* _EifDeleteCols,void* _EifSetRowLabelValue,void* _EifSetColLabelValue,void* _EifGetRowLabelValue,void* _EifGetColLabelValue)

@@ -97,5 +97,15 @@ EWXWEXPORT(int,wxSplitterWindow_GetMinimumPaneSize)(void* self)
 {
 	return ((wxSplitterWindow*)self)->GetMinimumPaneSize();
 }
+
+EWXWEXPORT(double,wxSplitterWindow_GetSashGravity)(void* self)
+{
+	return ((wxSplitterWindow*)self)->GetSashGravity();
+}
+	
+EWXWEXPORT(void,wxSplitterWindow_SetSashGravity)(void* self, double gravity)
+{
+	return ((wxSplitterWindow*)self)->SetSashGravity(gravity);
+}
 	
 }

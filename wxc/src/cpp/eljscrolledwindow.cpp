@@ -18,6 +18,11 @@ EWXWEXPORT(void*,wxScrolledWindow_GetTargetWindow)(void* self)
 	return (void*)((wxScrolledWindow*)self)->GetTargetWindow();
 }
 	
+EWXWEXPORT(void,wxScrolledWindow_ShowScrollbars)(void* self,int showh,int showv)
+{
+	((wxScrolledWindow*)self)->ShowScrollbars((wxScrollbarVisibility)showh,(wxScrollbarVisibility)showv);
+}
+
 EWXWEXPORT(void,wxScrolledWindow_SetScrollbars)(void* self,int pixelsPerUnitX,int pixelsPerUnitY,int noUnitsX,int noUnitsY,int xPos,int yPos,bool noRefresh)
 {
 	((wxScrolledWindow*)self)->SetScrollbars(pixelsPerUnitX, pixelsPerUnitY, noUnitsX, noUnitsY, xPos, yPos, noRefresh);

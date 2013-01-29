@@ -30,6 +30,7 @@ EWXWEXPORT(size_t,wxImage_ConvertToByteString)(wxImage* self,int type,char* data
 	wxMemoryOutputStream out;
 	self->SaveFile(out, type);
 	size_t len = out.GetLength();
+	if( !data ) return len;
         return out.CopyTo(data, len);
 }
 
@@ -38,6 +39,7 @@ EWXWEXPORT(size_t,wxImage_ConvertToLazyByteString)(wxImage* self,int type,char* 
 	wxMemoryOutputStream out;
 	self->SaveFile(out, type);
 	size_t len = out.GetLength();
+	if( !data ) return len;
         return out.CopyTo(data, len);
 }
 

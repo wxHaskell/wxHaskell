@@ -2482,6 +2482,8 @@ void       wxGrid_GetSelectionBlockTopLeft(TSelf(wxGrid) _obj, TClassRef(wxGridC
 void       wxGrid_GetSelectionBlockBottomRight(TSelf(wxGrid) _obj, TClassRef(wxGridCellCoordsArray) _arr);
 TArrayLen  wxGrid_GetSelectedRows(TSelf(wxGrid) _obj, TArrayIntOutVoid _arr);
 TArrayLen  wxGrid_GetSelectedCols(TSelf(wxGrid) _obj, TArrayIntOutVoid _arr);
+void       wxGrid_GetCellSize(TSelf(wxGrid) _obj, int row, int col, TSizeOut(srow,scol));
+void       wxGrid_SetCellSize(TSelf(wxGrid) _obj, int row, int col, TSize(srow,scol));
 
 /* wxGridCellAttr */
 TClassDef(wxGridCellAttr)
@@ -2565,6 +2567,11 @@ TClass(wxGridCellNumberEditor)  wxGridCellNumberEditor_Ctor( int min, int max );
 
 /* wxGridCellNumberRenderer */
 TClassDefExtend(wxGridCellNumberRenderer,wxGridCellStringRenderer)
+TClass(wxGridCellNumberRenderer)  wxGridCellNumberRenderer_Ctor();
+
+/* wxGridCellAutoWrapStringRenderer */
+TClassDefExtend(wxGridCellAutoWrapStringRenderer,wxGridCellStringRenderer)
+TClass(wxGridCellAutoWrapStringRenderer)  wxGridCellAutoWrapStringRenderer_Ctor();
 
 /* wxGridCellRenderer */
 TClassDefExtend(wxGridCellRenderer,wxGridCellWorker)
@@ -4179,6 +4186,7 @@ void       wxScrolledWindow_Scroll( TSelf(wxScrolledWindow) _obj, TPoint(x_pos,y
 void       wxScrolledWindow_SetScale( TSelf(wxScrolledWindow) _obj, double xs, double ys );
 void       wxScrolledWindow_SetScrollPageSize( TSelf(wxScrolledWindow) _obj, int orient, int pageSize );
 void       wxScrolledWindow_SetScrollbars( TSelf(wxScrolledWindow) _obj, int pixelsPerUnitX, int pixelsPerUnitY, int noUnitsX, int noUnitsY, int xPos, int yPos, TBool noRefresh );
+void       wxScrolledWindow_ShowScrollbars( TSelf(wxScrolledWindow) _obj, int showh, int showv );
 void       wxScrolledWindow_SetTargetWindow( TSelf(wxScrolledWindow) _obj, TClass(wxWindow) target );
 void       wxScrolledWindow_ViewStart( TSelf(wxScrolledWindow) _obj, TPointOutVoid(_x,_y) );
 
@@ -4424,6 +4432,8 @@ void       wxSplitterWindow_SetSplitMode( TSelf(wxSplitterWindow) _obj, int mode
 TBool      wxSplitterWindow_SplitHorizontally( TSelf(wxSplitterWindow) _obj, TClass(wxWindow) window1, TClass(wxWindow) window2, int sashPosition );
 TBool      wxSplitterWindow_SplitVertically( TSelf(wxSplitterWindow) _obj, TClass(wxWindow) window1, TClass(wxWindow) window2, int sashPosition );
 TBool      wxSplitterWindow_Unsplit( TSelf(wxSplitterWindow) _obj, TClass(wxWindow) toRemove );
+double     wxSplitterWindow_GetSashGravity( TSelf(wxSplitterWindow) _obj );
+void       wxSplitterWindow_SetSashGravity( TSelf(wxSplitterWindow) _obj, double gravity );
 
 /* wxStaticBitmap */
 TClassDefExtend(wxStaticBitmap,wxControl)

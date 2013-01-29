@@ -742,7 +742,7 @@ withStringResult f
         then return ""
         else withCString (replicate (fromCInt len) ' ') $ \cstr ->
              do f cstr
-                peekCString cstr
+                peekCStringLen (cstr,fromCInt len)
 
 withWStringResult :: (Ptr CWchar -> IO CInt) -> IO String
 withWStringResult f
@@ -765,7 +765,7 @@ withByteStringResult f
         then return $ BC.pack ""
         else withCString (replicate (fromCInt len) ' ') $ \cstr ->
              do f cstr
-                B.packCString cstr
+                B.packCStringLen (cstr,fromCInt len)
 
 withLazyByteStringResult :: (Ptr CChar -> IO CInt) -> IO LB.ByteString
 withLazyByteStringResult f
