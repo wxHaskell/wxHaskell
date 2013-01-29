@@ -146,7 +146,7 @@ import Data.Dynamic
 
 import Data.Int
 import Data.Word
-import Debug.Trace (putTraceMsg)
+import Debug.Trace (traceIO)
 
 import Graphics.UI.WXCore.WxcObject
 import Graphics.UI.WXCore.WxcClassTypes
@@ -888,7 +888,7 @@ withCharResult :: (Num a, Integral a, Show a) => IO a -> IO Char
 withCharResult io
   = do x <- io
        if (x < 0)
-          then do putTraceMsg ("Recieved negative unicode: " ++ (show x))
+          then do traceIO ("Recieved negative unicode: " ++ (show x))
                   return '\n'
           else return (fromCWchar x)
 
@@ -899,10 +899,10 @@ http://sourceforge.net/mailarchive/message.php?msg_id=54647.129.16.31.149.111168
 and here
 http://www.mail-archive.com/wxhaskell-users@lists.sourceforge.net/msg00267.html
 
-Windows GUI-only programs have no stdin, stdout or stderr. So we use Debug.Trace.putTraceMsg
+Windows GUI-only programs have no stdin, stdout or stderr. So we use Debug.Trace.traceIO
 for reporting message.
 http://www.haskell.org/ghc/docs/6.8.2/html/users_guide/terminal-interaction.html
-http://www.haskell.org/ghc/docs/6.8.2/html/libraries/base/Debug-Trace.html#v%3AputTraceMsg
+http://www.haskell.org/ghc/docs/7.4.1/html/libraries/base-4.5.0.0/Debug-Trace.html#v:traceIO
 -}
 
 
