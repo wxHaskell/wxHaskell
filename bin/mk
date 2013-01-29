@@ -1,8 +1,8 @@
 #!/bin/sh
-
 # build using cabal-dev
 
-#cabal-dev install ./wx ./wxcore ./wxdirect
+# Note: ensure cabal-dev/bin is on your PATH to ensure use of the by cabal-dev compiled wxdirect
+PATH=$HOME/Installs/wxHaskell-atze/cabal-dev/bin:$PATH
+export PATH
+
 cabal-dev install  ./wxdirect ./wxc ./wxcore ./wx
-#cabal-dev clean  ./wxdirect ./wxc ./wxcore ./wx
-#cabal-dev install ./wxc

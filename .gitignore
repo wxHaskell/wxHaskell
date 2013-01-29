@@ -21,6 +21,9 @@ WxcClassesMZ.hs
 # Dist directory
 dist/
 
+# cabal-dev
+cabal-dev/
+
 # generated config files
 config/
 
