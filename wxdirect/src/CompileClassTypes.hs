@@ -14,10 +14,10 @@ module CompileClassTypes( compileClassTypes ) where
 
 import qualified Data.Map as Map
 
-import Data.Time( getCurrentTime)
-import Types
+-- import Data.Time( getCurrentTime)
+-- import Types
 import HaskellNames
-import Classes( isClassName, haskellClassDefs )
+import Classes( {-isClassName,-} haskellClassDefs )
 import DeriveTypes( ClassName )
 import IOExtra
 
@@ -25,8 +25,8 @@ import IOExtra
   Compile
 -----------------------------------------------------------------------------------------}
 compileClassTypes :: Bool -> String -> String -> FilePath -> [FilePath] -> IO ()
-compileClassTypes showIgnore moduleRoot moduleName outputFile inputFiles
-  = do time    <- getCurrentTime
+compileClassTypes _showIgnore moduleRoot moduleName outputFile inputFiles
+  = do -- time    <- getCurrentTime
        let (exportsClass,classDecls) = haskellClassDefs
            exportsClassClasses       = exportDefs exportsClass 
 
@@ -58,13 +58,13 @@ compileClassTypes showIgnore moduleRoot moduleName outputFile inputFiles
 exportDefs :: [(ClassName,[String])] -> [String]
 exportDefs classExports 
   = let classMap = Map.fromListWith (++) classExports         
-    in  concatMap exportDef $ zip [0..] (Map.toAscList classMap)
+    in  concatMap exportDef $ zip [(0 :: Int)..] (Map.toAscList classMap)
   where
     exportDef (n, (className,exports))
       = [heading 2 className] ++ (commaSep n) exports
 
     commaSep n xs
-      = zipWith (exportComma n) [0..] xs
+      = zipWith (exportComma n) [(0 :: Int)..] xs
 
     heading i name
       = exportSpaces ++ "-- " ++ replicate i '*' ++ " " ++ name

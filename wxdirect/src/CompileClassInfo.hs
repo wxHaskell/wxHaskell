@@ -13,9 +13,9 @@
 module CompileClassInfo( compileClassInfo ) where
 
 import Data.Char( toLower )
-import Data.List( sortBy, sort )
+import Data.List( sortBy {-, sort-} )
 
-import Types
+-- import Types
 import HaskellNames
 import Classes
 import IOExtra
@@ -25,12 +25,12 @@ import IOExtra
   Compile
 -----------------------------------------------------------------------------------------}
 compileClassInfo :: Bool -> String -> String -> String -> String -> FilePath -> IO ()
-compileClassInfo verbose moduleRoot moduleClassesName moduleClassTypesName moduleName outputFile
-  = do let classNames  = sortBy cmpName objectClassNames
-           (classExports,classDefs)      = unzip (map toHaskellClassType classNames) 
-           (downcExports,downcDefs)      = unzip (map toHaskellDowncast classNames)
+compileClassInfo _verbose moduleRoot moduleClassesName moduleClassTypesName moduleName outputFile
+  = do let classNames'  = sortBy cmpName objectClassNames
+           (classExports,classDefs) = unzip (map toHaskellClassType classNames') 
+           (downcExports,downcDefs) = unzip (map toHaskellDowncast classNames')
 
-           defCount = length classNames
+           defCount = length classNames'
 
            export   = concat  [ ["module " ++ moduleRoot ++ moduleName
                                 , "    ( -- * Class Info"
@@ -111,13 +111,20 @@ compileClassInfo verbose moduleRoot moduleClassesName moduleClassTypesName modul
        putStrLn ("generated " ++ show defCount ++ " class info definitions")
        putStrLn "ok."
 
+cmpName :: String -> String -> Ordering
 cmpName s1 s2
   = compare (map toLower (haskellTypeName s1)) (map toLower (haskellTypeName s2))
 
+{-
+cmpDef :: Def -> Def -> Ordering
 cmpDef def1 def2
   = compare (defName def1) (defName def2)
+-}
 
+exportComma :: String
 exportComma  = exportSpaces ++ ","
+
+exportSpaces :: String
 exportSpaces = "     "
 
 
@@ -128,12 +135,15 @@ toHaskellClassType :: String -> (String,String)
 toHaskellClassType className
   = (classTypeDeclName
     ,"{-# NOINLINE " ++ classTypeDeclName ++ " #-}\n" ++
-     classTypeDeclName ++ " :: ClassType (" ++ classTypeName ++ " ())\n" ++
+     classTypeDeclName ++ " :: ClassType (" ++ classTypeName' ++ " ())\n" ++
      classTypeDeclName ++ " = ClassType (unsafePerformIO (classInfoFindClass " ++ classTypeString ++ "))\n\n"
     )
   where
-    classTypeDeclName = haskellDeclName ("class" ++ classTypeName)
-    classTypeName     = haskellTypeName className
+    classTypeDeclName :: String
+    classTypeDeclName = haskellDeclName ("class" ++ classTypeName')
+    classTypeName'    :: String
+    classTypeName'    = haskellTypeName className
+    classTypeString   :: String
     classTypeString   = "\"" ++ className ++ "\""
 
 
@@ -143,9 +153,9 @@ toHaskellClassType className
 toHaskellDowncast :: String -> (String,String)
 toHaskellDowncast className
   = (downcastName
-    ,downcastName ++ " :: " ++ classTypeName ++ " a -> " ++ classTypeName ++ " ()\n" ++
+    ,downcastName ++ " :: " ++ classTypeName' ++ " a -> " ++ classTypeName' ++ " ()\n" ++
      downcastName ++ " obj = objectCast obj\n\n"
     )
   where
-    classTypeName     = haskellTypeName className
-    downcastName      = haskellDeclName ("downcast" ++ classTypeName)
+    classTypeName'    = haskellTypeName className
+    downcastName      = haskellDeclName ("downcast" ++ classTypeName')

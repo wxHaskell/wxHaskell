@@ -127,7 +127,7 @@ distinctSize (MultiSet m)
 -- | /O(n)/. The number of elements in the multi set.
 size :: MultiSet a -> Int
 size b
-  = foldOccur (\x n m -> n+m) 0 b
+  = foldOccur (\_x n m -> n+m) 0 b
 
 -- | /O(log n)/. Is the element in the multi set?
 member :: Ord a => a -> MultiSet a -> Bool
@@ -185,7 +185,7 @@ delete :: Ord a => a -> MultiSet a -> MultiSet a
 delete x (MultiSet m)
   = MultiSet (M.updateWithKey f x m)
   where
-    f x n  | n > 0     = Just (n-1)
+    f _ n  | n > 0     = Just (n-1)
            | otherwise = Nothing
 
 -- | /O(log n)/. Delete all occurrences of an element.
@@ -220,7 +220,7 @@ difference   :: Ord a => MultiSet a -> MultiSet a -> MultiSet a
 difference (MultiSet t1) (MultiSet t2)
   = MultiSet (M.differenceWithKey f t1 t2)
   where
-    f x n m  | n-m > 0   = Just (n-m)
+    f _ n m  | n-m > 0   = Just (n-m)
              | otherwise = Nothing
 
 -- | The union of a list of multisets.
@@ -234,14 +234,14 @@ unions multisets
 -- | /O(n)/. Filter all elements that satisfy some predicate.
 filter :: Ord a => (a -> Bool) -> MultiSet a -> MultiSet a
 filter p (MultiSet m)
-  = MultiSet (M.filterWithKey (\x n -> p x) m)
+  = MultiSet (M.filterWithKey (\x _ -> p x) m)
 
 -- | /O(n)/. Partition the multi set according to some predicate.
 partition :: Ord a => (a -> Bool) -> MultiSet a -> (MultiSet a,MultiSet a)
 partition p (MultiSet m)
   = (MultiSet l,MultiSet r)
   where
-    (l,r) = M.partitionWithKey (\x n -> p x) m
+    (l,r) = M.partitionWithKey (\x _ -> p x) m
 
 {--------------------------------------------------------------------
   Fold
@@ -251,8 +251,8 @@ fold :: (a -> b -> b) -> b -> MultiSet a -> b
 fold f z (MultiSet m)
   = M.foldrWithKey apply z m
   where
-    apply x n z  | n > 0     = apply x (n-1) (f x z)
-                 | otherwise = z
+    apply x n z'  | n > 0     = apply x (n-1) (f x z')
+                  | otherwise = z'
 
 -- | /O(n)/. Fold over all occurrences of an element at once.
 foldOccur :: (a -> Int -> b -> b) -> b -> MultiSet a -> b
@@ -349,12 +349,12 @@ toAscOccurList (MultiSet m)
 -- | /O(n*log n)/. Create a multi set from a list of element\/occurrence pairs.
 fromOccurList :: Ord a => [(a,Int)] -> MultiSet a
 fromOccurList xs
-  = MultiSet (M.fromListWith (+) (Prelude.filter (\(x,i) -> i > 0) xs))
+  = MultiSet (M.fromListWith (+) (Prelude.filter (\(_, i) -> i > 0) xs))
 
 -- | /O(n)/. Create a multi set from an ascending list of element\/occurrence pairs.
 fromAscOccurList :: Ord a => [(a,Int)] -> MultiSet a
 fromAscOccurList xs
-  = MultiSet (M.fromAscListWith (+) (Prelude.filter (\(x,i) -> i > 0) xs))
+  = MultiSet (M.fromAscListWith (+) (Prelude.filter (\(_, i) -> i > 0) xs))
 
 {--------------------------------------------------------------------
   Maps
@@ -385,7 +385,7 @@ instance Eq a => Eq (MultiSet a) where
   Show
 --------------------------------------------------------------------}
 instance Show a => Show (MultiSet a) where
-  showsPrec d b  = showSet (toAscList b)
+  showsPrec _d b  = showSet (toAscList b)
 
 showSet :: Show a => [a] -> ShowS
 showSet []
@@ -393,8 +393,8 @@ showSet []
 showSet (x:xs)
   = showChar '{' . shows x . showTail xs
   where
-    showTail []     = showChar '}'
-    showTail (x:xs) = showChar ',' . shows x . showTail xs
+    showTail []       = showChar '}'
+    showTail (x':xs') = showChar ',' . shows x' . showTail xs'
 
 
 {--------------------------------------------------------------------

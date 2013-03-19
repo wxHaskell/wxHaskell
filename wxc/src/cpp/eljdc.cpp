@@ -211,6 +211,13 @@ EWXWEXPORT(void,wxDC_SetClippingRegionFromRegion)(wxDC* self,wxRegion* region)
 # endif
 }
 	
+#if wxCHECK_VERSION(2,9,5)
+EWXWEXPORT(void,wxDC_SetDeviceClippingRegion)(wxDC* self,wxRegion* region)
+{
+	self->SetDeviceClippingRegion(*region);
+}
+#endif
+	
 EWXWEXPORT(void,wxDC_DestroyClippingRegion)(wxDC* self)
 {
 	self->DestroyClippingRegion();

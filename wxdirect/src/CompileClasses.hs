@@ -13,19 +13,19 @@
 -----------------------------------------------------------------------------------------
 module CompileClasses( compileClasses, haskellTypeArg, haskellTypePar ) where
 
-import qualified Data.Set as Set
+-- import qualified Data.Set as Set
 import qualified Data.Map as Map
-import qualified MultiSet
+-- import qualified MultiSet
 
 import Data.Time( getCurrentTime)
-import Data.Char( toUpper, isUpper, toLower ) --toLower, toUpper, isSpace, isLower, isUpper )
-import Data.List( isPrefixOf, sort, sortBy, intersperse, zipWith4, elemIndex )
+import Data.Char( {-toUpper, isUpper,-} toLower ) --toLower, toUpper, isSpace, isLower, isUpper )
+import Data.List( isPrefixOf, sort, sortBy, {-intersperse, zipWith4,-} elemIndex )
 
 import Types
 import HaskellNames
-import Classes( isClassName, haskellClassDefs, objectClassNames, ClassInfo(..), classInfo, classIsManaged )
+import Classes( {-isClassName,-} haskellClassDefs, objectClassNames, ClassInfo(..), classInfo, classIsManaged )
 import ParseC( parseC )
-import DeriveTypes( deriveTypes, classifyName, Name(..), Method(..), ClassName, MethodName, PropertyName )
+import DeriveTypes( deriveTypes, classifyName, Name(..), Method(..), ClassName{-, MethodName, PropertyName-} )
 import IOExtra
 
 {-----------------------------------------------------------------------------------------
@@ -77,14 +77,23 @@ compileClasses showIgnore moduleRoot moduleClassTypesName moduleName outputFile 
        putStrLn ("ok.")
 
 
-compileClassesFile showIgnore moduleRoot moduleClassTypesName moduleName outputFile inputFiles decls time
+compileClassesFile :: a
+                   -> String
+                   -> String
+                   -> String
+                   -> String
+                   -> [String]
+                   -> [Decl]
+                   -> b
+                   -> IO (Int, Int)
+compileClassesFile _showIgnore moduleRoot moduleClassTypesName moduleName outputFile inputFiles decls _time
   = do let foreignDecls = map foreignDecl decls
            haskellDecls = map haskellDecl decls
            typeDecls    = map haskellTypeDecl decls
 
            marshalDecls = concat (zipWith3 (\t h f -> [t,h,f,""]) typeDecls haskellDecls foreignDecls)
 
-           (exportsClass,classDecls)          = haskellClassDefs
+           (exportsClass, _classDecls) = haskellClassDefs
 
            (exportsStatic,exportsClassClasses,classCount) = exportDefs decls exportsClass []
 
@@ -118,14 +127,17 @@ compileClassesFile showIgnore moduleRoot moduleClassTypesName moduleName outputF
        return (methodCount,classCount)
 
 
-
+cmpDecl :: Decl -> Decl -> Ordering
 cmpDecl decl1 decl2
   = compare (haskellDeclName (declName decl1)) (haskellDeclName (declName decl2))
 
-
+exportComma :: String
 exportComma  = exportSpaces ++ ","
+
+exportSpaces :: String
 exportSpaces = "     "
 
+dropFirstComma :: String -> String
 dropFirstComma str = maybe str replaceNthWithSpace (elemIndex ',' str)
     where replaceNthWithSpace n = let (front,back) = splitAt n str in front ++ " " ++ tail back
 
@@ -156,21 +168,21 @@ exportDefs decls classExports shortExports
         ,length (filter (not . null) classExps)
         )
   where
-    addMethods methodMap shortMap className classDecls
-      | null decls = []
-      | otherwise  = [heading 2 className] ++ decls
+    addMethods methodMap shortMap className' _classDecls
+      | null decls'' = []
+      | otherwise    = [heading 2 className'] ++ decls''
       where
-        decls =
-          (case Map.lookup className shortMap of
+        decls'' =
+          (case Map.lookup className' shortMap of
              Nothing    -> []
-             Just decls -> [heading 3 "Short methods"] ++ (commaSep decls)) ++
-          (case Map.lookup className methodMap of
+             Just decls' -> [heading 3 "Short methods"] ++ (commaSep decls')) ++
+          (case Map.lookup className' methodMap of
              Nothing    -> []
-             Just decls -> (commaSep decls))
+             Just decls' -> (commaSep decls'))
 
 
-    todef (classname,decls)
-      = decls
+    todef (_classname,decls')
+      = decls'
 
     exportDef decl
       = (case classifyName (declName decl) of
@@ -190,6 +202,7 @@ exportDefs decls classExports shortExports
 {-----------------------------------------------------------------------------------------
    Short cut names  (unused)
 -----------------------------------------------------------------------------------------}
+{-
 validShortNames :: [Decl] -> Set.Set String
 validShortNames decls
   = Set.fromList
@@ -206,19 +219,22 @@ validShortNames decls
   where
     headToUpper []      = []
     headToUpper (c:cs)  = toUpper c : cs
-
+-}
+{-
 shortName :: Decl -> String
 shortName decl
   = snd (shortNameEx decl)
-
+-}
+{-
 shortNameEx :: Decl -> (String,String)
 shortNameEx decl
   = case classifyName (declName decl) of
       Method cname (Normal name) -> (cname,haskellDeclName name)
       Method cname (Set name)    -> (cname,haskellDeclName  ("Set"++name))
       Method cname (Get name)    -> (cname,haskellDeclName  ("Get"++name))
-      other                      -> ("","")
-
+      _other                     -> ("","")
+-}
+{-
 shortDecl :: Set.Set String -> Decl -> [((ClassName,[String]), [String])]
 shortDecl validShorts decl    | Set.member sname validShorts
   = [( (cname,[sname])
@@ -230,8 +246,9 @@ shortDecl validShorts decl    | Set.member sname validShorts
   where
     (cname,sname) = shortNameEx decl
 
-shortDecl validShorts decl
+shortDecl _validShorts _decl
   = []
+-}
 
 {-----------------------------------------------------------------------------------------
    Compile "xxx_Delete" methods to "objectDelete" to accomodate managed objects.
@@ -259,7 +276,7 @@ haskellThisArgs decl
   = case classifyName (declName decl) of
       Method name _  | not (null args) && (argType (head args) == Object name)
                      -> [(True,head args)] ++ [(False,arg) | arg <- tail args]
-      other          -> [(False,arg) | arg <- args]
+      _other         -> [(False,arg) | arg <- args]
   where
     args = declArgs decl
 
@@ -281,29 +298,37 @@ haskellDecl decl | isDeleteMethod decl
 
 
 haskellDecl decl
-  = methodName ++ " " ++ haskellArgs (haskellSwapThis decl) ++ nlStart
+  = methodName' ++ " " ++ haskellArgs (haskellSwapThis decl) ++ nlStart
     ++ haskellToCResult decl (declRet decl) (
-           haskellToCArgsIO methodName (haskellThisArgs decl)
+           haskellToCArgsIO methodName' (haskellThisArgs decl)
         ++ foreignName (declName decl) ++ " " ++ haskellToCArgs decl (declArgs decl)
        )
   where
-    methodName = haskellDeclName (declName decl)
+    methodName' = haskellDeclName (declName decl)
 
+nl :: String
 nl
   = "\n    "
+  
+nlStart :: String
 nlStart
   = "\n  = "
+  
+pparens :: String -> String
 pparens txt
   = "(" ++ txt ++ ")"
 
+
+haskellArgs :: [Arg] -> String
 haskellArgs args
   = concatMap (\arg -> haskellName (argName arg) ++ " ") args
 
 
+haskellToCResult :: Decl -> Type -> String -> String
 haskellToCResult decl tp call
   = unsafeIO $
     case tp of
-      Fun f  -> traceWarning "function as result" decl $ call
+      Fun _   -> traceWarning "function as result" decl $ call
       EventId -> "withIntResult $" ++ nl ++ call
       Id    -> "withIntResult $" ++ nl ++ call
       Int _ -> "withIntResult $" ++ nl ++ call
@@ -330,21 +355,24 @@ haskellToCResult decl tp call
       ArrayInt _    -> "withArrayIntResult $ \\arr -> " ++ nl ++ call ++ " arr" -- always last
       ArrayIntPtr _ -> "withArrayIntPtrResult $ \\arr -> " ++ nl ++ call ++ " arr" -- always last
       ArrayString _ -> "withArrayWStringResult $ \\arr -> " ++ nl ++ call ++ " arr" -- always last
-      ArrayObject name _ -> "withArrayObjectResult $ \\arr -> " ++ nl ++ call ++ " arr" -- always last
-      other -> call
+      ArrayObject _ _ -> "withArrayObjectResult $ \\arr -> " ++ nl ++ call ++ " arr" -- always last
+      _other          -> call
   where
     unsafeIO body
       = case tp of
           EventId  -> "unsafePerformIO $" ++ nl ++ body
           Id       -> "unsafePerformIO $" ++ nl ++ body
-          other    | isPrefixOf "Null_" (declName decl)  -> "unsafePerformIO $" ++ nl ++ body
+          _other   | isPrefixOf "Null_" (declName decl)  -> "unsafePerformIO $" ++ nl ++ body
                    | otherwise -> body
 
 
-haskellToCArgsIO methodName args
-  = concatMap (\(isSelf,arg) -> haskellToCArgIO methodName isSelf arg) args
+haskellToCArgsIO :: String -> [(Bool, Arg)] -> String
+haskellToCArgsIO methodName' args
+  = concatMap (\(isSelf,arg) -> haskellToCArgIO methodName' isSelf arg) args
 
-haskellToCArgIO methodName isSelf arg
+
+haskellToCArgIO :: String -> Bool -> Arg -> String
+haskellToCArgIO methodName' isSelf arg
   = case argType arg of
       String _    -> "withCWString " ++ haskellName (argName arg)
                       ++ " $ \\" ++ haskellCStringName (argName arg) ++ " -> " ++ nl
@@ -358,7 +386,7 @@ haskellToCArgIO methodName isSelf arg
                   -> "withArrayWString " ++ haskellName (argName arg)
                      ++ " $ \\" ++ haskellArrayLenName (argName arg) ++ " " ++ haskellArrayName (argName arg)
                      ++ " -> " ++ nl
-      ArrayObject tp _
+      ArrayObject _tp _
                   -> "withArrayObject " ++ haskellName (argName arg)
                      ++ " $ \\" ++ haskellArrayLenName (argName arg) ++ " " ++ haskellArrayName (argName arg)
                      ++ " -> " ++ nl
@@ -370,30 +398,34 @@ haskellToCArgIO methodName isSelf arg
                   -> "withArrayIntPtr " ++ haskellName (argName arg)
                      ++ " $ \\" ++ haskellArrayLenName (argName arg) ++ " " ++ haskellArrayName (argName arg)
                      ++ " -> " ++ nl
-      Object obj  -> (if isSelf then withSelf (classInfo obj) ("\"" ++ methodName ++ "\"") 
+      Object obj  -> (if isSelf then withSelf (classInfo obj) ("\"" ++ methodName' ++ "\"") 
                                 else withPtr (classInfo obj)) ++ " "
                      ++ haskellName (argName arg)
                      ++ " $ \\" ++ haskellCObjectName (argName arg) ++ " -> " ++ nl
-      other       -> ""
+      _other      -> ""
 
+
+haskellToCArgs :: Decl -> [Arg] -> String
 haskellToCArgs decl args
   = concatMap (\arg -> haskellToCArg decl arg ++ "  ") args
 
+
+haskellToCArg :: Decl -> Arg -> String
 haskellToCArg decl arg
   = case argType arg of
-      RefObject name -> traceError "reference object as argument" decl $ name
+      RefObject _    -> traceError "reference object as argument" decl $ name
       EventId        -> traceError "event id as argument" decl $ name
       Id             -> traceError "id as argument" decl $ name
       Int _ -> pparens ("toCInt " ++ name)
       IntPtr-> pparens ("toCIntPtr " ++ name)
       Char  -> pparens ("toCWchar " ++ name)
       Bool  -> pparens ("toCBool " ++ name)
-      Fun f -> pparens ("toCFunPtr " ++ name)
+      Fun _ -> pparens ("toCFunPtr " ++ name)
 
       String _   -> haskellCStringName (argName arg)
       ByteString Lazy -> haskellByteStringName name ++ " (fromIntegral $ LB.length " ++ haskellName name ++ ")"
       ByteString _ -> haskellByteStringName name ++ " " ++ haskellByteStringLenName name
-      Object obj -> haskellCObjectName (argName arg)
+      Object     _ -> haskellCObjectName (argName arg)
       Point CDouble -> pparens ("toCDoublePointX " ++ name) ++ " " ++ pparens( "toCDoublePointY " ++ name)
       Point _  -> pparens ("toCIntPointX " ++ name) ++ " " ++ pparens( "toCIntPointY " ++ name)
       Vector CDouble -> pparens ("toCDoubleVectorX " ++ name) ++ " " ++ pparens( "toCDoubleVectorY " ++ name)
@@ -409,30 +441,35 @@ haskellToCArg decl arg
                     ++ pparens ("colorBlue " ++ name) 
 
       ArrayString _     -> haskellArrayLenName name ++ " " ++ haskellArrayName name
-      ArrayObject tp _  -> haskellArrayLenName name ++ " " ++ haskellArrayName name
+      ArrayObject _ _   -> haskellArrayLenName name ++ " " ++ haskellArrayName name
       ArrayInt _        -> haskellArrayLenName name ++ " " ++ haskellArrayName name
       ArrayIntPtr _     -> haskellArrayLenName name ++ " " ++ haskellArrayName name
 
-      other -> name
+      _other -> name
   where
     name = haskellName (argName arg)
 
-
+haskellCStringName :: String -> String
 haskellCStringName name
   = "cstr_" ++ haskellName name
 
+haskellByteStringName :: String -> String
 haskellByteStringName name
   = "bs_" ++ haskellName name
 
+haskellByteStringLenName :: String -> String
 haskellByteStringLenName name
   = "bslen_" ++ haskellName name
 
+haskellArrayName :: String -> String
 haskellArrayName name
   = "carr_" ++ haskellName name
 
+haskellArrayLenName :: String -> String
 haskellArrayLenName name
   = "carrlen_" ++ haskellName name
 
+haskellCObjectName :: String -> String
 haskellCObjectName name
   = "cobj_" ++ haskellName name
 
@@ -464,10 +501,12 @@ haskellTypeSignature name decl
     name ++ " :: "  ++ haskellTypeArgs decl (haskellSwapThis decl)
 
 
+haskellTypeArgs :: Decl -> [Arg] -> String
 haskellTypeArgs decl args
   = concatMap (\(i,arg) -> haskellTypeArg decl i arg ++ " -> ") (zip [1..] args)
 
 
+haskellRetType :: Decl -> [Char] -> String
 haskellRetType decl typedecl
   = case declRet decl of
       EventId   -> "{-# NOINLINE " ++ haskellDeclName (declName decl) ++ " #-}\n" ++ typedecl ++ " EventId"
@@ -480,15 +519,20 @@ haskellRetType decl typedecl
 
 
 -- type def. for clarity
-haskellTypeArg decl i (Arg ["id"] (Int _))     = "Id"
-haskellTypeArg decl i (Arg ["_id"] (Int _))    = "Id"
-haskellTypeArg decl i (Arg ["_stl"] (Int _))   = "Style"
-haskellTypeArg decl i arg
+haskellTypeArg :: a -> Int -> Arg -> String
+haskellTypeArg _decl _i (Arg ["id"] (Int _))     = "Id"
+haskellTypeArg _decl _i (Arg ["_id"] (Int _))    = "Id"
+haskellTypeArg _decl _i (Arg ["_stl"] (Int _))   = "Style"
+haskellTypeArg _decl i  arg
   = haskellType i (argType arg)
 
+
+haskellTypePar :: Int -> Type -> String
 haskellTypePar i tp
   = parenType (haskellType i) tp
 
+
+haskellType :: Int -> Type -> String
 haskellType i tp
   = case tp of
       Bool   -> "Bool"
@@ -524,7 +568,7 @@ haskellType i tp
       Fun f  -> "FunPtr " ++ pparens f
       RefObject name  -> classTypeName (classInfo name) (typeVar i) -- haskellTypeName name ++ typeVar i
       Object name     -> classTypeName (classInfo name) (typeVar i) -- haskellTypeName name ++ typeVar i
-      other           -> error ("Non exaustive pattern: CompileClasses.haskellType: " ++ show tp)
+      _other          -> error ("Non exaustive pattern: CompileClasses.haskellType: " ++ show tp)
 
 {-----------------------------------------------------------------------------------------
    Translate a declaration to a foreign import declaration
@@ -538,6 +582,8 @@ foreignDecl decl
       ++ foreignName (declName decl) ++ " :: "
       ++ foreignArgs decl (declArgs decl) ++ foreignResultType (declRet decl)
 
+
+foreignName :: String -> String
 foreignName name
   | isPrefixOf "wx" name  && elem '_' name  = name
   | otherwise                               = "wx_" ++ name
@@ -546,12 +592,16 @@ foreignArgs :: Decl -> [Arg] -> String
 foreignArgs decl args
   = concatMap (\(i,arg) -> foreignArg decl i arg ++ " -> ") (zip [1..] args)
 
+
+foreignArg :: Decl -> Int -> Arg -> String
 foreignArg decl i arg
   = case argType arg of
       RefObject name -> traceError "RefObject in argument" decl $ foreignType i (RefObject name)
       Void           -> traceError "void type in argument" decl $ foreignType i Void
       tp             -> foreignType i tp
 
+
+foreignResultType :: Type -> String
 foreignResultType tp
   = case tp of
       ArrayInt _    -> "Ptr CInt -> IO CInt"
@@ -568,14 +618,18 @@ foreignResultType tp
       Size _   -> "Ptr CInt -> Ptr CInt -> IO ()"
       Rect CDouble -> "Ptr CDouble -> Ptr CDouble -> Ptr CDouble -> Ptr CDouble -> IO ()"
       Rect _    -> "Ptr CInt -> Ptr CInt -> Ptr CInt -> Ptr CInt -> IO ()"
-      RefObject name        -> foreignType 0 tp ++ " -> IO ()"
+      RefObject _name -> foreignType 0 tp ++ " -> IO ()"
       EventId -> "IO CInt"
-      Id    -> "IO CInt"
-      other   -> "IO " ++ foreignTypePar 0 tp
+      Id      -> "IO CInt"
+      _other  -> "IO " ++ foreignTypePar 0 tp
 
+
+foreignTypePar :: Int -> Type -> String
 foreignTypePar i tp
   = parenType (foreignType i) tp
 
+
+foreignType :: Int -> Type -> [Char]
 foreignType i tp
   = case tp of
       Bool   -> "CBool"
@@ -611,17 +665,23 @@ foreignType i tp
       ArrayIntPtr _      -> "CInt -> Ptr CIntPtr"
       RefObject name -> "Ptr (T" ++ haskellTypeName name ++ typeVar i ++ ")"
       Object name    -> "Ptr (T" ++ haskellTypeName name ++ typeVar i ++ ")"
+      _              -> error $ "CompileClasses.foreignType: unexpected type: " ++ show tp
 
+
+parenType :: (Type -> String) -> Type -> String
 parenType f tp
   = parenFun tp (f tp)
   where
-    parenFun tp
-      = case tp of
+    parenFun tp'
+      = case tp' of
           Ptr _       -> pparens
           Object _    -> pparens
           RefObject _ -> pparens
-          other       -> id
+          _other      -> id
 
 
+typeVar :: Int -> String
 typeVar i = " " ++ typeVars !! i
+
+typeVars :: [String]
 typeVars  = "()" : [[toEnum (fromEnum 'a' + x)] | x <- [0..]]

@@ -19,7 +19,6 @@ module HaskellNames( haskellDeclName
 
 import qualified Data.Set as Set
 import Data.Char( toLower, toUpper, isLower, isUpper )
-import Data.Time( getCurrentTime)
 import Data.List( isPrefixOf )
 
 {-----------------------------------------------------------------------------------------
@@ -81,6 +80,7 @@ reservedTypeNames
 {-----------------------------------------------------------------------------------------
 
 -----------------------------------------------------------------------------------------}
+haskellDeclName :: String -> String
 haskellDeclName name
   | isPrefixOf "wxMDI" name     = haskellName ("mdi" ++ drop 5 name)
   | isPrefixOf "wxDC_" name     = haskellName ("dc" ++ drop 5 name)
@@ -95,9 +95,11 @@ haskellDeclName name
   | otherwise                   = haskellName name
 
 
+haskellArgName :: String -> String
 haskellArgName name
   = haskellName (dropWhile (=='_') name)
 
+haskellName :: String -> String
 haskellName name
   | Set.member suggested reservedVarNames  = "wx" ++ suggested
   | otherwise                              = suggested
@@ -107,6 +109,7 @@ haskellName name
           (c:cs)  -> toLower c : filter (/='_') cs
           []      -> "wx"
 
+haskellUnderscoreName :: String -> String
 haskellUnderscoreName name
   | Set.member suggested reservedVarNames  = "wx" ++ suggested
   | otherwise                              = suggested
@@ -118,6 +121,7 @@ haskellUnderscoreName name
           []           -> "wx"
 
 
+haskellTypeName :: String -> String
 haskellTypeName name
   | isPrefixOf "ELJ" name                   = haskellTypeName ("WXC" ++ drop 3 name)
   | Set.member suggested reservedTypeNames  = "Wx" ++ suggested
@@ -128,25 +132,28 @@ haskellTypeName name
           'W':'X':'C':cs -> "WXC" ++ cs
           'w':'x':'c':cs -> "WXC" ++ cs
           'w':'x':cs  -> firstUpper cs
-          other       -> firstUpper name
+          _           -> firstUpper name
 
-    firstUpper name
-      = case name of
+    firstUpper name'
+      = case name' of
           c:cs  | isLower c       -> toUpper c : cs
-                | not (isUpper c) -> "Wx" ++ name
-                | otherwise       -> name
+                | not (isUpper c) -> "Wx" ++ name'
+                | otherwise       -> name'
           []    -> "Wx"
 
+haskellUnBuiltinTypeName :: String -> String
 haskellUnBuiltinTypeName name
   | isBuiltin name  = haskellTypeName name ++ "Object"
   | otherwise       = haskellTypeName name
 
+isBuiltin :: String -> Bool
 isBuiltin name
   = Set.member name builtinObjects
 
 {-----------------------------------------------------------------------------------------
  Haddock prologue
 -----------------------------------------------------------------------------------------}
+getPrologue :: String -> String -> String -> [String] -> [String]
 getPrologue moduleName content contains inputFiles
   = [line
     ,"{-|\tModule      :  " ++ moduleName

@@ -12,8 +12,6 @@ module IOExtra( writeFileLazy ) where
 
 import Control.Exception
 import Control.Monad
-import System.Directory
-import System.Environment
 import System.IO.Error
 import qualified System.IO.Strict as Strictly
 

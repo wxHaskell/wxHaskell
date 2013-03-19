@@ -22,13 +22,9 @@ module Classes( isClassName, isBuiltin, haskellClassDefs
               , managedClasses
               ) where
 
-import System.Environment ( getEnv )
-import Control.Exception ( catch, SomeException(..) )
-import Data.Char( isUpper )
-import Data.List( sort, sortBy )
 import qualified Data.Set as Set
 import qualified Data.Map as Map
-import Prelude hiding ( catch )
+import Text.Parsec.Prim hiding ( try )
 import HaskellNames( haskellTypeName, isBuiltin )
 import Types
 
@@ -60,24 +56,28 @@ setWxcDir dir
 {-----------------------------------------------------------------------------------------
 
 -----------------------------------------------------------------------------------------}
+{-
 ignoreClasses :: Set.Set String
 ignoreClasses
   = Set.fromList ["wxFile", "wxDir", "wxString", "wxManagedPtr"]
+-}
 
 classes :: [Class]
 classes
   = unsafePerformIO $
     do 
        -- urk, ugly hack.
-       wxcdir <- getWxcDir
-       cs <- parseClassDefs (wxcdir ++ "/include/wxc.h")
+       wxcdir' <- getWxcDir
+       cs <- parseClassDefs (wxcdir' ++ "/include/wxc.h")
        return cs
 
 
+mergeClasses :: [Class] -> [Class] -> [Class]
 mergeClasses xs ys
   = foldr (\c cs -> mergeClass c cs) xs ys
 
 
+mergeClass :: Class -> [Class] -> [Class]
 mergeClass cls []   = [cls]
 mergeClass cls1@(Class name1 subs1)  (cls2@(Class name2 subs2) : cs)
   | name1 == name2  = Class name2 (mergeClasses subs1 subs2) : cs
@@ -99,8 +99,8 @@ data ClassInfo = ClassInfo{ classWxName   :: String
 classIsManaged :: String -> Bool
 classIsManaged name
   = case findManaged name of
-      Just info -> True
-      Nothing   -> False
+      Just _  -> True
+      Nothing -> False
 
 classInfo :: String -> ClassInfo
 classInfo name
@@ -194,15 +194,21 @@ data Class
   deriving Eq
 
 instance Show Class where
-  showsPrec d c
+  showsPrec _ c
     = showString (showClass 0 c)
 
+
+{-
+showClasses :: [Class] -> String
 showClasses cs
   = unlines (map (showClass 0) cs)
+-}
 
+showClass :: Int -> Class -> [Char]
 showClass indent (Class name subs)
   = (replicate indent '\t' ++ name ++ concatMap ("\n"++) (map (showClass (indent+1)) subs))
 
+isClassName :: String -> Bool
 isClassName s
   = Set.member s classNames
 
@@ -210,12 +216,12 @@ objectClassNames :: [String]
 objectClassNames
   = case filter isObject classes of
       [classObject] -> flatten classObject
-      other         -> []
+      _             -> []
   where
     flatten (Class name derived)
       = name : concatMap flatten derived
 
-    isObject (Class name derived)
+    isObject (Class name _derived)
       = (name == "wxObject")
 
 
@@ -234,6 +240,7 @@ classExtends
       = Map.insert name parent (Map.unions (map (flatten name) derived))
 
 
+{-
 sortClasses :: [Class] -> [Class]
 sortClasses cs
   = map sortExtends (sortBy cmp cs)
@@ -242,13 +249,14 @@ sortClasses cs
 
     sortExtends (Class name extends)
       = Class name (sortClasses extends)
-
+-}
 
 haskellClassDefs :: ([(String,[String])],[String])     -- exported, definitions
 haskellClassDefs
   = unzip (concatMap (haskellClass []) classes)
 
 
+haskellClass :: [[Char]] -> Class -> [(([Char], [[Char]]), [Char])]
 haskellClass parents (Class name derived)
 --  | isBuiltin name = []   -- handled as a basic type
 --  | otherwise
@@ -270,12 +278,13 @@ haskellClass parents (Class name derived)
     className s   = "C" ++ haskellTypeName s
     inheritName s = "T" ++ haskellTypeName s
 
+{-
     explicitInheritance
       = foldl extend (className tname ++ " a") parents
       where
         extend child parent
           = "C"++parent ++ " " ++ pparens child
-
+-}
     inheritanceType
       = (if null parents then id else (\tp -> inheritName (head parents) ++ " " ++ pparens tp))
          (className tname ++ " a")
@@ -285,6 +294,7 @@ haskellClass parents (Class name derived)
         ++ pparens (className tname ++ " a")
 
 
+pparens :: [Char] -> [Char]
 pparens txt
   = "(" ++ txt ++ ")"
 
@@ -295,6 +305,7 @@ pparens txt
    with subclassing expressed by putting tabs in front of the class.
    see: http://www.wxwindows.org/classhierarchy.txt
 -----------------------------------------------------------------------------------------}
+{-
 parseClassHierarchy :: FilePath -> IO [Class]
 parseClassHierarchy fname
   = do result <- parseFromFile parseClasses (if null fname then "classhierarchy.txt" else fname)
@@ -321,51 +332,62 @@ pclasses indent
 
 pclass :: Int -> Parser [Class]
 pclass indent
-  = do try (count indent pindent)
+  = do _    <- try (count indent pindent)
        name <- pclassName
-       whiteSpace
+       _    <- whiteSpace
        mkClass
-            <- (do char '\n'
+            <- (do _ <- char '\n'
                    return (\subs -> filterClass (Class name subs))
                 <|>
                 do name2 <- try $
-                             do char '='
-                                whiteSpace
+                             do _     <- char '='
+                                _     <- whiteSpace
                                 name2 <- pclassName
-                                whiteSpace
-                                char '\n'
+                                _     <- whiteSpace
+                                _     <- char '\n'
                                 return name2
                    return (\subs -> filterClass (Class name2 subs))
                 <|>
-                do skipToEndOfLine
-                   return (\subs -> []))
+                do _ <- skipToEndOfLine
+                   return (\_subs -> []))
        subs <- pclasses (indent+1)
        return (mkClass subs)
   <|>
-    do char '\n'
+    do _ <- char '\n'
        return []
   <?> "class"
+-}
 
-
+{-
 filterClass :: Class -> [Class]
 filterClass (Class name subs)
   | not (Set.member name ignoreClasses) = [Class name subs]
 filterClass cls
   = []
+-}
 
-
+{-
+pindent :: Parser ()
 pindent
-  = do{ char '\t'; return ()} <|> do{ count 8 space; return () }
+  = (char '\t'     >> return ()) <|> 
+    (count 8 space >> return ())
   <?> ""
+-}
 
+{-
+pclassName :: Parser [Char]
 pclassName
   = many1 alphaNum
   <?> "class name"
-
+-}
+{-
+skipToEndOfLine :: Parser Char
 skipToEndOfLine
-  = do many (noneOf "\n")
+  = do _ <- many (noneOf "\n")
        char '\n'
+-}
 
+whiteSpace :: Parser [Char]
 whiteSpace
   = many (oneOf " \t")
 
@@ -377,13 +399,13 @@ whiteSpace
 parseClassDefs :: FilePath -> IO [Class]
 parseClassDefs fname
   = do putStrLn "reading class definitions:"
-       lines  <- readHeaderFile fname
-       let defs    = filter (not . null . fst) (map parseClassDef lines)
+       contents <- readHeaderFile fname
+       let defs    = filter (not . null . fst) (map parseClassDef contents)
            extends = Map.fromList defs
            extend name
                    = complete (Class name [])
                    where
-                     complete cls@(Class cname ext)
+                     complete cls@(Class cname _ext)
                        = case Map.lookup cname extends of
                            Just ""     -> cls
                            Just parent -> complete (Class parent [cls])
@@ -395,37 +417,43 @@ parseClassDefs fname
 parseClassDef :: String -> (String,String)
 parseClassDef line
   = case parse pdef "" line of
-      Left err  -> ("","")
+      Left _err -> ("","")
       Right r   -> r
 
 pdef :: Parser (String,String)
 pdef
-  = do reserved "TClassDefExtend"
-       psymbol "("
-       tp <- identifier
-       psymbol ","
+  = do _   <- reserved "TClassDefExtend"
+       _   <- psymbol "("
+       tp  <- identifier
+       _   <- psymbol ","
        ext <- identifier
-       psymbol ")"
+       _   <- psymbol ")"
        return (tp,ext)
   <|>
-    do reserved "TClassDef"
+    do _  <- reserved "TClassDef"
        tp <- parens identifier
        return (tp,"")
 
-parens p
-  = do{ psymbol "("; x <- p; psymbol ")"; return x }
 
+parens :: Parser b -> Parser b
+parens p
+  = do { _ <- psymbol "("; x <- p; _ <- psymbol ")"; return x }
+
+psymbol :: String -> Parser String
 psymbol s
   = lexeme (string s)
 
+reserved :: String -> Parser String
 reserved s
   = lexeme (try (string s))
 
+identifier :: Parser String
 identifier
   = lexeme (many1 alphaNum)
 
+lexeme :: Parser b -> Parser b
 lexeme p
   = do{ x <- p
-      ; whiteSpace
+      ; _ <- whiteSpace
       ; return x
       }

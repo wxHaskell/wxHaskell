@@ -22,27 +22,34 @@ import System.IO.Unsafe ( unsafePerformIO )
 {-----------------------------------------------------------------------------------------
   Tracing
 -----------------------------------------------------------------------------------------}
+trace :: String -> t -> t
 trace s x
   = seq (unsafePerformIO (putStrLn s)) x
 
+traceIgnore :: [Char] -> Decl -> t -> t
 traceIgnore msg decl x
   = trace ("ignore: " ++ fill 12 msg ++ ": " ++ declName decl) x
   where
-    fill n s  | length s >= 12  = s
-              | otherwise       = s ++ replicate (12 - length s) ' '
+    fill :: Int -> String -> String
+    fill n s  | length s >= n  = s
+              | otherwise      = s ++ replicate (n - length s) ' '
 
+traceWarning :: [Char] -> Decl -> t -> t
 traceWarning msg decl x
   = trace ("****************************************************\n" ++
            "warning : " ++ msg ++ ": " ++ declName decl) x
 
+traceError :: [Char] -> Decl -> t -> t
 traceError msg decl x
   = trace ("****************************************************\n" ++
            "error : " ++ msg ++ ": " ++ declName decl) x
 
 
+errorMsg :: [Char] -> t
 errorMsg str
   = error ("error: " ++ str)
 
+errorMsgDecl :: Decl -> [Char] -> t
 errorMsgDecl decl str
   = errorMsg (str ++ " in " ++ declName decl ++ ": " ++ show decl)
 

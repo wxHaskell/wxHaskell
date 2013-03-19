@@ -20,13 +20,14 @@ import Text.ParserCombinators.Parsec.Language
 
 import Types
 
+
 {-----------------------------------------------------------------------------------------
    Parse C
 -----------------------------------------------------------------------------------------}
 parseC :: FilePath -> IO [Decl]
 parseC fname
-  = do lines  <- readHeaderFile fname
-       declss <- mapM (parseDecl fname) (pairComments lines)
+  = do contents  <- readHeaderFile fname
+       declss <- mapM (parseDecl fname) (pairComments  contents)
        -- putStrLn ("ok.")
        return (concat declss)
 
@@ -35,7 +36,10 @@ readHeaderFile :: FilePath -> IO [String]
 readHeaderFile fname
   = do putStrLn ("parsing: " ++ fname)
        input <- readFile fname
-       lls   <- mapM readIncludeFile (flattenComments (lines input))
+       -- Remove comment lines (starting with "//")
+       let filteredLines =
+             filter (not . ("//" `isPrefixOf`) . dropWhile isSpace) $ lines input
+       lls   <- mapM readIncludeFile (flattenComments filteredLines)
        return (concat lls)
   where
     pathName
@@ -52,9 +56,9 @@ readHeaderFile fname
                         
 -- flaky, but suitable
 flattenComments :: [String] -> [String]
-flattenComments lines
-  = case lines of
-      (('/':'*':xs):xss) -> let (incomment,comment:rest) = span (not . endsComment) lines
+flattenComments inputLines
+  = case inputLines of
+      (('/':'*':_):_) -> let (incomment,comment:rest) = span (not . endsComment) inputLines
                          in (concat (incomment ++ [comment]) : flattenComments rest)
       xs : xss        -> xs : flattenComments xss
       []              -> []
@@ -63,8 +67,8 @@ flattenComments lines
                      
 
 pairComments :: [String] -> [(String,String)]
-pairComments lines
-  = case lines of
+pairComments inputLines
+  = case inputLines of
       ('/':'*':'*':xs) : ys : xss  | not (classDef ys) -> (reverse (drop 2 (reverse xs)),ys) : pairComments xss
       xs : xss                     | not (classDef xs) -> ("",xs) : pairComments xss
                                    | otherwise         -> pairComments xss
@@ -96,12 +100,12 @@ pdecl
 pfundecl :: Parser Decl
 pfundecl
   = do optional (reserved "EXPORT")
-       declRet <- ptype
+       declRet' <- ptype
        optional (reserved "_stdcall" <|> reserved "__cdecl")
-       declName <- identifier <?> "function name"
-       declArgs <- pargs
-       semi
-       return (Decl declName declRet declArgs "")
+       declName' <- identifier <?> "function name"
+       declArgs' <- pargs
+       _         <- semi
+       return (Decl declName' declRet' declArgs' "")
   <?> "function declaration"
 
 pargs :: Parser [Arg]
@@ -112,16 +116,16 @@ pargs
 parg :: Parser Arg
 parg
   =   pargTypes
-  <|> do argType <- ptype
-         argName <- identifier
-         return (Arg [argName] argType)
+  <|> do argType' <- ptype
+         argName' <- identifier
+         return (Arg [argName'] argType')
   <?> "argument"
 
 ptype :: Parser Type
 ptype
   = do tp    <- patomtype
        stars <- many (symbol "*")
-       return (foldr (\_ tp -> Ptr tp) tp stars)
+       return (foldr (\_ tp' -> Ptr tp') tp stars)
   <?> "type"
 
 patomtype :: Parser Type
@@ -191,38 +195,42 @@ pargTypes
        return (Arg argnames tp)
   <|>
     do reserved "TArrayObject"
-       parens  (do n <- identifier
-                   comma
+       parens  (do n  <- identifier
+                   _  <- comma
                    tp <- identifier
-                   comma
-                   p <- identifier
+                   _  <- comma
+                   p  <- identifier
                    return (Arg [n,p] (ArrayObject tp CVoid)))
 
+pargs2 :: Parser [String]
 pargs2
   = do a1 <- identifier
-       comma
+       _  <- comma
        a2 <- identifier
        return [a1,a2]
 
+pargs3 :: Parser [String]
 pargs3
   = do a1 <- identifier
-       comma
+       _  <- comma
        a2 <- identifier
-       comma
+       _  <- comma
        a3 <- identifier
        return [a1,a2,a3]
 
+pargs4 :: Parser [String]
 pargs4
   = do a1 <- identifier
-       comma
+       _  <- comma
        a2 <- identifier
-       comma
+       _  <- comma
        a3 <- identifier
-       comma
+       _  <- comma
        a4 <- identifier
        return [a1,a2,a3,a4]
 
 
+pargType2 :: Parser Type
 pargType2
   =   do reserved "TPoint";  return (Point CInt)
   <|> do reserved "TSize";   return (Size CInt)
@@ -246,9 +254,11 @@ pargType2
   <|> do reserved "TByteString"; return (ByteString Strict)
   <|> do reserved "TByteStringLazy"; return (ByteString Lazy)
 
+pargType3 :: Parser Type
 pargType3
   =   do reserved "TColorRGB"; return (ColorRGB CChar)
 
+pargType4 :: Parser Type
 pargType4
   =   do reserved "TRect"; return (Rect CInt)
   <|> do reserved "TRectDouble"; return (Rect CDouble)
@@ -289,12 +299,26 @@ lexer
                       ]
     }
 
+whiteSpace    :: Parser ()
 whiteSpace    = P.whiteSpace lexer
-lexeme        = P.lexeme lexer
+
+symbol        :: String -> Parser String
 symbol        = P.symbol lexer
+
+parens        :: Parser a -> Parser a
 parens        = P.parens lexer
+
+semi          :: Parser String
 semi          = P.semi lexer
+
+comma         :: Parser String
 comma         = P.comma lexer
+
+commaSep      :: Parser a -> Parser [a]
 commaSep      = P.commaSep lexer
+
+identifier    :: Parser String
 identifier    = P.identifier lexer
+
+reserved      :: String -> Parser ()
 reserved      = P.reserved lexer

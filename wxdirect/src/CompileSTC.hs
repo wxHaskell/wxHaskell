@@ -14,7 +14,6 @@ import Text.ParserCombinators.Parsec
 import qualified Text.ParserCombinators.Parsec.Token as P
 import Text.ParserCombinators.Parsec.Language
 
-import Data.Char
 import Data.List
 import Control.Monad
 
@@ -27,8 +26,8 @@ compileSTC :: Bool       -- ^ Verbose
            -> IO ()
 compileSTC verbose outputDir inputs = do
   dfs <- mapM parseH inputs
-  let (ds,fs) = unzip dfs
-      d = concat ds --currently unused
+  let (_ds,fs) = unzip dfs
+      -- d = concat ds --currently unused
       f = concat fs
       h_target = outputDir ++ "include/stc_gen.h"
       cpp_target = outputDir ++ "src/stc_gen.cpp"
@@ -39,14 +38,19 @@ compileSTC verbose outputDir inputs = do
   when verbose $
        putStrLn $ "Wrote type macros and c wrappers for " ++ show (length f) ++ " functions."
 
+
+type Function = (String, String, [(String, String)])
+
+
+parseH :: FilePath -> IO ([Def], [Function])
 parseH fname = do putStrLn ("parsing: " ++ fname)
                   input <- liftM lines $ readFile fname
                   let (defs, cpp) = partitionDefines $ input
                   case parse plines fname (unlines cpp) of
-                    Left err -> print err >> return ([],[])
+                    Left  err   -> print err >> return ([],[])
                     Right funcs -> return (defs,filter convertable funcs)
 
--- returns a list of defenitions, see Types.Def
+-- returns a list of definitions, see Types.Def
 -- and a new list of lines without #define's
 partitionDefines :: [String] -> ([Def], [String])
 partitionDefines lns = (defs, cpp)
@@ -55,20 +59,22 @@ partitionDefines lns = (defs, cpp)
           toDef x = let (name,value) = break (==' ') x
                     in Def name (read value) DefInt
 
+  
+plines :: Parser [Function]
 plines = whiteSpace >> many1 pfunc
 
-pfunc :: Parser (String, String, [(String, String)])
-pfunc = do ret <- identifier
+pfunc :: Parser Function
+pfunc = do ret   <- identifier
            stars <- option "" $ symbol "*"
-           func <- identifier
-           args <- parens $ commaSep $ arg
-           symbol ";"
+           func  <- identifier
+           args  <- parens $ commaSep $ arg
+           _     <- symbol ";"
            return (ret ++ stars,func,args)
-    where arg = do option "" $ try $ symbol "const"
-                   t <- identifier
+    where arg = do _     <- option "" $ try $ symbol "const"
+                   t     <- identifier
                    stars <- option "" $ symbol "*"
-                   option "" $ symbol "&"
-                   name <- identifier
+                   _     <- option "" $ symbol "&"
+                   name  <- identifier
                    return (t ++ stars, name)
 
 {-----------------------------------------------------------------------------------------
@@ -79,32 +85,53 @@ lexer :: P.TokenParser ()
 lexer
   = P.makeTokenParser $ javaStyle
 
-whiteSpace    = P.whiteSpace lexer
-lexeme        = P.lexeme lexer
-symbol        = P.symbol lexer
-parens        = P.parens lexer
-semi          = P.semi lexer
-comma         = P.comma lexer
-commaSep      = P.commaSep lexer
-identifier    = P.identifier lexer
-reserved      = P.reserved lexer
+
+whiteSpace :: Parser ()
+whiteSpace = P.whiteSpace lexer
+
+-- lexeme  = P.lexeme     lexer
+
+symbol     :: String -> Parser String 
+symbol     = P.symbol     lexer
+
+parens     :: Parser a -> Parser a
+parens     = P.parens     lexer
+
+-- semi       :: Parser String
+-- semi       = P.semi       lexer
+
+-- comma   = P.comma      lexer
+
+commaSep   :: Parser a -> Parser [a]
+commaSep   = P.commaSep   lexer
+
+identifier :: Parser String
+identifier = P.identifier lexer
+
+-- reserved   :: String -> Parser ()
+-- reserved   = P.reserved   lexer
 
 
 {-----------------------------------------------------------------------------------------
    code gen
 -----------------------------------------------------------------------------------------}
 
-convertable (t,f,a) = elem t ["int", "bool", "void"]
+convertable :: Function -> Bool
+convertable (t,_f,_a) = elem t ["int", "bool", "void"]
 
+glue :: String -> [String] -> String
 glue str strs = concat $ intersperse str strs
 
 -- CPP function generator (Creates functions that can be exported as C functions)
 
+cppfunc :: Function -> String
 cppfunc x = macro x ++ arguments x ++ "\n" ++ body x
 
-macro (ret, func, args) = "EWXWEXPORT(" ++ ret ++ ", wxStyledTextCtrl_" ++ func ++ ")"
+macro :: Function -> String
+macro (ret, func, _args) = "EWXWEXPORT(" ++ ret ++ ", wxStyledTextCtrl_" ++ func ++ ")"
 
-arguments (ret, func, args) = "(" ++ glue ", " params ++ ")"
+arguments :: Function -> String
+arguments (_ret, _func, args) = "(" ++ glue ", " params ++ ")"
         where
         params = "void* _obj" : rest
         rest = map transType args
@@ -118,6 +145,7 @@ arguments (ret, func, args) = "(" ++ glue ", " params ++ ")"
         transType ("wxColour", n) = glue ", " ["int " ++ n ++ c | c <- ["_r","_g","_b"]]
         transType (_,          n) = "void* " ++ n
 
+body :: Function -> String
 body (ret, func, args) = "{\n" ++ "#ifdef wxUSE_STC\n  "
                          ++ maybeReturn ++ " ((wxStyledTextCtrl*) _obj)->"
                          ++ func ++ "(" ++ glue ", " params ++ ");\n"
@@ -136,7 +164,7 @@ body (ret, func, args) = "{\n" ++ "#ifdef wxUSE_STC\n  "
         transParam (t,           n) = "*(" ++ t ++ "*) " ++ n
 
 -- Generator for functions signatures with type macros
-
+headerfunc :: Function -> String
 headerfunc (ret, func, args) = returnType ret ++ " wxStyledTextCtrl_" ++ func
                                ++ "(" ++ glue ", " params ++ ");"
         where

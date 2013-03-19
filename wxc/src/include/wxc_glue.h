@@ -1625,6 +1625,9 @@ void       wxDC_SetBackgroundMode( TSelf(wxDC) _obj, int mode );
 void       wxDC_SetBrush( TSelf(wxDC) _obj, TClass(wxBrush) brush );
 void       wxDC_SetClippingRegion( TSelf(wxDC) _obj, TRect(x,y,width,height) );
 void       wxDC_SetClippingRegionFromRegion( TSelf(wxDC) _obj, TClass(wxRegion) region );
+#if wxCHECK_VERSION(2,9,5)
+void       wxDC_SetDeviceClippingRegion( TSelf(wxDC) _obj, TClass(wxRegion) region );
+#endif
 void       wxDC_SetDeviceOrigin( TSelf(wxDC) _obj, TPoint(x,y) );
 void       wxDC_SetFont( TSelf(wxDC) _obj, TClass(wxFont) font );
 void       wxDC_SetLogicalFunction( TSelf(wxDC) _obj, int function );

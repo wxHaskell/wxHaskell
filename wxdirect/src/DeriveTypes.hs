@@ -19,12 +19,12 @@ module DeriveTypes ( deriveTypes, deriveTypesAll
 import qualified Data.Set as Set
 import qualified Data.Map as Map
 
-import Data.Char( toLower, toUpper, isSpace, isLower, isUpper )
-import Data.List( isPrefixOf, sort, sortBy, intersperse )
+import Data.Char( toUpper, isUpper )
+import Data.List( isPrefixOf )
 
 import Types
-import HaskellNames
-import Classes( isClassName, haskellClassDefs )
+-- import HaskellNames
+import Classes( isClassName )
 
 {-----------------------------------------------------------------------------------------
   The whole type derivation can be tuned with this tables
@@ -362,6 +362,7 @@ deriveTypesAll showIgnore decls
 {-----------------------------------------------------------------------------------------
   Ignore certain decls
 -----------------------------------------------------------------------------------------}
+shouldIgnore :: Decl -> Maybe String
 shouldIgnore decl
   = walk ignore
   where
@@ -374,15 +375,15 @@ shouldIgnore decl
    Remove duplicates and undefined stuff
 -----------------------------------------------------------------------------------------}
 removeDupsAndUndefined :: (Decl -> Maybe String) -> Bool -> [Decl] -> [Decl]
-removeDupsAndUndefined shouldIgnore showIgnore decls
-  = filter Set.empty decls
+removeDupsAndUndefined shouldIgnore' showIgnore decls
+  = filterDupsAndUndefined Set.empty decls
   where
-    filter set [] = []
-    filter set (decl:decls)
-      = case shouldIgnore decl of
-          Just msg -> (if showIgnore then traceIgnore msg decl else id) $ filter set decls
-          other    | Set.member (declName decl) set  -> traceIgnore "duplicate" decl $ filter set decls
-                   | otherwise                       -> decl : filter (Set.insert (declName decl) set) decls
+    filterDupsAndUndefined _   [] = []
+    filterDupsAndUndefined set (decl:decls')
+      = case shouldIgnore' decl of
+          Just msg -> (if showIgnore then traceIgnore msg decl else id) $ filterDupsAndUndefined set decls'
+          _other   | Set.member (declName decl) set  -> traceIgnore "duplicate" decl $ filterDupsAndUndefined set decls'
+                   | otherwise                       -> decl : filterDupsAndUndefined (Set.insert (declName decl) set) decls'
 
 {-----------------------------------------------------------------------------------------
    Derive "Out" types
@@ -391,47 +392,46 @@ deriveOutTypes :: Decl -> Decl
 deriveOutTypes decl
   = case (declRet decl,reverse (declArgs decl)) of
       -- string
-      (StringLen,Arg name (StringOut ctp) :args)
+      (StringLen,Arg _name (StringOut ctp) :args)
           -> decl{ declRet = String ctp, declArgs = reverse args }
       -- bytestring
-      (ByteStringLen,Arg name (ByteStringOut ctp) :args)
+      (ByteStringLen,Arg _name (ByteStringOut ctp) :args)
           -> decl{ declRet = ByteString ctp, declArgs = reverse args }
       -- int array
-      (ArrayLen,Arg name (ArrayIntOut ctp) :args)
+      (ArrayLen,Arg _name (ArrayIntOut ctp) :args)
           -> decl{ declRet = ArrayInt ctp, declArgs = reverse args }
       -- intptr array
-      (ArrayLen,Arg name (ArrayIntPtrOut ctp) :args)
+      (ArrayLen,Arg _name (ArrayIntPtrOut ctp) :args)
           -> decl{ declRet = ArrayIntPtr ctp, declArgs = reverse args }
       -- string array
-      (ArrayLen,Arg name (ArrayStringOut ctp) :args)
+      (ArrayLen,Arg _name (ArrayStringOut ctp) :args)
           -> decl{ declRet = ArrayString ctp, declArgs = reverse args }
       -- object array
-      (ArrayLen,Arg name (ArrayObjectOut cname ctp) :args)
+      (ArrayLen,Arg _name (ArrayObjectOut cname ctp) :args)
           -> decl{ declRet = ArrayObject cname ctp, declArgs = reverse args }
       -- unknown array
       (ArrayLen,args)
           -> decl{ declRet = Int CInt, declArgs = reverse args }
       -- point
-      (Void,Arg name (PointOut ctp   ):args)
+      (Void,Arg _name (PointOut ctp   ):args)
           -> decl{ declRet = Point ctp   , declArgs = reverse args }
       -- size
-      (Void,Arg name (SizeOut ctp   ):args)
+      (Void,Arg _name (SizeOut ctp   ):args)
           -> decl{ declRet = Size ctp   , declArgs = reverse args }
       -- vector
-      (Void,Arg name (VectorOut ctp   ):args)
+      (Void,Arg _name (VectorOut ctp   ):args)
           -> decl{ declRet = Vector ctp   , declArgs = reverse args }
       -- rect
-      (Void,Arg name (RectOut ctp   ):args)
+      (Void,Arg _name (RectOut ctp   ):args)
           -> decl{ declRet = Rect ctp   , declArgs = reverse args }
       -- rect -- just for treectrl::getBoundingRect and listctrl::GetItemRect
-      (Int CInt,Arg name (RectOut ctp   ):args)
+      (Int CInt,Arg _name (RectOut ctp   ):args)
           -> decl{ declRet = Rect ctp   , declArgs = reverse args }
       -- reference
       (Void,Arg _ obj@(RefObject _):args)
           -> decl{ declRet = obj, declArgs = reverse args }
       -- other
-      other
-          -> decl
+      _   -> decl
 
 {-----------------------------------------------------------------------------------------
    Derive extended types
@@ -449,6 +449,7 @@ deriveBetterTypes decl
 
 
 -- Extended types: int x, int y  => Point
+deriveExtTypes :: Decl -> Decl
 deriveExtTypes decl
   = decl{ declArgs = deriveExtArgs (declArgs decl) }
   where
@@ -475,6 +476,7 @@ deriveExtTypes decl
       = []
 
 -- Derive string return: "int fun(..., void* _buf)"
+deriveStringReturn :: Decl -> Decl
 deriveStringReturn decl
   = case (classifyName (declName decl),declRet decl,reverse (declArgs decl)) of
       -- string
@@ -482,10 +484,11 @@ deriveStringReturn decl
           -> decl{ declRet = String CVoid, declArgs = reverse args }
       (_,Int _,Arg ["_buf"] (Ptr Char):args)
           -> decl{ declRet = String CChar, declArgs = reverse args }
-      other
+      _other
           -> decl
 
 -- Extended return types. Like string: "int fun(..., void* _buf)"
+deriveExtReturn :: Decl -> Decl
 deriveExtReturn decl
   = case (classifyName (declName decl),declRet decl,reverse (declArgs decl)) of
       -- string
@@ -530,7 +533,7 @@ deriveExtReturn decl
           cname = "wx" ++ drop 5 name
 
       -- Is/Has
-      (Method cname (Normal mname),Int ctp,_)
+      (Method _cname (Normal mname),Int _ctp,_)
           | (isPrefixOf "Is" mname || isPrefixOf "Has" mname || isPrefixOf "Can" mname
             || mname=="Ok" || isPrefixOf "Contains" mname)
           -> decl{ declRet = Bool }
@@ -548,45 +551,48 @@ deriveExtReturn decl
             createName  = drop (length "Create") mname
 
       -- Boolean methods
-      (Method cname (Normal mname),Int ctp,_)
+      (Method _cname (Normal mname),Int _ctp,_)
           | Set.member mname booleanMethods
           -> decl{ declRet = Bool }
 
       -- Object methods
-      (Method cname (Normal mname),Ptr Void,_)
+      (Method _cname (Normal mname),Ptr Void,_)
           -> case Map.lookup mname objectMethods of
                Just tp  -> decl{ declRet = tp }
                Nothing  -> decl
       -- other
-      other  -> decl
+      _   -> decl
 
 
 -- returned properties: assumes that deriveThis has already been done
+deriveReturnProperties :: Decl -> Decl
 deriveReturnProperties decl
   = case (classifyName (declName decl),declRet decl,reverse (declArgs decl)) of
       -- Get via reference
-      (Method cname (Get propname),Void,Arg _ (Ptr Void):args)
+      (Method _cname (Get propname),Void,Arg _ (Ptr Void):args)
           | isClassName ("wx" ++ propname)
           -> -- trace ("ref: " ++ propname ++ ": " ++ declName decl) $
              decl{ declRet = RefObject ("wx" ++ propname), declArgs = reverse args }
 
-      (Method cname (Get propname),Void,[Arg _ (Object objname),argself@(Arg _ (Object selfname))])
+      (Method cname (Get _propname),Void,[Arg _ (Object objname),argself@(Arg _ (Object selfname))])
           | selfname == cname
           -> -- trace ("ref: " ++ objname ++ ": " ++ declName decl) $
              decl{ declRet = RefObject objname, declArgs = [argself] }
 
       -- bit adventurous: deals with things like "bitmapGetSubBitmap"
-      (Method cname (Get propname),Void,(Arg _ (Object objname):args))
+      (Method _cname (Get propname),Void,(Arg _ (Object _objname):args))
           | Map.member  propname objectProperties
           -> case Map.lookup propname objectProperties of
                Just (Object name) -> -- trace ("ref: " ++ name ++ ": " ++ declName decl) $
                                      decl{ declRet = RefObject name, declArgs = reverse args }
+               Just _             -> error "deriveReturnProperties: unexpected objectProperty (1)"
                Nothing            -> traceError ("illegal reference object") decl $ decl
 
       (Method cname (Get propname),Void,Arg ["_ref"] (Ptr Void):args)
           -> case Map.lookup propname objectProperties of
                Just (Object name) -> -- trace ("ref: " ++ name ++ ": " ++ declName decl) $
                                      decl{ declRet = RefObject name, declArgs = reverse args }
+               Just _             -> error "deriveReturnProperties: unexpected objectProperty (2)"
                Nothing  | cname == "wxListEvent" && propname == "Item"
                         -> -- trace ("ref: ListItem: " ++ declName decl) $
                            decl{ declRet = RefObject "wxListItem", declArgs = reverse args }
@@ -611,36 +617,37 @@ deriveReturnProperties decl
                             decl{ declRet = RefObject "Ptr", declArgs = reverse args }
 
       -- Get
-      (Method cname (Get propname),Ptr Void,_)
+      (Method _cname (Get propname),Ptr Void,_)
           | isClassName ("wx" ++ propname)
           -> decl{ declRet = Object ("wx" ++ propname) }
           | otherwise
           -> case Map.lookup propname objectProperties of
                 Just tp -> decl{ declRet = tp }
                 Nothing -> decl
-      (Method cname (Get propname),Int _,_)
+      (Method _cname (Get propname),Int _,_)
           | Set.member propname booleanProperties
           -> decl{ declRet = Bool }
 
 
       -- Set
-      (Method cname (Set propname),_,Arg argname (Ptr Void):args)
+      (Method _cname (Set propname),_,Arg argname (Ptr Void):args)
           | isClassName ("wx" ++ propname)
           -> decl{ declArgs = reverse (Arg argname (Object ("wx"++propname)) : args)}
           | otherwise
           -> case Map.lookup propname objectProperties of
                Just tp -> decl{ declArgs = reverse (Arg argname tp : args)}
                Nothing -> decl
-      (Method cname (Set propname),_,Arg argname (Int _):args)
+      (Method _cname (Set propname),_,Arg argname (Int _):args)
           | Set.member propname booleanProperties
           -> decl{ declArgs = reverse (Arg argname Bool : args)}
 
       -- other
-      other  -> decl
+      _   -> decl
 
 
 
 -- Simple types: char* => String
+deriveSimpleTypes :: Decl -> Decl
 deriveSimpleTypes decl
   = decl{ declArgs = deriveArgs (declArgs decl) }
   where
@@ -650,7 +657,7 @@ deriveSimpleTypes decl
     deriveArg arg
       = case argType arg of
           Ptr Char  -> String CChar
-          Int ctp   | Set.member (argName arg) booleans  -> Bool
+          Int _ctp  | Set.member (argName arg) booleans  -> Bool
                     | isPrefixOf "is" (argName arg)      -> Bool
           Ptr Void  -> case Map.lookup (argName arg) objects of
                          Just name  -> Object name
@@ -667,18 +674,20 @@ deriveSimpleTypes decl
 
 -- Check for "this" pointer
 -- derive for "wxObject_Create :: ... -> IO (Ptr ())"
+deriveThis :: Decl -> Decl
 deriveThis decl
   = case classifyName (declName decl) of
       Create cname    | declRet decl == Ptr Void         -- bitmapCreate
                       -> decl{ declRet = Object cname }
-      Method cname m  | not (null args) && (argType (head args) == Ptr Void) && not (elem cname ["ELJApp"])
+      Method cname _m | not (null args) && (argType (head args) == Ptr Void) && not (elem cname ["ELJApp"])
                       -> decl{ declArgs = (head args){ argType = Object cname} : tail args }
-      other           -> decl
+      _               -> decl
   where
     args = declArgs decl
 
 
 -- derive event ids: int expEVT_XXX() and expXXX_XXX();
+deriveId :: Decl -> Decl
 deriveId decl@Decl{ declRet = Int _, declArgs = [] }
   | isPrefixOf "expEVT_" (declName decl)
   = decl{ declRet = EventId }
@@ -709,19 +718,19 @@ type PropertyName = String
 classifyName :: String -> Name
 classifyName s
   = case s of
-      ('w':'x':name) -> className s
-      ('c':'b':name) -> className s
-      (c:cs)         | isUpper c -> className s
-      other          -> Name s
+      ('w' : 'x' : _)     -> getClassName s
+      ('c' : 'b' : _)     -> getClassName s
+      (c : _) | isUpper c -> getClassName s
+      _                   -> Name s
   where
-    className name
+    getClassName name
       = case (span (/='_') name) of
-         (cname,method)   | isClassName cname && not (null method)
-              -> if (method == "_Create")
+         (cname,method')   | isClassName cname && not (null method')
+              -> if (method' == "_Create")
                   then Create cname
-                 else if (isPrefixOf "_Get" method)
-                  then Method cname (Get (drop 4 method))
-                 else if (isPrefixOf "_Set" method)
-                  then Method cname (Set (drop 4 method))
-                  else Method cname (Normal (drop 1 method))
+                 else if (isPrefixOf "_Get" method')
+                  then Method cname (Get (drop 4 method'))
+                 else if (isPrefixOf "_Set" method')
+                  then Method cname (Set (drop 4 method'))
+                  else Method cname (Normal (drop 1 method'))
          (_,_)-> Name s

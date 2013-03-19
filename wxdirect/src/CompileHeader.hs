@@ -14,18 +14,18 @@ module CompileHeader( compileHeader ) where
 
 import qualified Data.Set as Set
 import qualified Data.Map as Map
-import qualified MultiSet
+-- import qualified MultiSet
 
-import Data.Time( getCurrentTime)
-import Data.List( isPrefixOf )
-import Data.Char( toUpper, isUpper )
-import Data.List( isPrefixOf, sort, sortBy, intersperse, zipWith4 )
+-- import Data.Time( getCurrentTime)
+-- import Data.List( isPrefixOf )
+-- import Data.Char( toUpper, isUpper )
+import Data.List( isPrefixOf, sort, sortBy, intersperse {-, zipWith4-} )
 
 import Types
 import HaskellNames
-import Classes( isClassName, classNames, classExtends )
+import Classes( {-isClassName,-} classNames, classExtends )
 import ParseC( parseC )
-import DeriveTypes( deriveTypesAll, classifyName, Name(..), Method(..), ClassName, MethodName, PropertyName )
+import DeriveTypes( deriveTypesAll, classifyName, Name(..), {-Method(..), ClassName, MethodName, PropertyName-} )
 import IOExtra
 
 {-----------------------------------------------------------------------------------------
@@ -34,7 +34,7 @@ import IOExtra
 compileHeader :: Bool -> FilePath -> [FilePath] -> IO ()
 compileHeader showIgnore outputFile inputFiles
   = do declss  <- mapM parseC inputFiles
-       time    <- getCurrentTime
+       -- time <- getCurrentTime
        let decls        = deriveTypesAll showIgnore (sortBy cmpDecl (concat declss))
 
            typeDecls    = cTypeDecls decls
@@ -55,12 +55,19 @@ compileHeader showIgnore outputFile inputFiles
        putStrLn ("ok.\n")
 
 
+cmpDecl :: Decl -> Decl -> Ordering
 cmpDecl decl1 decl2
   = compare (haskellDeclName (declName decl1)) (haskellDeclName (declName decl2))
 
-
+{-
+exportComma :: String
 exportComma  = exportSpaces ++ ","
+-}
+
+{-
+exportSpaces :: String
 exportSpaces = "     "
+-}
 
 {-----------------------------------------------------------------------------------------
    Translate declarations to a c type declarations
@@ -85,21 +92,21 @@ cTypeDecls decls
          concatMap toDecls (Map.toAscList (Map.delete "Null" (Map.delete "Misc." (Map.delete "Events" tdeclMap))))
         )
   where
-    addMethods methodMap className classDecls
-      = heading className ++
-        (case Map.lookup className classExtends of
+    addMethods methodMap className' classDecls
+      = heading className' ++
+        (case Map.lookup className' classExtends of
           Nothing  -> []
-          Just ""  -> ["TClassDef(" ++ className ++ ")"]
-          Just ext -> ["TClassDefExtend(" ++ className ++ "," ++ ext ++ ")"]
+          Just ""  -> ["TClassDef(" ++ className' ++ ")"]
+          Just ext -> ["TClassDefExtend(" ++ className' ++ "," ++ ext ++ ")"]
         )
         ++ classDecls ++
-        (case Map.lookup className methodMap of
-           Nothing    -> []
-           Just decls -> decls)
+        (case Map.lookup className' methodMap of
+           Nothing   -> []
+           Just dcls -> dcls)
 
 
-    toDecls (classname,decls)
-      = decls
+    toDecls (_classname, dcls)
+      = dcls
 
     typeDef decl
       = (case classifyName (declName decl) of
@@ -131,19 +138,22 @@ cTypeSignature decl
     "( "  ++ concat (intersperse ", " (cTypeArgs decl (declArgs decl) ++ cOutArg (declRet decl))) ++ " );"
 
 
+fill :: Int -> String -> String
 fill n s
   | length s >= n  = s
   | otherwise      = s ++ replicate (n - length s) ' '
 
-cTypeArgs decl []
-  = []
-cTypeArgs decl (arg:args)
-  = cTypeArg decl className arg : map (cTypeArg decl "") args
-  where
-    className  = case classifyName (declName decl) of
-                   Method cname m  -> cname
-                   otherwise       -> ""
 
+cTypeArgs :: Decl -> [Arg] -> [String]
+cTypeArgs _    []         = []
+cTypeArgs decl (arg:args)
+  = cTypeArg decl getClassName arg : map (cTypeArg decl "") args
+  where
+    getClassName = case classifyName (declName decl) of
+                     Method cname _  -> cname
+                     _otherwise      -> ""
+
+cRetType :: Decl -> Type -> String
 cRetType decl tp
   = case tp of
       -- out
@@ -154,7 +164,7 @@ cRetType decl tp
       Point _   -> "void"
       Size _    -> "void"
       Rect _    -> "void"
-      RefObject name  -> "void"
+      RefObject _ -> "void"
       -- typedefs
       EventId -> "int"
       -- basic
@@ -163,16 +173,17 @@ cRetType decl tp
       Int CLong -> "long"
       Int TimeT -> "time_t"
       Int SizeT -> "size_t"
-      Int other -> "int"
+      Int _     -> "int"
       Void      -> "void"
       Double    -> "double"
       Float     -> "float"
       Ptr Void    -> "void*"
       Ptr t       -> cRetType decl t ++ "*"
       Object name -> "TClass(" ++  name ++ ")"
-      other  -> traceError ("unknown return type (" ++ show tp ++ ")") decl $
-                "void"
+      _other      -> traceError ("unknown return type (" ++ show tp ++ ")") decl $
+                       "void"
 
+cOutArg :: Type -> [String]
 cOutArg tp
   = case tp of
       Vector ctp    -> ["TVectorOut" ++ ctypeSpec CInt ctp    ++ "(_vx,_vy)"]
@@ -183,11 +194,12 @@ cOutArg tp
       RefObject name  -> ["TClassRef(" ++  name ++ ") _ref"]
       ArrayString ctp       -> ["TArrayString" ++ ctypeSpec CChar ctp ++ " _strs"]
       ArrayObject name ctp  -> ["TArrayObject" ++ ctypeSpec CObject ctp ++ "(" ++ name ++ ") _objs"]
-      other  -> []
+      _other                -> []
 
 
 -- type def. for clarity
-cTypeArg decl className arg
+cTypeArg :: Decl -> String -> Arg -> String
+cTypeArg decl className' arg
   = case argType arg of
       -- basic
       Bool      -> "TBool " ++ argName arg
@@ -195,7 +207,7 @@ cTypeArg decl className arg
       Int CLong -> "long " ++ argName arg
       Int TimeT -> "time_t " ++ argName arg
       Int SizeT -> "size_t " ++ argName arg
-      Int other -> "int " ++ argName arg
+      Int _     -> "int " ++ argName arg
       Void      -> "void " ++ argName arg
       Double    -> "double " ++ argName arg
       Float     -> "float " ++ argName arg
@@ -209,11 +221,11 @@ cTypeArg decl className arg
       Size ctp   -> "TSize" ++ ctypeSpec CInt ctp ++  argNameTuple
       String ctp -> "TString" ++ ctypeSpec CChar ctp  ++ " " ++ argName arg
       Rect ctp   -> "TRect" ++ ctypeSpec CInt ctp  ++  argNameTuple
-      Fun f      -> "TClosureFun "  ++ argName arg
+      Fun _f     -> "TClosureFun "  ++ argName arg
       ArrayString ctp      -> "TArrayString" ++ ctypeSpec CChar ctp ++ " " ++ argName arg
       ArrayObject name ctp -> "TArrayObject" ++ ctypeSpec CObject ctp ++ "(" ++ name ++ ") " ++ argName arg
       RefObject name  -> "TClassRef(" ++  name ++ ") " ++ argName arg
-      Object name     | className == name  -> "TSelf(" ++  name ++ ") " ++ argName arg
+      Object name     | className' == name  -> "TSelf(" ++  name ++ ") " ++ argName arg
                       | otherwise          -> "TClass(" ++  name ++ ") " ++ argName arg
 
       -- temporary types (can this ever happen?)
@@ -226,6 +238,8 @@ cTypeArg decl className arg
       SizeOut ctp       -> "TSizeOut" ++ ctypeSpec CInt ctp ++ argNameTuple
       VectorOut ctp     -> "TVectorOut" ++ ctypeSpec CInt  ctp ++ argNameTuple
       RectOut ctp       -> "TRectOut" ++ ctypeSpec CInt ctp ++ argNameTuple
+
+      _other  -> error ("cTypeArg: unknown argument type (" ++ show (argType arg) ++ ")") 
 {-
       other  -> traceError ("unknown argument type (" ++ show (argType arg) ++ ")") decl $
                 "ctypeSpec"
@@ -235,6 +249,7 @@ cTypeArg decl className arg
       = "(" ++ concat (intersperse "," (argNames arg)) ++ ")"
 
 
+ctypeSpec :: CBaseType -> CBaseType -> String
 ctypeSpec deftp ctp
   | deftp==ctp  = ""
   | otherwise   = case ctp of
@@ -242,4 +257,4 @@ ctypeSpec deftp ctp
                     CLong   -> "Long"
                     CChar   -> "Char"
                     CVoid   -> "Void"
-                    other   -> ""
+                    _other  -> ""
