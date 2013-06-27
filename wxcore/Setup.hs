@@ -26,14 +26,18 @@ main = defaultMainWithHooks simpleUserHooks { confHook = myConfHook }
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
 wxcoreDirectory  :: FilePath
-wxcoreDirectory  = "src/haskell/Graphics/UI/WXCore"
+wxcoreDirectory  = "src" </> "haskell" </> "Graphics" </> "UI" </> "WXCore"
+
+wxcoreDirectoryQuoted  :: FilePath
+wxcoreDirectoryQuoted  = "\"" ++ wxcoreDirectory ++ "\""
+
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
 -- |This slightly dubious function obtains the install path for the wxc package we are using.
 -- It works by finding the wxc package's installation info, then finding the include directory 
 -- which contains wxc's headers (amongst the wxWidgets include dirs) and then going up a level.
--- It would be nice the path was park of InstalledPackageInfo, but it isn't.
+-- It would be nice if the path was part of InstalledPackageInfo, but it isn't.
 wxcInstallDir :: LocalBuildInfo -> IO FilePath
 wxcInstallDir lbi = 
     case searchByName (installedPkgs lbi) "wxc" of
@@ -54,14 +58,18 @@ myConfHook (pkg0, pbi) flags = do
 
     lbi <- confHook simpleUserHooks (pkg0, pbi) flags
     wxcDirectory <- wxcInstallDir lbi
-    let wxcoreIncludeFile = wxcDirectory </> "include/wxc.h"
+    let wxcoreIncludeFile  = "\"" ++ wxcDirectory </> "include" </> "wxc.h\""
+    let wxcDirectoryQuoted = "\"" ++ wxcDirectory ++ "\""
+    let system' command    = putStrLn command >> system command
 
     putStrLn "Generating class type definitions from .h files"
-    system $ "wxdirect -t --wxc " ++ wxcDirectory ++ " -o " ++ wxcoreDirectory ++ " " ++ wxcoreIncludeFile
+    system' $ "wxdirect -t --wxc " ++ wxcDirectoryQuoted ++ " -o " ++ wxcoreDirectoryQuoted ++ " " ++ wxcoreIncludeFile
+
     putStrLn "Generating class info definitions"
-    system $ "wxdirect -i --wxc " ++ wxcDirectory ++ " -o " ++ wxcoreDirectory ++ " " ++ wxcoreIncludeFile
+    system' $ "wxdirect -i --wxc " ++ wxcDirectoryQuoted ++ " -o " ++ wxcoreDirectoryQuoted ++ " " ++ wxcoreIncludeFile
+
     putStrLn "Generating class method definitions from .h files"
-    system $ "wxdirect -c --wxc " ++ wxcDirectory ++ " -o " ++ wxcoreDirectory ++ " " ++ wxcoreIncludeFile
+    system' $ "wxdirect -c --wxc " ++ wxcDirectoryQuoted ++ " -o " ++ wxcoreDirectoryQuoted ++ " " ++ wxcoreIncludeFile
 
     let lpd       = localPkgDescr lbi
     let lib       = fromJust (library lpd)

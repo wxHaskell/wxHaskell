@@ -80,7 +80,7 @@ library
     build-depends:
       array >= 0.2 && < 0.5,
       base >= 4 && < 5,
-      containers >= 0.2 && < 0.5
+      containers >= 0.2 && < 0.6
   else
     build-depends:
       array >= 0.1 && < 0.3,
