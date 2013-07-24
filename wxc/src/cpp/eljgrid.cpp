@@ -56,7 +56,7 @@ EWXWEXPORT(void,wxGridCellEditor_Show)(wxGridCellEditor* self,bool show,void* at
 	self->Show(show, (wxGridCellAttr*)attr);
 }
 	
-#if wxCHECK_VERSION(2,9,5) // (wxVERSION_NUMBER >= 2905)
+#if (wxVERSION_NUMBER >= 2905)
 EWXWEXPORT(void,wxGridCellEditor_PaintBackground)(wxGridCellEditor* self,wxDC* dc,int x,int y,int w,int h,wxGridCellAttr* attr)
 {
 	self->PaintBackground(*dc, wxRect(x, y, w, h), *attr);

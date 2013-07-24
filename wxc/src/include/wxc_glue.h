@@ -2544,7 +2544,7 @@ void       wxGridCellEditor_HandleReturn( TSelf(wxGridCellEditor) _obj, TClass(w
 TBool      wxGridCellEditor_IsAcceptedKey( TSelf(wxGridCellEditor) _obj, TClass(wxEvent) event );
 TBool      wxGridCellEditor_IsCreated( TSelf(wxGridCellEditor) _obj );
 void       wxGridCellEditor_PaintBackground( TSelf(wxGridCellEditor) _obj, TClass(wxDC) dc, TRect(x,y,w,h), TClass(wxGridCellAttr) attr );
-#if wxCHECK_VERSION(2,9,5) // (wxVERSION_NUMBER >= 2905)
+#if (wxVERSION_NUMBER >= 2905)
 void       wxGridCellEditor_PaintBackground( TSelf(wxGridCellEditor) _obj, TClass(wxDC) dc, TRect(x,y,w,h), TClass(wxGridCellAttr) attr );
 #else
 void       wxGridCellEditor_PaintBackground( TSelf(wxGridCellEditor) _obj, TRect(x,y,w,h), TClass(wxGridCellAttr) attr );
