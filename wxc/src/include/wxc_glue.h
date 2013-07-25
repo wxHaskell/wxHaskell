@@ -2551,12 +2551,12 @@ TClass(wxControl) wxGridCellEditor_GetControl( TSelf(wxGridCellEditor) _obj );
 void       wxGridCellEditor_HandleReturn( TSelf(wxGridCellEditor) _obj, TClass(wxEvent) event );
 TBool      wxGridCellEditor_IsAcceptedKey( TSelf(wxGridCellEditor) _obj, TClass(wxEvent) event );
 TBool      wxGridCellEditor_IsCreated( TSelf(wxGridCellEditor) _obj );
+// AD 20130725: this should be dependent on version nr but wxdirect cannot deal with preprocessing directives, so this is fixed on an implicit presence of a correct wxWidgets version
+// #if (wxVERSION_NUMBER >= 2905)
 void       wxGridCellEditor_PaintBackground( TSelf(wxGridCellEditor) _obj, TClass(wxDC) dc, TRect(x,y,w,h), TClass(wxGridCellAttr) attr );
-#if (wxVERSION_NUMBER >= 2905)
-void       wxGridCellEditor_PaintBackground( TSelf(wxGridCellEditor) _obj, TClass(wxDC) dc, TRect(x,y,w,h), TClass(wxGridCellAttr) attr );
-#else
-void       wxGridCellEditor_PaintBackground( TSelf(wxGridCellEditor) _obj, TRect(x,y,w,h), TClass(wxGridCellAttr) attr );
-#endif
+// #else
+// void       wxGridCellEditor_PaintBackground( TSelf(wxGridCellEditor) _obj, TRect(x,y,w,h), TClass(wxGridCellAttr) attr );
+// #endif
 void       wxGridCellEditor_Reset( TSelf(wxGridCellEditor) _obj );
 void       wxGridCellEditor_SetControl( TSelf(wxGridCellEditor) _obj, TClass(wxControl) control );
 void       wxGridCellEditor_SetParameters( TSelf(wxGridCellEditor) _obj, TClass(wxString) params );
