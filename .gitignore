@@ -30,3 +30,6 @@ config/
 # OS Generated files
 .DS_Store*
 Thumbs.db
+
+# Backups created by editors
+*.bak
