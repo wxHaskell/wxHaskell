@@ -44,6 +44,7 @@ gui = do
 -- show anything!
             , on paintRaw := paintGL glCanvas
             ]
+   repaint f
 
 convWG (WX.Size w h) = (GL.Size (convInt32  w) (convInt32  h))
 convInt32 = fromInteger . toInteger
