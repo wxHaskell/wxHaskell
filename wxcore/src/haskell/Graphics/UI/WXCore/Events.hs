@@ -31,6 +31,7 @@ module Graphics.UI.WXCore.Events
         , sliderOnCommand
         , textCtrlOnTextEnter
         , listCtrlOnListEvent
+        , toggleButtonOnCommand
         , treeCtrlOnTreeEvent
         , gridOnGridEvent
         , propertyGridOnPropertyGridEvent
@@ -88,6 +89,7 @@ module Graphics.UI.WXCore.Events
         , sliderGetOnCommand
         , textCtrlGetOnTextEnter
         , listCtrlGetOnListEvent
+        , toggleButtonGetOnCommand
         , treeCtrlGetOnTreeEvent
         , gridGetOnGridEvent
         , propertyGridGetOnPropertyGridEvent
@@ -410,6 +412,16 @@ spinCtrlOnCommand spinCtrl eventHandler
 spinCtrlGetOnCommand :: SpinCtrl a -> IO (IO ())
 spinCtrlGetOnCommand spinCtrl
   = unsafeWindowGetHandlerState spinCtrl wxEVT_COMMAND_SPINCTRL_UPDATED (skipCurrentEvent)
+
+-- | Set an event handler for a push button.
+toggleButtonOnCommand :: ToggleButton a -> IO () -> IO ()
+toggleButtonOnCommand button eventHandler
+  = windowOnEvent button [wxEVT_COMMAND_TOGGLEBUTTON_CLICKED] eventHandler (\evt -> eventHandler)
+
+-- | Get the current button event handler on a window.
+toggleButtonGetOnCommand :: Window a -> IO (IO ())
+toggleButtonGetOnCommand button
+  = unsafeWindowGetHandlerState button wxEVT_COMMAND_TOGGLEBUTTON_CLICKED skipCurrentEvent
 
 {-----------------------------------------------------------------------------------------
   wxStyledTextCtrl's event

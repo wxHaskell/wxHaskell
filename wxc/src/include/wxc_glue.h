@@ -1119,6 +1119,14 @@ void       wxBitmapButton_SetBitmapLabel( TSelf(wxBitmapButton) _obj, TClass(wxB
 void       wxBitmapButton_SetBitmapSelected( TSelf(wxBitmapButton) _obj, TClass(wxBitmap) sel );
 void       wxBitmapButton_SetMargins( TSelf(wxBitmapButton) _obj, TPoint(x,y) );
 
+/* wxBitmapToggleButton */
+TClassDefExtend(wxBitmapToggleButton,wxToggleButton)
+TClass(wxBitmapToggleButton) wxBitmapToggleButton_Create( TClass(wxWindow) parent, int id, TClass(wxBitmap) _bmp, TRect(x,y,w,h), int style );
+TBool      wxBitmapToggleButton_Enable( TSelf(wxBitmapToggleButton) _obj, TBool enable );
+TBool      wxBitmapToggleButton_GetValue( TSelf(wxBitmapToggleButton) _obj );
+void       wxBitmapToggleButton_SetValue( TSelf(wxBitmapToggleButton) _obj, TBool state );
+void       wxBitmapToggleButton_SetBitmapLabel( TSelf(wxBitmapToggleButton) _obj, TClass(wxBitmap) _bmp );
+
 /* wxBitmapDataObject */
 TClassDefExtend(wxBitmapDataObject,wxDataObjectSimple)
 TClass(wxBitmapDataObject) BitmapDataObject_Create( TClass(wxBitmap) _bmp );

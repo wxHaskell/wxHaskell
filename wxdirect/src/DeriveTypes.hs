@@ -316,8 +316,8 @@ ignore
   -- message parameters: eljmime / wrapper.h
     ,prefix "wxMessageParameters"        "message param"
   -- non-portable
-    ,equals "expEVT_COMMAND_TOGGLEBUTTON_CLICKED" "toggle button"
-    ,prefix "wxToggleButton_"            "toggle button"
+    --,equals "expEVT_COMMAND_TOGGLEBUTTON_CLICKED" "toggle button"
+    --,prefix "wxToggleButton_"            "toggle button"
     ,prefix "wxDialUpEvent_"             "dialup events"
     ,prefix "wxDialUpManager_"           "dialup manager"
     ,prefix "wxCriticalSection_"         "threads"

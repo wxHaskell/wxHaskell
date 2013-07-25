@@ -30,9 +30,36 @@ EWXWEXPORT(bool,wxToggleButton_Enable)(wxToggleButton* self,bool enable)
 	return self->Enable(enable);
 }
 
+/*
 EWXWEXPORT(int,expEVT_COMMAND_TOGGLEBUTTON_CLICKED)()
 {
 	return wxEVT_COMMAND_TOGGLEBUTTON_CLICKED;
+}
+*/
+
+EWXWEXPORT(wxBitmapToggleButton*,wxBitmapToggleButton_Create)(wxWindow* _prt,int _id,wxBitmap* _bmp, int _lft, int _top, int _wdt, int _hgt, int _stl)
+{
+	return new wxBitmapToggleButton (_prt, _id, *_bmp, wxPoint(_lft, _top), wxSize(_wdt, _hgt), _stl, wxDefaultValidator);
+}
+
+EWXWEXPORT(void,wxBitmapToggleButton_SetValue)(wxBitmapToggleButton* self,bool state)
+{
+	self->SetValue(state);
+}
+	
+EWXWEXPORT(bool,wxBitmapToggleButton_GetValue)(wxBitmapToggleButton* self)
+{
+	return self->GetValue();
+}
+	
+EWXWEXPORT(bool,wxBitmapToggleButton_Enable)(wxBitmapToggleButton* self,bool enable)
+{
+	return self->Enable(enable);
+}
+
+EWXWEXPORT(void,wxBitmapToggleButton_SetBitmapLabel)(wxBitmapToggleButton* self,wxBitmap* _bmp)
+{
+	self->SetBitmapLabel(*_bmp);
 }
 
 }

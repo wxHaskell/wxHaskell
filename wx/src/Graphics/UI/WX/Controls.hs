@@ -45,6 +45,9 @@ module Graphics.UI.WX.Controls
       , Slider, hslider, vslider, sliderEx, sliderRes
       -- ** Gauge
       , Gauge, hgauge, vgauge, gaugeEx, gaugeRes
+      -- ** ToggleButton
+      , ToggleButton, BitmapToggleButton
+      , toggleButton, bitmapToggleButton
       -- ** Tree control
       , TreeCtrl, treeCtrl, treeCtrlEx, treeEvent, treeCtrlRes
       -- ** List control
@@ -963,6 +966,51 @@ instance Selection (SpinCtrl a) where
 instance Selecting (SpinCtrl a) where
   select 
     = newEvent "select" spinCtrlGetOnCommand spinCtrlOnCommand
+
+{--------------------------------------------------------------------------------
+  ToggleButton
+--------------------------------------------------------------------------------}
+-- | Create a toggle button. 
+--
+-- * Instances: 'Commanding',  -- 'Textual', 'Literate', 'Dimensions', 'Colored', 'Visible', 'Child',
+--             'Able', 'Tipped', 'Identity', 'Styled', 'Reactive', 'Paint'.
+--
+toggleButton :: Window a -> [Prop (ToggleButton ())] -> IO (ToggleButton ())
+toggleButton parent props
+  = feed2 props defaultStyle $
+    initialWindow $ \id rect -> \props flags ->
+    do bb <- toggleButtonCreate parent id "" rect flags
+       set bb props
+       return bb
+
+instance Commanding (ToggleButton a) where
+  command  = newEvent "command" toggleButtonGetOnCommand toggleButtonOnCommand
+
+instance Checkable (ToggleButton a) where
+  checkable = enabled 
+  checked   = newAttr "checked" toggleButtonGetValue toggleButtonSetValue
+
+-- | Create a bitmap toggle button. Use the 'picture' attribute to set the
+-- bitmap.
+--
+-- * Instances: 'Commanding', 'Pictured' -- 'Textual', 'Literate', 'Dimensions', 'Colored', 'Visible', 'Child',
+--             'Able', 'Tipped', 'Identity', 'Styled', 'Reactive', 'Paint'.
+--
+bitmapToggleButton :: Window a -> [Prop (BitmapToggleButton ())] -> IO (BitmapToggleButton ())
+bitmapToggleButton parent props
+  = feed2 props defaultStyle $
+    initialWindow $ \id rect -> \props flags ->
+    do bb <- bitmapToggleButtonCreate parent id nullBitmap rect flags
+       set bb props
+       return bb
+
+instance Pictured (BitmapToggleButton a) where
+  picture
+    = writeAttr "picture" setter
+    where
+      setter w fname
+        = do fpath <- getAbsoluteFilePath fname
+             withBitmapFromFile fpath (bitmapToggleButtonSetBitmapLabel w)
 
 
 {--------------------------------------------------------------------------------

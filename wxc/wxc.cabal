@@ -107,6 +107,7 @@ extra-source-files:
     src/cpp/eljtextctrl.cpp
     src/cpp/eljtimer.cpp
     src/cpp/eljtipwnd.cpp
+    src/cpp/eljtglbtn.cpp
     src/cpp/eljtoolbar.cpp
     src/cpp/eljvalidator.cpp
     src/cpp/eljwindow.cpp
@@ -246,6 +247,7 @@ library
     src/cpp/eljtextctrl.cpp
     src/cpp/eljtimer.cpp
     src/cpp/eljtipwnd.cpp
+    src/cpp/eljtglbtn.cpp
     src/cpp/eljtoolbar.cpp
     src/cpp/eljvalidator.cpp
     src/cpp/eljwindow.cpp
