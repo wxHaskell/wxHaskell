@@ -13,8 +13,8 @@ Status
 
 This fork builds & compiles
 - against: wxWidgets (http://www.wxwidgets.org/) 2.9.5 released 20130716
-- with: Haskell platform (http://www.haskell.org/platform/) 2013.2.0.0, 64 bits
-- on: MacOSX 10.8.4
+- with: Haskell platform (http://www.haskell.org/platform/) 2013.2.0.0
+- on: MacOSX 10.8.4, 64 bits Haskell platform
 
 Patches up and until 20130725 have been merged into this fork.
 
@@ -23,13 +23,16 @@ This is partly because internally components (in particular wxdirect)
 cannot deal with version variation done by means of (C) preprocessing.
 OS and Haskell platform differences should be no problem if it was no problem before this fork.
 
-All packages have cabal version 0.90.1.0, preparing this to be a maintenance release.
+All packages have cabal version 0.90.1.0, intending this to lead to a maintenance release.
 
 Build & installation
 ====================
 
 As of 20130725:
-- Prerequisites: install wxWidgets 2.9.5 directly from a source release or use a platform specific installer.
+- Prerequisites:
+  - install wxWidgets 2.9.5 directly from a source release or use a platform specific installer.
+    - if installed from source release configure with
+        ./configure --disable-debug_flag	# to avoid debugging popups
 
 - Development build using cabal-dev inside the wxHaskell directory:
 
@@ -49,7 +52,7 @@ As of 20130725:
   
     bin/mk-cabal-clean
 
-Note: cabal and development builds share the same build directory. Should not be a problem though...
+Note: cabal and cabal-dev builds share the same build directory. Should not be a problem though...
 
 
 Platform specifics
