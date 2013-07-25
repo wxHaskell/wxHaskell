@@ -1,0 +1,10 @@
+#!/bin/sh
+# build using cabal
+
+for d in wxdirect wxc wxcore wx
+do
+  cd $d
+  echo "$d: "
+  cabal clean
+  cd ..
+done

@@ -1,0 +1,12 @@
+#!/bin/sh
+# build using cabal
+
+# Note: reinstallation is enforced
+
+for d in wxdirect wxc wxcore wx
+do
+  cd $d
+  cabal configure
+  cabal install --force-reinstalls
+  cd ..
+done
