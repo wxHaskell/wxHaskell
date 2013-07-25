@@ -16,10 +16,19 @@ import System.Directory (createDirectoryIfMissing, doesFileExist, getCurrentDire
 import System.Environment (getEnv)
 import System.Exit (ExitCode (..))
 import System.FilePath.Posix ((</>), (<.>), replaceExtension, takeFileName, dropFileName, addExtension)
+import System.IO (hPutStrLn, stderr)
 import System.IO.Unsafe (unsafePerformIO)
-import System.Process (readProcess)
+import qualified System.Process as Process
+import qualified Control.Exception as E
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+
+readProcess :: FilePath -> [String] -> String -> IO String
+readProcess cmd args stdin =
+  Process.readProcess cmd args stdin
+  `E.catch` \(E.SomeException err) -> do
+    hPutStrLn stderr $ "readProcess failed: " ++ show err
+    E.throwIO err
 
 main :: IO ()
 main = defaultMainWithHooks simpleUserHooks { confHook = myConfHook, buildHook = myBuildHook, instHook = myInstHook }

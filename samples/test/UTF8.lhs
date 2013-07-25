@@ -36,7 +36,7 @@ the Unicode Transformation Format with 8-bit words.
 >     encodeOne, decodeOne,
 >   ) where
 
-> import Char (ord, chr)
+> import Data.Char (ord, chr)
 > import Data.Word (Word8, Word16, Word32)
 > import Data.Bits (Bits, shiftL, shiftR, (.&.), (.|.))
 

@@ -10,12 +10,12 @@
 --------------------------------------------------------------------------------}
 module Main where
 
-import Directory
-import List( zip3 )
+import System.Directory
+import Data.List( zip3 )
 import System.FilePath
 import Graphics.UI.WX
-import Graphics.UI.WXCore 
-
+import Graphics.UI.WXCore
+import Control.Exception
 
 main :: IO ()
 main 
@@ -150,23 +150,30 @@ onListEvent l status event
               propagateEvent
       other
         -> propagateEvent
-  
+
+ioExceptionHandler :: a -> IOException -> IO a
+ioExceptionHandler res _ = return res
+
+swallowIOExceptions :: a -> IO a -> IO a
+swallowIOExceptions def act =
+  act `catch` ioExceptionHandler def
+
 {--------------------------------------------------------------------------------
    View directory files
 --------------------------------------------------------------------------------}
 listCtrlShowDir :: ListCtrl a -> FilePath -> IO ()
 listCtrlShowDir listCtrl path
-  = do itemsDelete listCtrl
+  = swallowIOExceptions () $
+    do itemsDelete listCtrl
        contents <- getDirectoryContents path
        let paths = map (\cont -> path ++ cont) contents
        mapM_ (listCtrlAddFile listCtrl) (zip3 [0..] contents paths)
-  `catch` \err -> return ()
 
 listCtrlAddFile l (idx,fname,fpath)
-  = do isdir <- doesDirectoryExist fpath `catch` \err -> return False
+  = do isdir <- swallowIOExceptions False $ doesDirectoryExist fpath
        perm  <- getPermissions fpath
        time  <- getModificationTime fpath
-       let image = imageIndex (if isdir 
+       let image = imageIndex (if isdir
                                 then imgFolder 
                                 else if (extension fname == "hs")
                                       then imgHFile
@@ -212,10 +219,10 @@ treeCtrlAddSubDirs t parent
 -- Return the sub directories of a certain directory as a tuple: the full path and the directory name.
 getSubdirs :: FilePath -> IO [(FilePath,FilePath)]
 getSubdirs fpath
-  = do contents  <- getDirectoryContents fpath `catch` \err -> return []
-       let names = filter (\dir -> head dir /= '.') contents
+  = do contents  <- swallowIOExceptions [] $ getDirectoryContents fpath
+       let names = filter (\dir -> head dir /= '.') $ contents
            paths = map (\dir -> fpath ++ dir ++ "/") names
-       isdirs    <- mapM (\dir -> doesDirectoryExist dir `catch` \err -> return False) paths
+       isdirs    <- mapM (\dir -> swallowIOExceptions False $ doesDirectoryExist dir) paths
        let dirs  = [(path,name) | (isdir,(path,name)) <- zip isdirs (zip paths names), isdir]
        return dirs
        
@@ -226,7 +233,7 @@ getRootDir
   = do current <- getCurrentDirectory
        let rootName  = takeWhile (not . isPathSeparator) current
            rootPath  = rootName ++ "/"
-       exist <- do{ getDirectoryContents rootPath; return True } `catch` \err -> return False
+       exist <- swallowIOExceptions False $ doesDirectoryExist rootPath
        if exist
         then return (rootPath,rootName)
         else return (current ++ "/", reverse (takeWhile (not . isPathSeparator) (reverse current)))
