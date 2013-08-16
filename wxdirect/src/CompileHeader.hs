@@ -14,18 +14,14 @@ module CompileHeader( compileHeader ) where
 
 import qualified Data.Set as Set
 import qualified Data.Map as Map
--- import qualified MultiSet
 
--- import Data.Time( getCurrentTime)
--- import Data.List( isPrefixOf )
--- import Data.Char( toUpper, isUpper )
-import Data.List( isPrefixOf, sort, sortBy, intersperse {-, zipWith4-} )
+import Data.List( isPrefixOf, sort, sortBy, intersperse )
 
 import Types
 import HaskellNames
-import Classes( {-isClassName,-} classNames, classExtends )
+import Classes( classNames, classExtends )
 import ParseC( parseC )
-import DeriveTypes( deriveTypesAll, classifyName, Name(..), {-Method(..), ClassName, MethodName, PropertyName-} )
+import DeriveTypes( deriveTypesAll, classifyName, Name(..) )
 import IOExtra
 
 {-----------------------------------------------------------------------------------------
@@ -157,26 +153,26 @@ cRetType :: Decl -> Type -> String
 cRetType decl tp
   = case tp of
       -- out
-      String _  -> "TStringLen"
-      ArrayString _ -> "TArrayLen"
+      String _        -> "TStringLen"
+      ArrayString _   -> "TArrayLen"
       ArrayObject _ _ -> "TArrayLen"
-      Vector _  -> "void"
-      Point _   -> "void"
-      Size _    -> "void"
-      Rect _    -> "void"
-      RefObject _ -> "void"
+      Vector _        -> "void"
+      Point _         -> "void"
+      Size _          -> "void"
+      Rect _          -> "void"
+      RefObject _     -> "void"
       -- typedefs
-      EventId -> "int"
+      EventId     -> "int"
       -- basic
-      Bool      -> "TBool"
-      Char      -> "TChar"
-      Int CLong -> "long"
-      Int TimeT -> "time_t"
-      Int SizeT -> "size_t"
-      Int _     -> "int"
-      Void      -> "void"
-      Double    -> "double"
-      Float     -> "float"
+      Bool        -> "TBool"
+      Char        -> "TChar"
+      Int CLong   -> "long"
+      Int TimeT   -> "time_t"
+      Int SizeT   -> "size_t"
+      Int _       -> "int"
+      Void        -> "void"
+      Double      -> "double"
+      Float       -> "float"
       Ptr Void    -> "void*"
       Ptr t       -> cRetType decl t ++ "*"
       Object name -> "TClass(" ++  name ++ ")"
@@ -186,15 +182,15 @@ cRetType decl tp
 cOutArg :: Type -> [String]
 cOutArg tp
   = case tp of
-      Vector ctp    -> ["TVectorOut" ++ ctypeSpec CInt ctp    ++ "(_vx,_vy)"]
-      Point ctp     -> ["TPointOut" ++ ctypeSpec CInt ctp    ++ "(_x,_y)"]
-      Size ctp      -> ["TSizeOut" ++ ctypeSpec CInt ctp    ++ "(_w,_h)"]
-      String ctp    -> ["TStringOut" ++ ctypeSpec CChar ctp ++ " _buf"]
-      Rect ctp      -> ["TRectOut" ++ ctypeSpec CInt ctp    ++ "(_x,_y,_w,_h)" ]
-      RefObject name  -> ["TClassRef(" ++  name ++ ") _ref"]
-      ArrayString ctp       -> ["TArrayString" ++ ctypeSpec CChar ctp ++ " _strs"]
-      ArrayObject name ctp  -> ["TArrayObject" ++ ctypeSpec CObject ctp ++ "(" ++ name ++ ") _objs"]
-      _other                -> []
+      Vector ctp           -> ["TVectorOut" ++ ctypeSpec CInt ctp    ++ "(_vx,_vy)"]
+      Point ctp            -> ["TPointOut" ++ ctypeSpec CInt ctp    ++ "(_x,_y)"]
+      Size ctp             -> ["TSizeOut" ++ ctypeSpec CInt ctp    ++ "(_w,_h)"]
+      String ctp           -> ["TStringOut" ++ ctypeSpec CChar ctp ++ " _buf"]
+      Rect ctp             -> ["TRectOut" ++ ctypeSpec CInt ctp    ++ "(_x,_y,_w,_h)" ]
+      RefObject name       -> ["TClassRef(" ++  name ++ ") _ref"]
+      ArrayString ctp      -> ["TArrayString" ++ ctypeSpec CChar ctp ++ " _strs"]
+      ArrayObject name ctp -> ["TArrayObject" ++ ctypeSpec CObject ctp ++ "(" ++ name ++ ") _objs"]
+      _other               -> []
 
 
 -- type def. for clarity
@@ -212,32 +208,32 @@ cTypeArg decl className' arg
       Double    -> "double " ++ argName arg
       Float     -> "float " ++ argName arg
       Ptr Void  -> "void* " ++ argName arg
-      Ptr t  -> cRetType decl t ++ "* " ++ argName arg
+      Ptr t     -> cRetType decl t ++ "* " ++ argName arg
       -- typedefs
-      EventId -> "int"
+      EventId   -> "int"
       -- special
-      Vector ctp -> "TVector" ++ ctypeSpec CInt ctp ++ argNameTuple
-      Point ctp  -> "TPoint" ++ ctypeSpec CInt ctp ++ argNameTuple
-      Size ctp   -> "TSize" ++ ctypeSpec CInt ctp ++  argNameTuple
-      String ctp -> "TString" ++ ctypeSpec CChar ctp  ++ " " ++ argName arg
-      Rect ctp   -> "TRect" ++ ctypeSpec CInt ctp  ++  argNameTuple
-      Fun _f     -> "TClosureFun "  ++ argName arg
+      Vector ctp           -> "TVector" ++ ctypeSpec CInt ctp ++ argNameTuple
+      Point ctp            -> "TPoint" ++ ctypeSpec CInt ctp ++ argNameTuple
+      Size ctp             -> "TSize" ++ ctypeSpec CInt ctp ++  argNameTuple
+      String ctp           -> "TString" ++ ctypeSpec CChar ctp  ++ " " ++ argName arg
+      Rect ctp             -> "TRect" ++ ctypeSpec CInt ctp  ++  argNameTuple
+      Fun _f               -> "TClosureFun "  ++ argName arg
       ArrayString ctp      -> "TArrayString" ++ ctypeSpec CChar ctp ++ " " ++ argName arg
       ArrayObject name ctp -> "TArrayObject" ++ ctypeSpec CObject ctp ++ "(" ++ name ++ ") " ++ argName arg
-      RefObject name  -> "TClassRef(" ++  name ++ ") " ++ argName arg
-      Object name     | className' == name  -> "TSelf(" ++  name ++ ") " ++ argName arg
-                      | otherwise          -> "TClass(" ++  name ++ ") " ++ argName arg
+      RefObject name       -> "TClassRef(" ++  name ++ ") " ++ argName arg
+      Object name | className' == name -> "TSelf(" ++  name ++ ") " ++ argName arg
+                  | otherwise          -> "TClass(" ++  name ++ ") " ++ argName arg
 
       -- temporary types (can this ever happen?)
-      StringLen         -> "TStringLen " ++ argName arg
-      StringOut ctp     -> "TStringOut" ++ ctypeSpec CChar ctp ++ " " ++ argName arg
-      ArrayLen          -> "TArrayLen " ++ argName arg
-      ArrayStringOut ctp        -> "TArrayStringOut" ++ ctypeSpec CChar ctp ++ " " ++ argName arg
-      ArrayObjectOut name ctp   -> "TArrayObjectOut" ++ ctypeSpec CObject ctp ++ "(" ++ name ++ ") " ++ argName arg
-      PointOut ctp      -> "TPointOut" ++ ctypeSpec CInt ctp ++ argNameTuple
-      SizeOut ctp       -> "TSizeOut" ++ ctypeSpec CInt ctp ++ argNameTuple
-      VectorOut ctp     -> "TVectorOut" ++ ctypeSpec CInt  ctp ++ argNameTuple
-      RectOut ctp       -> "TRectOut" ++ ctypeSpec CInt ctp ++ argNameTuple
+      StringLen               -> "TStringLen " ++ argName arg
+      StringOut ctp           -> "TStringOut" ++ ctypeSpec CChar ctp ++ " " ++ argName arg
+      ArrayLen                -> "TArrayLen " ++ argName arg
+      ArrayStringOut ctp      -> "TArrayStringOut" ++ ctypeSpec CChar ctp ++ " " ++ argName arg
+      ArrayObjectOut name ctp -> "TArrayObjectOut" ++ ctypeSpec CObject ctp ++ "(" ++ name ++ ") " ++ argName arg
+      PointOut ctp            -> "TPointOut" ++ ctypeSpec CInt ctp ++ argNameTuple
+      SizeOut ctp             -> "TSizeOut" ++ ctypeSpec CInt ctp ++ argNameTuple
+      VectorOut ctp           -> "TVectorOut" ++ ctypeSpec CInt  ctp ++ argNameTuple
+      RectOut ctp             -> "TRectOut" ++ ctypeSpec CInt ctp ++ argNameTuple
 
       _other  -> error ("cTypeArg: unknown argument type (" ++ show (argType arg) ++ ")") 
 {-

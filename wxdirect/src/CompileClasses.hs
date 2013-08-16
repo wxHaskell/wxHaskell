@@ -8,24 +8,22 @@
     Portability :  portable
 
     Module that compiles method definitions to Haskell, together
-    with a proper marshaling wrapper.
+    with a proper marshalling wrapper.
 -}
 -----------------------------------------------------------------------------------------
 module CompileClasses( compileClasses, haskellTypeArg, haskellTypePar ) where
 
--- import qualified Data.Set as Set
 import qualified Data.Map as Map
--- import qualified MultiSet
 
-import Data.Time( getCurrentTime)
-import Data.Char( {-toUpper, isUpper,-} toLower ) --toLower, toUpper, isSpace, isLower, isUpper )
-import Data.List( isPrefixOf, sort, sortBy, {-intersperse, zipWith4,-} elemIndex )
+import Data.Time( getCurrentTime )
+import Data.Char( toLower )
+import Data.List( isPrefixOf, sort, sortBy, elemIndex )
 
 import Types
 import HaskellNames
-import Classes( {-isClassName,-} haskellClassDefs, objectClassNames, ClassInfo(..), classInfo, classIsManaged )
+import Classes( haskellClassDefs, objectClassNames, ClassInfo(..), classInfo, classIsManaged )
 import ParseC( parseC )
-import DeriveTypes( deriveTypes, classifyName, Name(..), Method(..), ClassName{-, MethodName, PropertyName-} )
+import DeriveTypes( deriveTypes, classifyName, Name(..), Method(..), ClassName )
 import IOExtra
 
 {-----------------------------------------------------------------------------------------
@@ -46,7 +44,7 @@ compileClasses showIgnore moduleRoot moduleClassTypesName moduleName outputFile 
            module2        = moduleRoot ++ moduleName ++ postfix2
 
            export   = concat  [ ["module " ++ moduleRoot ++ moduleName
-                                , "    ( -- * Re-export" 
+                                , "    ( -- * Re-export"
                                 , "      module " ++ module1
                                 , "    , module " ++ module2
                                 , "    , module " ++ moduleRoot ++ moduleClassTypesName
@@ -69,7 +67,7 @@ compileClasses showIgnore moduleRoot moduleClassTypesName moduleName outputFile 
            prologue = getPrologue moduleName "class"
                                    (show methodCount ++ " methods for " ++ show classCount ++ " classes.")
                                    inputFiles
-       
+
        let output  = unlines (prologue ++ export)
        putStrLn ("generating: " ++ outputFile ++ ".hs")
        writeFileLazy (outputFile ++ ".hs") output
@@ -258,8 +256,8 @@ isDeleteMethod :: Decl -> Bool
 isDeleteMethod decl
   = case (declRet decl, declArgs decl, classifyName (declName decl)) of
       (Void,[Arg [_] (Object selfName)],Method cname (Normal mname))
-         -> (mname == "Delete" || mname=="SafeDelete") 
-            && (selfName == cname) 
+         -> (mname == "Delete" || mname=="SafeDelete")
+            && (selfName == cname)
             && (cname `elem` objectClassNames || classIsManaged cname)
       _  -> False
 
@@ -310,11 +308,11 @@ haskellDecl decl
 nl :: String
 nl
   = "\n    "
-  
+
 nlStart :: String
 nlStart
   = "\n  = "
-  
+
 pparens :: String -> String
 pparens txt
   = "(" ++ txt ++ ")"
@@ -329,33 +327,32 @@ haskellToCResult :: Decl -> Type -> String -> String
 haskellToCResult decl tp call
   = unsafeIO $
     case tp of
-      Fun _   -> traceWarning "function as result" decl $ call
-      EventId -> "withIntResult $" ++ nl ++ call
-      Id    -> "withIntResult $" ++ nl ++ call
-      Int _ -> "withIntResult $" ++ nl ++ call
-      IntPtr-> "withIntPtrResult $" ++ nl ++ call
-      Bool  -> "withBoolResult $" ++ nl ++ call
-      Char  -> "withCharResult $" ++ nl ++ call
-      Object obj -> withResult (classInfo obj)  ++ " $" ++ nl ++ call
-      String _ -> "withWStringResult $ \\buffer -> " ++ nl ++ call ++ " buffer"    -- always last argument!
+      Fun _           -> traceWarning "function as result" decl $ call
+      EventId         -> "withIntResult $" ++ nl ++ call
+      Id              -> "withIntResult $" ++ nl ++ call
+      Int _           -> "withIntResult $" ++ nl ++ call
+      IntPtr          -> "withIntPtrResult $" ++ nl ++ call
+      Bool            -> "withBoolResult $" ++ nl ++ call
+      Char            -> "withCharResult $" ++ nl ++ call
+      Object obj      -> withResult (classInfo obj)  ++ " $" ++ nl ++ call
+      String _        -> "withWStringResult $ \\buffer -> " ++ nl ++ call ++ " buffer"    -- always last argument!
       ByteString Lazy -> "withLazyByteStringResult $ \\buffer -> " ++ nl ++ call ++ " buffer"    -- always last argument!
-      ByteString _ -> "withByteStringResult $ \\buffer -> " ++ nl ++ call ++ " buffer"    -- always last argument!
-      Point CDouble -> "withPointDoubleResult $ \\px py -> " ++ nl ++ call ++ " px py"       -- always last argument!
-      Point _  -> "withPointResult $ \\px py -> " ++ nl ++ call ++ " px py"       -- always last argument!
-      Vector CDouble -> "withVectorDoubleResult $ \\pdx pdy -> " ++ nl ++ call ++ " pdx pdy"       -- always last argument!
-      Vector _ -> "withVectorResult $ \\pdx pdy -> " ++ nl ++ call ++ " pdx pdy"       -- always last argument!
-      Size CDouble -> "withSizeDoubleResult $ \\pw ph -> " ++ nl ++ call ++ " pw ph"       -- always last argument!
-      Size _   -> "withSizeResult $ \\pw ph -> " ++ nl ++ call ++ " pw ph"       -- always last argument!
-      Rect CDouble -> "withRectDoubleResult $ \\px py pw ph -> " ++ nl ++ call ++ "px py pw ph"       -- always last argument!
-      Rect _   -> "withRectResult $ \\px py pw ph -> " ++ nl ++ call ++ "px py pw ph"       -- always last argument!
-      
-      -- RefObject name  -> "withRef" ++ haskellTypeName name ++ " $ \\pref -> " ++ nl ++ call ++ " pref"  -- always last argument!
-      RefObject name -> case withRef (classInfo name) of
-                          ""     -> errorMsgDecl decl "illegal reference object" 
-                          action -> action ++ " $ \\pref -> " ++ nl ++ call ++ " pref"  -- always last argument!
-      ArrayInt _    -> "withArrayIntResult $ \\arr -> " ++ nl ++ call ++ " arr" -- always last
-      ArrayIntPtr _ -> "withArrayIntPtrResult $ \\arr -> " ++ nl ++ call ++ " arr" -- always last
-      ArrayString _ -> "withArrayWStringResult $ \\arr -> " ++ nl ++ call ++ " arr" -- always last
+      ByteString _    -> "withByteStringResult $ \\buffer -> " ++ nl ++ call ++ " buffer"    -- always last argument!
+      Point CDouble   -> "withPointDoubleResult $ \\px py -> " ++ nl ++ call ++ " px py"       -- always last argument!
+      Point _         -> "withPointResult $ \\px py -> " ++ nl ++ call ++ " px py"       -- always last argument!
+      Vector CDouble  -> "withVectorDoubleResult $ \\pdx pdy -> " ++ nl ++ call ++ " pdx pdy"       -- always last argument!
+      Vector _        -> "withVectorResult $ \\pdx pdy -> " ++ nl ++ call ++ " pdx pdy"       -- always last argument!
+      Size CDouble    -> "withSizeDoubleResult $ \\pw ph -> " ++ nl ++ call ++ " pw ph"       -- always last argument!
+      Size _          -> "withSizeResult $ \\pw ph -> " ++ nl ++ call ++ " pw ph"       -- always last argument!
+      Rect CDouble    -> "withRectDoubleResult $ \\px py pw ph -> " ++ nl ++ call ++ "px py pw ph"       -- always last argument!
+      Rect _          -> "withRectResult $ \\px py pw ph -> " ++ nl ++ call ++ "px py pw ph"       -- always last argument!
+
+      RefObject name  -> case withRef (classInfo name) of
+                           ""     -> errorMsgDecl decl "illegal reference object"
+                           action -> action ++ " $ \\pref -> " ++ nl ++ call ++ " pref"  -- always last argument!
+      ArrayInt _      -> "withArrayIntResult $ \\arr -> " ++ nl ++ call ++ " arr" -- always last
+      ArrayIntPtr _   -> "withArrayIntPtrResult $ \\arr -> " ++ nl ++ call ++ " arr" -- always last
+      ArrayString _   -> "withArrayWStringResult $ \\arr -> " ++ nl ++ call ++ " arr" -- always last
       ArrayObject _ _ -> "withArrayObjectResult $ \\arr -> " ++ nl ++ call ++ " arr" -- always last
       _other          -> call
   where
@@ -399,7 +396,7 @@ haskellToCArgIO methodName' isSelf arg
                   -> "withArrayIntPtr " ++ haskellName (argName arg)
                      ++ " $ \\" ++ haskellArrayLenName (argName arg) ++ " " ++ haskellArrayName (argName arg)
                      ++ " -> " ++ nl
-      Object obj  -> (if isSelf then withSelf (classInfo obj) ("\"" ++ methodName' ++ "\"") 
+      Object obj  -> (if isSelf then withSelf (classInfo obj) ("\"" ++ methodName' ++ "\"")
                                 else withPtr (classInfo obj)) ++ " "
                      ++ haskellName (argName arg)
                      ++ " $ \\" ++ haskellCObjectName (argName arg) ++ " -> " ++ nl
@@ -414,37 +411,37 @@ haskellToCArgs decl args
 haskellToCArg :: Decl -> Arg -> String
 haskellToCArg decl arg
   = case argType arg of
-      RefObject _    -> traceError "reference object as argument" decl $ name
-      EventId        -> traceError "event id as argument" decl $ name
-      Id             -> traceError "id as argument" decl $ name
-      Int _ -> pparens ("toCInt " ++ name)
-      IntPtr-> pparens ("toCIntPtr " ++ name)
-      Char  -> pparens ("toCWchar " ++ name)
-      Bool  -> pparens ("toCBool " ++ name)
-      Fun _ -> pparens ("toCFunPtr " ++ name)
+      RefObject _     -> traceError "reference object as argument" decl $ name
+      EventId         -> traceError "event id as argument" decl $ name
+      Id              -> traceError "id as argument" decl $ name
+      Int _           -> pparens ("toCInt " ++ name)
+      IntPtr          -> pparens ("toCIntPtr " ++ name)
+      Char            -> pparens ("toCWchar " ++ name)
+      Bool            -> pparens ("toCBool " ++ name)
+      Fun _           -> pparens ("toCFunPtr " ++ name)
 
-      String _   -> haskellCStringName (argName arg)
+      String _        -> haskellCStringName (argName arg)
       ByteString Lazy -> haskellByteStringName name ++ " (fromIntegral $ LB.length " ++ haskellName name ++ ")"
-      ByteString _ -> haskellByteStringName name ++ " " ++ haskellByteStringLenName name
-      Object     _ -> haskellCObjectName (argName arg)
-      Point CDouble -> pparens ("toCDoublePointX " ++ name) ++ " " ++ pparens( "toCDoublePointY " ++ name)
-      Point _  -> pparens ("toCIntPointX " ++ name) ++ " " ++ pparens( "toCIntPointY " ++ name)
-      Vector CDouble -> pparens ("toCDoubleVectorX " ++ name) ++ " " ++ pparens( "toCDoubleVectorY " ++ name)
-      Vector _ -> pparens ("toCIntVectorX " ++ name) ++ " " ++ pparens( "toCIntVectorY " ++ name)
-      Size CDouble -> pparens ("toCDoubleSizeW " ++ name) ++ " " ++ pparens( "toCDoubleSizeH " ++ name)
-      Size _   -> pparens ("toCIntSizeW " ++ name) ++ " " ++ pparens( "toCIntSizeH " ++ name)
-      Rect CDouble -> pparens ("toCDoubleRectX " ++ name) ++ " " ++ pparens( "toCDoubleRectY " ++ name)
-                   ++ pparens ("toCDoubleRectW " ++ name) ++ " " ++ pparens( "toCDoubleRectH " ++ name)
-      Rect _   -> pparens ("toCIntRectX " ++ name) ++ " " ++ pparens( "toCIntRectY " ++ name)
-                  ++ pparens ("toCIntRectW " ++ name) ++ " " ++ pparens( "toCIntRectH " ++ name)
-      ColorRGB _ ->    pparens ("colorRed " ++ name) ++ " " 
-                    ++ pparens ("colorGreen " ++ name) ++ " "
-                    ++ pparens ("colorBlue " ++ name) 
+      ByteString _    -> haskellByteStringName name ++ " " ++ haskellByteStringLenName name
+      Object     _    -> haskellCObjectName (argName arg)
+      Point CDouble   -> pparens ("toCDoublePointX " ++ name) ++ " " ++ pparens( "toCDoublePointY " ++ name)
+      Point _         -> pparens ("toCIntPointX " ++ name) ++ " " ++ pparens( "toCIntPointY " ++ name)
+      Vector CDouble  -> pparens ("toCDoubleVectorX " ++ name) ++ " " ++ pparens( "toCDoubleVectorY " ++ name)
+      Vector _        -> pparens ("toCIntVectorX " ++ name) ++ " " ++ pparens( "toCIntVectorY " ++ name)
+      Size CDouble    -> pparens ("toCDoubleSizeW " ++ name) ++ " " ++ pparens( "toCDoubleSizeH " ++ name)
+      Size _          -> pparens ("toCIntSizeW " ++ name) ++ " " ++ pparens( "toCIntSizeH " ++ name)
+      Rect CDouble    -> pparens ("toCDoubleRectX " ++ name) ++ " " ++ pparens( "toCDoubleRectY " ++ name)
+                         ++ pparens ("toCDoubleRectW " ++ name) ++ " " ++ pparens( "toCDoubleRectH " ++ name)
+      Rect _          -> pparens ("toCIntRectX " ++ name) ++ " " ++ pparens( "toCIntRectY " ++ name)
+                         ++ pparens ("toCIntRectW " ++ name) ++ " " ++ pparens( "toCIntRectH " ++ name)
+      ColorRGB _      ->    pparens ("colorRed " ++ name) ++ " "
+                         ++ pparens ("colorGreen " ++ name) ++ " "
+                         ++ pparens ("colorBlue " ++ name)
 
-      ArrayString _     -> haskellArrayLenName name ++ " " ++ haskellArrayName name
-      ArrayObject _ _   -> haskellArrayLenName name ++ " " ++ haskellArrayName name
-      ArrayInt _        -> haskellArrayLenName name ++ " " ++ haskellArrayName name
-      ArrayIntPtr _     -> haskellArrayLenName name ++ " " ++ haskellArrayName name
+      ArrayString _   -> haskellArrayLenName name ++ " " ++ haskellArrayName name
+      ArrayObject _ _ -> haskellArrayLenName name ++ " " ++ haskellArrayName name
+      ArrayInt _      -> haskellArrayLenName name ++ " " ++ haskellArrayName name
+      ArrayIntPtr _   -> haskellArrayLenName name ++ " " ++ haskellArrayName name
 
       _other -> name
   where
@@ -536,40 +533,40 @@ haskellTypePar i tp
 haskellType :: Int -> Type -> String
 haskellType i tp
   = case tp of
-      Bool   -> "Bool"
-      Int _  -> "Int"
-      IntPtr -> "IntPtr"
-      Int64  -> "Int64"
-      Word   -> "Word"
-      Word8  -> "Word8"
-      Word32 -> "Word32"
-      Void   -> "()"
-      Char   -> "Char"
-      Double -> "Double"
-      Float  -> "Float"
-      Ptr Void  -> "Ptr " ++ typeVar i
-      Ptr t  -> "Ptr " ++ foreignTypePar i t
+      Bool     -> "Bool"
+      Int _    -> "Int"
+      IntPtr   -> "IntPtr"
+      Int64    -> "Int64"
+      Word     -> "Word"
+      Word8    -> "Word8"
+      Word32   -> "Word32"
+      Void     -> "()"
+      Char     -> "Char"
+      Double   -> "Double"
+      Float    -> "Float"
+      Ptr Void -> "Ptr " ++ typeVar i
+      Ptr t    -> "Ptr " ++ foreignTypePar i t
       -- special
-      Vector CDouble -> "(Vector2 Double)"
-      Vector _ -> "Vector"
-      Point CDouble  -> "(Point2 Double)"
-      Point _  -> "Point"
-      Size CDouble -> "(Size2D Double)"
-      Size _   -> "Size"
-      ColorRGB _ -> "Color"
-      String _ -> "String"
-      ByteString Lazy -> "LB.ByteString"
-      ByteString _ -> "B.ByteString"
-      ArrayString _ -> "[String]"
-      ArrayInt _    -> "[Int]"
-      ArrayIntPtr _ -> "[IntPtr]"
+      Vector CDouble     -> "(Vector2 Double)"
+      Vector _           -> "Vector"
+      Point CDouble      -> "(Point2 Double)"
+      Point _            -> "Point"
+      Size CDouble       -> "(Size2D Double)"
+      Size _             -> "Size"
+      ColorRGB _         -> "Color"
+      String _           -> "String"
+      ByteString Lazy    -> "LB.ByteString"
+      ByteString _       -> "B.ByteString"
+      ArrayString _      -> "[String]"
+      ArrayInt _         -> "[Int]"
+      ArrayIntPtr _      -> "[IntPtr]"
       ArrayObject name _ -> "[" ++ haskellTypeName name ++ typeVar i ++ "]"
-      Rect CDouble   -> "(Rect2D Double)"
-      Rect _   -> "Rect"
-      Fun f  -> "FunPtr " ++ pparens f
-      RefObject name  -> classTypeName (classInfo name) (typeVar i) -- haskellTypeName name ++ typeVar i
-      Object name     -> classTypeName (classInfo name) (typeVar i) -- haskellTypeName name ++ typeVar i
-      _other          -> error ("Non exaustive pattern: CompileClasses.haskellType: " ++ show tp)
+      Rect CDouble       -> "(Rect2D Double)"
+      Rect _             -> "Rect"
+      Fun f              -> "FunPtr " ++ pparens f
+      RefObject name     -> classTypeName (classInfo name) (typeVar i) -- haskellTypeName name ++ typeVar i
+      Object name        -> classTypeName (classInfo name) (typeVar i) -- haskellTypeName name ++ typeVar i
+      _other             -> error ("Non exaustive pattern: CompileClasses.haskellType: " ++ show tp)
 
 {-----------------------------------------------------------------------------------------
    Translate a declaration to a foreign import declaration
@@ -605,24 +602,24 @@ foreignArg decl i arg
 foreignResultType :: Type -> String
 foreignResultType tp
   = case tp of
-      ArrayInt _    -> "Ptr CInt -> IO CInt"
-      ArrayIntPtr _ -> "Ptr CIntPtr -> IO CInt"
-      ArrayString _ -> "Ptr (Ptr CWchar) -> IO CInt"
+      ArrayInt _         -> "Ptr CInt -> IO CInt"
+      ArrayIntPtr _      -> "Ptr CIntPtr -> IO CInt"
+      ArrayString _      -> "Ptr (Ptr CWchar) -> IO CInt"
       ArrayObject name _ -> "Ptr " ++ foreignTypePar 0 (Object name) ++ " -> IO CInt"
-      String _ -> "Ptr CWchar -> IO CInt"
-      ByteString _ -> "Ptr CChar -> IO CInt"
-      Point CDouble -> "Ptr CDouble -> Ptr CDouble -> IO ()"
-      Point _  -> "Ptr CInt -> Ptr CInt -> IO ()"
-      Vector CDouble -> "Ptr Double -> Ptr Double -> IO ()"
-      Vector _ -> "Ptr CInt -> Ptr CInt -> IO ()"
-      Size CDouble -> "Ptr CDouble -> Ptr CDouble -> IO ()"
-      Size _   -> "Ptr CInt -> Ptr CInt -> IO ()"
-      Rect CDouble -> "Ptr CDouble -> Ptr CDouble -> Ptr CDouble -> Ptr CDouble -> IO ()"
-      Rect _    -> "Ptr CInt -> Ptr CInt -> Ptr CInt -> Ptr CInt -> IO ()"
-      RefObject _name -> foreignType 0 tp ++ " -> IO ()"
-      EventId -> "IO CInt"
-      Id      -> "IO CInt"
-      _other  -> "IO " ++ foreignTypePar 0 tp
+      String _           -> "Ptr CWchar -> IO CInt"
+      ByteString _       -> "Ptr CChar -> IO CInt"
+      Point CDouble      -> "Ptr CDouble -> Ptr CDouble -> IO ()"
+      Point _            -> "Ptr CInt -> Ptr CInt -> IO ()"
+      Vector CDouble     -> "Ptr Double -> Ptr Double -> IO ()"
+      Vector _           -> "Ptr CInt -> Ptr CInt -> IO ()"
+      Size CDouble       -> "Ptr CDouble -> Ptr CDouble -> IO ()"
+      Size _             -> "Ptr CInt -> Ptr CInt -> IO ()"
+      Rect CDouble       -> "Ptr CDouble -> Ptr CDouble -> Ptr CDouble -> Ptr CDouble -> IO ()"
+      Rect _             -> "Ptr CInt -> Ptr CInt -> Ptr CInt -> Ptr CInt -> IO ()"
+      RefObject _name    -> foreignType 0 tp ++ " -> IO ()"
+      EventId            -> "IO CInt"
+      Id                 -> "IO CInt"
+      _other             -> "IO " ++ foreignTypePar 0 tp
 
 
 foreignTypePar :: Int -> Type -> String
@@ -647,26 +644,26 @@ foreignType i tp
       Ptr Void  -> "Ptr " ++ typeVar i
       Ptr t     -> "Ptr " ++ foreignTypePar i t
       -- special
-      String _ -> "CWString"
-      ByteString Lazy -> "Ptr Word8 -> Int"
-      ByteString _ -> "Ptr CChar -> Int"
-      Point CDouble  -> "CDouble -> CDouble"
-      Point _  -> "CInt -> CInt"
-      Vector CDouble  -> "CDouble -> CDouble"
-      Vector _ -> "CInt -> CInt"
-      Size CDouble  -> "CDouble -> CDouble"
-      Size _   -> "CInt -> CInt"
-      ColorRGB _ -> "Word8 -> Word8 -> Word8"
-      Rect CDouble -> "CDouble -> CDouble -> CDouble -> CDouble"
-      Rect _   -> "CInt -> CInt -> CInt -> CInt"
-      Fun f    -> "Ptr " ++ pparens f
+      String _           -> "CWString"
+      ByteString Lazy    -> "Ptr Word8 -> Int"
+      ByteString _       -> "Ptr CChar -> Int"
+      Point CDouble      -> "CDouble -> CDouble"
+      Point _            -> "CInt -> CInt"
+      Vector CDouble     -> "CDouble -> CDouble"
+      Vector _           -> "CInt -> CInt"
+      Size CDouble       -> "CDouble -> CDouble"
+      Size _             -> "CInt -> CInt"
+      ColorRGB _         -> "Word8 -> Word8 -> Word8"
+      Rect CDouble       -> "CDouble -> CDouble -> CDouble -> CDouble"
+      Rect _             -> "CInt -> CInt -> CInt -> CInt"
+      Fun f              -> "Ptr " ++ pparens f
       ArrayObject name _ -> "CInt -> Ptr " ++ foreignTypePar i (Object name)
       ArrayString _      -> "CInt -> Ptr (Ptr CWchar)"
       ArrayInt _         -> "CInt -> Ptr CInt"
       ArrayIntPtr _      -> "CInt -> Ptr CIntPtr"
-      RefObject name -> "Ptr (T" ++ haskellTypeName name ++ typeVar i ++ ")"
-      Object name    -> "Ptr (T" ++ haskellTypeName name ++ typeVar i ++ ")"
-      _              -> error $ "CompileClasses.foreignType: unexpected type: " ++ show tp
+      RefObject name     -> "Ptr (T" ++ haskellTypeName name ++ typeVar i ++ ")"
+      Object name        -> "Ptr (T" ++ haskellTypeName name ++ typeVar i ++ ")"
+      _                  -> error $ "CompileClasses.foreignType: unexpected type: " ++ show tp
 
 
 parenType :: (Type -> String) -> Type -> String

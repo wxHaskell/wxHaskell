@@ -7,7 +7,7 @@
     Stability   :  provisional
     Portability :  portable
 
-    Module that derives more specific types from a  C-header signature.
+    Module that derives more specific types from a C-header signature.
     Also removes duplicates and ignored definitions.
 -}
 -----------------------------------------------------------------------------------------
@@ -23,11 +23,10 @@ import Data.Char( toUpper, isUpper )
 import Data.List( isPrefixOf )
 
 import Types
--- import HaskellNames
 import Classes( isClassName )
 
 {-----------------------------------------------------------------------------------------
-  The whole type derivation can be tuned with this tables
+  The whole type derivation can be tuned with these tables
 -----------------------------------------------------------------------------------------}
 -- | Map properties names (@GetInvokingWindow@) to object types (@Window@).
 objectProperties :: Map.Map String Type
@@ -73,7 +72,7 @@ objectProperties
     ,("LogTarget"       , "wxLog")
     ]
 
--- | Property names that correspond with a boolean
+-- | Property names that correspond to a boolean
 booleanProperties :: Set.Set String
 booleanProperties
   = Set.fromList
@@ -177,7 +176,7 @@ strings
     ]
 
 
--- | Argument name  pairs that correspond to Points.
+-- | Argument name pairs that correspond to Points.
 points :: Set.Set (String,String)
 points
   = Set.fromList
@@ -195,7 +194,7 @@ points
     , ("_lft","_top")       -- FileDialog
     ]
 
--- | Argument name  pairs that correspond to Sizes.
+-- | Argument name pairs that correspond to Sizes.
 sizes :: Set.Set (String,String)
 sizes
   = Set.fromList
@@ -205,7 +204,7 @@ sizes
     , ("_width","_height")
     ]
 
--- | Argument name  pairs that correspond to Vectors.
+-- | Argument name pairs that correspond to Vectors.
 vectors :: Set.Set (String,String)
 vectors
   = Set.fromList
@@ -213,7 +212,7 @@ vectors
     , ("_dx","_dy")
     ]
 
--- | Argument name  quadruples that correspond to Rectangles.
+-- | Argument name quadruples that correspond to Rectangles.
 rectangles :: Set.Set (String,String,String,String)
 rectangles
   = Set.fromList
@@ -228,56 +227,56 @@ rectangles
 objects :: Map.Map String String
 objects
   = Map.fromList
-    [("submenu"   ,"wxMenu")
-    ,("handler"   ,"wxEvtHandler")
-    ,("dc"        ,"wxDC")
-    ,("_prc"      ,"wxProcess")
-    ,("ctrl"      ,"wxControl")
-    ,("win"       ,"wxWindow")
-    ,("_wnd"      ,"wxWindow")
-    ,("_prt"      ,"wxWindow")
-    ,("parent"    ,"wxWindow")
-    ,("_par"      ,"wxWindow")
-    ,("_prt"      ,"wxWindow")
-    ,("child","wxWindow")
-    ,("_lst","wxList")
-    ,("sibling","wxWindow")
-    ,("otherW","wxWindow")
-    ,("otherWin","wxWindow")
-    ,("nb","wxNotebook")
-    ,("cmap","wxPalette")
-    ,("theFont","wxFont")
-    ,("stipple","wxBitmap")
-    ,("_bmp"      ,"wxBitmap")
-    ,("bmp"       ,"wxBitmap")
-    ,("bmp1"      ,"wxBitmap")
-    ,("bmp2"      ,"wxBitmap")
-    ,("t1","wxDateTime")
-    ,("t2","wxDateTime")
-    ,("dt","wxDateTime")
-    ,("col","wxColour")
-    ,("_itm","wxMenuItem")
-    ,("cfg"       ,"wxConfigBase")    -- htmlHelpController
-    ,("config"    ,"wxConfigBase")    -- htmlHelpController
+    [ ("submenu",  "wxMenu")
+    , ("handler",  "wxEvtHandler")
+    , ("dc",       "wxDC")
+    , ("_prc",     "wxProcess")
+    , ("ctrl",     "wxControl")
+    , ("win",      "wxWindow")
+    , ("_wnd",     "wxWindow")
+    , ("_prt",     "wxWindow")
+    , ("parent",   "wxWindow")
+    , ("_par",     "wxWindow")
+    , ("_prt",     "wxWindow")
+    , ("child",    "wxWindow")
+    , ("_lst",     "wxList")
+    , ("sibling",  "wxWindow")
+    , ("otherW",   "wxWindow")
+    , ("otherWin", "wxWindow")
+    , ("nb",       "wxNotebook")
+    , ("cmap",     "wxPalette")
+    , ("theFont",  "wxFont")
+    , ("stipple",  "wxBitmap")
+    , ("_bmp",     "wxBitmap")
+    , ("bmp",      "wxBitmap")
+    , ("bmp1",     "wxBitmap")
+    , ("bmp2",     "wxBitmap")
+    , ("t1",       "wxDateTime")
+    , ("t2",       "wxDateTime")
+    , ("dt",       "wxDateTime")
+    , ("col",      "wxColour")
+    , ("_itm",     "wxMenuItem")
+    , ("cfg",      "wxConfigBase")    -- htmlHelpController
+    , ("config",   "wxConfigBase")    -- htmlHelpController
     ]
 
 -- | Argument name  pairs that correspond to a certain (haskell) function pointer.
 functions :: Map.Map String String
 functions
   = Map.fromList
-    [ ("_fun_CEvent"      , "Ptr fun -> Ptr state -> Event evt -> IO ()")
+    [ ("_fun_CEvent", "Ptr fun -> Ptr state -> Event evt -> IO ()")
     ]
 
 
 referenceObjects :: Map.Map String String
 referenceObjects
   = Map.fromList
-    [ ("AddTime", "wxDateTime")
+    [ ("AddTime",      "wxDateTime")
     , ("SubtractTime", "wxDateTime")
-    , ("AddDate", "wxDateTime")
+    , ("AddDate",      "wxDateTime")
     , ("SubtractDate", "wxDateTime")
-    , ("LoadBitmap", "wxBitmap")
-    , ("LoadIcon",   "wxIcon")
+    , ("LoadBitmap",   "wxBitmap")
+    , ("LoadIcon",     "wxIcon")
     ]
 
 -- | Definitions that should be ignored.
