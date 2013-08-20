@@ -14,6 +14,8 @@ module ParseC( parseC, readHeaderFile ) where
 
 import Data.Char( isSpace )
 import Data.List( isPrefixOf )
+import Data.Functor( (<$>) )
+import System.Process( readProcess )
 import Text.ParserCombinators.Parsec
 import qualified Text.ParserCombinators.Parsec.Token as P
 import Text.ParserCombinators.Parsec.Language
@@ -26,34 +28,36 @@ import Types
 -----------------------------------------------------------------------------------------}
 parseC :: FilePath -> IO [Decl]
 parseC fname
-  = do contents  <- readHeaderFile fname
-       declss <- mapM (parseDecl fname) (pairComments  contents)
-       -- putStrLn ("ok.")
+  = do contents <- readHeaderFile fname
+       declss   <- mapM (parseDecl fname) (pairComments  contents)
        return (concat declss)
 
--- flaky but suitable.
+
 readHeaderFile :: FilePath -> IO [String]
-readHeaderFile fname
-  = do putStrLn ("parsing: " ++ fname)
-       input <- readFile fname
-       -- Remove comment lines (starting with "//")
-       let filteredLines =
-             filter (not . ("//" `isPrefixOf`) . dropWhile isSpace) $ lines input
-       lls   <- mapM readIncludeFile (flattenComments filteredLines)
-       return (concat lls)
-  where
-    pathName
-      = reverse $ dropWhile (\c -> not (elem c "/\\")) $ reverse fname
+readHeaderFile fname =
+  do
+    includeDirectories <- getIncludeDirectories
+    putStrLn ("Preprocessing and parsing file: " ++ fname ++ 
+              ",\n  using include directories: " ++ (unwords includeDirectories)) 
+    flattenComments . filter (not . isPrefixOf "#") . lines <$>
+      readProcess 
+        "cpp"
+        ( includeDirectories ++ 
+          [fname              -- The file to process
+          , "-C"              -- Keep the comments
+          , "-DWXC_TYPES_H"   -- Make sure wxc_types.h is not included, 
+                              -- so the type macros are not replaced 
+                              -- (the parser scans for certain macros)
+          ]
+        )
+        ""
 
-    readIncludeFile line
-      | isPrefixOf "#include \"" line  
-      = readHeaderFile (pathName ++ includePath)
-      where
-        includePath = takeWhile (/='"') $ tail $ dropWhile (/='"') line
-
-    readIncludeFile line
-      = return [line]
-                        
+getIncludeDirectories :: IO [String]
+getIncludeDirectories = 
+  filter (isPrefixOf "-I") . words <$> 
+    readProcess "wx-config" ["--cppflags"] ""
+    
+                      
 -- flaky, but suitable
 flattenComments :: [String] -> [String]
 flattenComments inputLines
@@ -138,6 +142,11 @@ patomtype
   <|> do reserved "float";  return Float
   <|> do reserved "size_t"; return (Int SizeT)
   <|> do reserved "time_t"; return (Int TimeT)
+  <|> do reserved "uint8_t";  return Word8
+  <|> do reserved "uint32_t"; return Word32
+  <|> do reserved "uint64_t"; return Word64
+  <|> do reserved "intptr_t"; return IntPtr
+  <|> do reserved "int64_t";  return Int64
   <|> do reserved "TIntPtr";  return IntPtr
   <|> do reserved "TInt64"; return Int64
   <|> do reserved "TUInt"; return Word

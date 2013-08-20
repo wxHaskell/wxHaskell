@@ -50,7 +50,8 @@ executable wxdirect
     parsec     >= 2.1.0 && < 4,
     strict,
     time       >= 1.0   && < 1.5,
-    filepath   <  1.4
+    filepath   <  1.4,
+    process    >= 1.1   && < 1.2
 
   if flag(splitBase)
     build-depends:
