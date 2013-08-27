@@ -59,4 +59,4 @@ Platform specifics
 ==================
 
 MacOSX:
-- 20130725: homebrew (http://brew.sh/) does not yet install 2.9.5 (by means of 'brew install wxmac').
+- 20130725: homebrew (http://brew.sh/) does not yet install wxWidgets 2.9.5 (by means of 'brew install wxmac').
