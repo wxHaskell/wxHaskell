@@ -12,16 +12,11 @@ Status
 ======
 
 This fork builds & compiles
-- against: wxWidgets (http://www.wxwidgets.org/) 2.9.5 released 20130716
+- against: wxWidgets (http://www.wxwidgets.org/) 2.9.3, 2.9.4 and 2.9.5
 - with: Haskell platform (http://www.haskell.org/platform/) 2013.2.0.0
 - on: MacOSX 10.8.4, 64 bits Haskell platform
 
 Patches up and until 20130725 have been merged into this fork.
-
-There is no guarantee that this fork builds with other combinations.
-This is partly because internally components (in particular wxdirect)
-cannot deal with version variation done by means of (C) preprocessing.
-OS and Haskell platform differences should be no problem if it was no problem before this fork.
 
 All packages have cabal version 0.90.1.0, intending this to lead to a maintenance release.
 
@@ -30,7 +25,7 @@ Build & installation
 
 As of 20130725:
 - Prerequisites:
-  - install wxWidgets 2.9.5 directly from a source release or use a platform specific installer.
+  - install wxWidgets 2.9.3, 2.9.4 or 2.9.5 directly from a source release or use a platform specific installer.
     - if installed from source release configure with
         ./configure --disable-debug_flag	# to avoid debugging popups
 

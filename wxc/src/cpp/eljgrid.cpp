@@ -56,18 +56,17 @@ EWXWEXPORT(void,wxGridCellEditor_Show)(wxGridCellEditor* self,bool show,void* at
 	self->Show(show, (wxGridCellAttr*)attr);
 }
 	
-// AD 20130725: this should be dependent on version nr but wxdirect cannot deal with preprocessing directives, so this is fixed on an implicit presence of a correct wxWidgets version
-// #if (wxVERSION_NUMBER >= 2905)
+#if (wxVERSION_NUMBER >= 2905)
 EWXWEXPORT(void,wxGridCellEditor_PaintBackground)(wxGridCellEditor* self,wxDC* dc,int x,int y,int w,int h,wxGridCellAttr* attr)
 {
 	self->PaintBackground(*dc, wxRect(x, y, w, h), *attr);
 }
-// #else
-// EWXWEXPORT(void,wxGridCellEditor_PaintBackground)(wxGridCellEditor* self,int x,int y,int w,int h,void* attr)
-// {
-// 	self->PaintBackground(wxRect(x, y, w, h), (wxGridCellAttr*)attr);
-// }
-// #endif
+#else
+EWXWEXPORT(void,wxGridCellEditor_PaintBackground)(wxGridCellEditor* self,int x,int y,int w,int h,void* attr)
+{
+	self->PaintBackground(wxRect(x, y, w, h), (wxGridCellAttr*)attr);
+}
+#endif
 	
 EWXWEXPORT(void,wxGridCellEditor_BeginEdit)(wxGridCellEditor* self,int row,int col,void* grid)
 {
@@ -77,7 +76,7 @@ EWXWEXPORT(void,wxGridCellEditor_BeginEdit)(wxGridCellEditor* self,int row,int c
 EWXWEXPORT(bool,wxGridCellEditor_EndEdit)(wxGridCellEditor* self,int row,int col,wxGrid* grid, wxString* oldCell, wxString* newCell)
 {
 #if (wxVERSION_NUMBER < 2900)
-	return self->EndEdit(row, col,  grid);
+  return self->EndEdit(row, col,  grid);
 #else
   return self->EndEdit(row, col, grid, *oldCell, newCell);
 #endif

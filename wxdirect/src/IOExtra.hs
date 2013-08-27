@@ -5,7 +5,7 @@
 
     Maintainer  :  wxhaskell-devel@lists.sourceforge.net
 
-    Defines most of the classes in wxWindows.
+    Module that writes a string lazily to a file.
 -}
 -----------------------------------------------------------------------------------------
 module IOExtra( writeFileLazy ) where
@@ -17,7 +17,7 @@ import qualified System.IO.Strict as Strictly
 
 {-----------------------------------------------------------------------------------------
 Only write to the file if its contents have changed,
-e.g. don't change the file's modifed time unless you change the contents.
+e.g. don't change the file's modified time, unless you change the contents.
 -----------------------------------------------------------------------------------------}
 writeFileLazy :: FilePath -> String -> IO ()
 writeFileLazy f str = fileChanged >>= flip when (writeFile f str)

@@ -7,7 +7,7 @@
     Stability   :  provisional
     Portability :  portable
 
-    Utility module to create haskell compatible names.
+    Utility module to create Haskell compatible names.
 -}
 -----------------------------------------------------------------------------------------
 module HaskellNames( haskellDeclName

@@ -9,17 +9,15 @@
 
     The program @wxDirect@ generates the @Graphics.UI.WXCore.WxcClasses@ module automatically
     from the @wxc.h@ header file and the header files included in it. It is highly dependent on the
-    format of these header files but generates a very reasonable Haskell interface
-    on top the basic C interface.
+    format of these header files, but generates a very reasonable Haskell interface
+    on top of the basic C interface.
 
     The generation process can easily be tuned by editing the string lists in this file.
 -}
 -----------------------------------------------------------------------------------------
 module Main where
 
--- import Data.List( isPrefixOf )
-
-import System.Environment( getArgs{-, getEnv-} )
+import System.Environment( getArgs )
 import System.Console.GetOpt
 import System.FilePath  ( pathSeparator )
 

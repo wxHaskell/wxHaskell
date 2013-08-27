@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------------------------
 {-| Module      :  CompileSTC
-    Copyright   :  (c) Haste Developper Team 2004, 2005
+    Copyright   :  (c) Haste Developer Team 2004, 2005
     License     :  BSD-style
 
     Maintainer  :  wxhaskell-devel@lists.sourceforge.net

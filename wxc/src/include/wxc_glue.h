@@ -3,6 +3,9 @@
 
 /* $Id: wxc_glue.h,v 1.23 2005/02/25 11:14:58 dleijen Exp $ */
 
+/* wx/version.h must be included for preprocessing by wxdirect */
+#include "wx/version.h"
+
 /* Null */
 TClass(wxAcceleratorTable) Null_AcceleratorTable(  );
 TClass(wxBitmap) Null_Bitmap(  );
@@ -75,8 +78,6 @@ int expEVT_COMMAND_DATAVIEW_ITEM_DROP_POSSIBLE();
 int expEVT_COMMAND_DATAVIEW_ITEM_DROP();
 int expEVT_DATE_CHANGED();
 int expEVT_WINDOW_MODAL_DIALOG_CLOSED();
-//int expEVT_DIALUP_CONNECTED();
-//int expEVT_DIALUP_DISCONNECTED();
 int expEVT_COMMAND_BUTTON_CLICKED();
 int expEVT_COMMAND_CHECKBOX_CLICKED();
 int expEVT_COMMAND_CHOICE_SELECTED();
@@ -2551,12 +2552,13 @@ TClass(wxControl) wxGridCellEditor_GetControl( TSelf(wxGridCellEditor) _obj );
 void       wxGridCellEditor_HandleReturn( TSelf(wxGridCellEditor) _obj, TClass(wxEvent) event );
 TBool      wxGridCellEditor_IsAcceptedKey( TSelf(wxGridCellEditor) _obj, TClass(wxEvent) event );
 TBool      wxGridCellEditor_IsCreated( TSelf(wxGridCellEditor) _obj );
-// AD 20130725: this should be dependent on version nr but wxdirect cannot deal with preprocessing directives, so this is fixed on an implicit presence of a correct wxWidgets version
-// #if (wxVERSION_NUMBER >= 2905)
+
+#if (wxVERSION_NUMBER >= 2905)
 void       wxGridCellEditor_PaintBackground( TSelf(wxGridCellEditor) _obj, TClass(wxDC) dc, TRect(x,y,w,h), TClass(wxGridCellAttr) attr );
-// #else
-// void       wxGridCellEditor_PaintBackground( TSelf(wxGridCellEditor) _obj, TRect(x,y,w,h), TClass(wxGridCellAttr) attr );
-// #endif
+#else
+void       wxGridCellEditor_PaintBackground( TSelf(wxGridCellEditor) _obj, TRect(x,y,w,h), TClass(wxGridCellAttr) attr );
+#endif
+
 void       wxGridCellEditor_Reset( TSelf(wxGridCellEditor) _obj );
 void       wxGridCellEditor_SetControl( TSelf(wxGridCellEditor) _obj, TClass(wxControl) control );
 void       wxGridCellEditor_SetParameters( TSelf(wxGridCellEditor) _obj, TClass(wxString) params );

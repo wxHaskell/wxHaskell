@@ -24,19 +24,8 @@ library
   hs-source-dirs:
     src
 
-  if flag(splitBase)
-    build-depends:
-        base >= 4 && < 5
-  else
-    build-depends:
-        base >= 3 && < 4
-
   exposed-modules:
     Application.Wxdirect
-
-  ghc-options: -Wall
-  if impl(ghc >= 6.8)
-    ghc-options: -fwarn-tabs
 
 executable wxdirect
   main-is: Main.hs
@@ -50,7 +39,6 @@ executable wxdirect
                , DeriveTypes
                , HaskellNames
                , IOExtra
-               , MultiSet
                , ParseC
                , Types
 
@@ -62,7 +50,8 @@ executable wxdirect
     parsec     >= 2.1.0 && < 4,
     strict,
     time       >= 1.0   && < 1.5,
-    filepath   <  1.4
+    filepath   <  1.4,
+    process    >= 1.1   && < 1.2
 
   if flag(splitBase)
     build-depends:
