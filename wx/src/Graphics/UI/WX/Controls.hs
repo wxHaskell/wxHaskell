@@ -735,7 +735,7 @@ singleListBoxRes parent name props =
 --
 multiListBox :: Window a -> [Prop (MultiListBox ())] -> IO (MultiListBox ())
 multiListBox parent props
-  = feed2 props (wxLB_MULTIPLE .+. wxLB_EXTENDED .+. wxHSCROLL .+. wxLB_NEEDED_SB) $
+  = feed2 props (wxLB_EXTENDED .+. wxHSCROLL .+. wxLB_NEEDED_SB) $
     initialWindow $ \id rect ->
     initialSorted $ \props flags ->
     do lb <- listBoxCreate parent id rect [] flags
