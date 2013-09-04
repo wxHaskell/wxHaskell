@@ -10,6 +10,7 @@ extern int APPTerminating;
 #endif
 
 #include <windows.h>
+#include <locale.h>
 
 #if wxCHECK_VERSION(2,5,0)
  #define wxHANDLE  HINSTANCE
@@ -25,6 +26,11 @@ EWXWEXPORT(void, ELJApp_InitializeC) (wxClosure* closure, int _argc, char** _arg
 {
   wxHANDLE wxhInstance = GetModuleHandle(NULL);
 
+  /*
+   * Set the locale to "C",
+   * to prevent a wxWidgets assert failure in intl.cpp
+   */
+  setlocale(LC_ALL, "C");
 
 /* check memory leaks with visual C++ */
 #if (defined(__WXDEBUG__) && defined(_MSC_VER))
