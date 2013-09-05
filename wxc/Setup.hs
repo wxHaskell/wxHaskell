@@ -1,6 +1,7 @@
 import Control.Monad (mapM_, when)
+import Data.Functor  ( (<$>) )
 import Data.List (foldl', intersperse, intercalate, nub, lookup, isPrefixOf)
-import Data.Maybe (fromJust)
+import Data.Maybe (fromJust, isNothing)
 import Distribution.PackageDescription
 import Distribution.Simple
 import Distribution.Simple.InstallDirs (InstallDirs(..))
@@ -12,9 +13,9 @@ import Distribution.Simple.Utils (installOrdinaryFile)
 import Distribution.System (OS (..), Arch (..), buildOS, buildArch)
 import Distribution.Verbosity (normal, verbose)
 import System.Cmd (system)
-import System.Directory (createDirectoryIfMissing, doesFileExist, getCurrentDirectory, getModificationTime)
+import System.Directory (createDirectoryIfMissing, doesFileExist, findExecutable, getCurrentDirectory, getModificationTime)
 import System.Environment (getEnv)
-import System.Exit (ExitCode (..))
+import System.Exit (ExitCode (..), exitFailure)
 import System.FilePath.Posix ((</>), (<.>), replaceExtension, takeFileName, dropFileName, addExtension)
 import System.IO (hPutStrLn, stderr)
 import System.IO.Unsafe (unsafePerformIO)
@@ -45,6 +46,12 @@ includeDirectory = "include"
 
 -- Comment out type signature because of a Cabal API change from 1.6 to 1.7
 myConfHook (pkg0, pbi) flags = do
+
+    wxConfigMissing <- isNothing <$> findExecutable "wx-config"
+    when wxConfigMissing $
+      do
+        putStrLn "Error: wx-config not found, please install wx-config before installing wxc"
+        exitFailure
 
     lbi <- confHook simpleUserHooks (pkg0, pbi) flags
     let lpd       = localPkgDescr lbi
