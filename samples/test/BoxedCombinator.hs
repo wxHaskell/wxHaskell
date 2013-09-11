@@ -1,11 +1,11 @@
 module Main where
 import Graphics.UI.WX
 
-bugtext = unlines [ "Former bug: these button should react when clicked"
+bugtext = unlines [ "Former bug: these buttons should react when clicked"
                   , "but the boxed one does not"
                   , ""
                   , "Buggy   in: MacOS X [now fixed!]"
-                  , "Working in: Linux"
+                  , "Working in: Linux and Windows"
                   ]
 
 main = start $ do

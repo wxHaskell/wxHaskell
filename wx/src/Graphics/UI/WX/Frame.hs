@@ -11,10 +11,10 @@
 
 Frames.
     
-* Instances: 'HasImage', 'Form', 'Closeable', 'Framed' -- 
-             'Textual', 'Literate', 'Dimensions', 'Colored', 'Visible', 'Child', 
+* Instances: 'Form', 'Closeable', 'Framed' --
+             'Textual', 'Literate', 'Dimensions', 'Colored', 'Visible', 'Child',
              'Able', 'Tipped', 'Identity', 'Styled', 'Reactive', 'Paint',
-	     'HasDefault'.
+             'HasDefault'.
              
 
 -}

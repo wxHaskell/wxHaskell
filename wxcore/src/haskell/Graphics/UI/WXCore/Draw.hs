@@ -153,7 +153,7 @@ windowCalcUnscrolledPosition window p
 -- some degree of portability. The '_fontFace' can be used to specify the exact (platform
 -- dependent) font. 
 --
--- Note that the original wxWindows @FontStyle@ is renamed to @FontShape@.
+-- Note that the original wxWidgets @FontStyle@ is renamed to @FontShape@.
 data FontStyle
   = FontStyle{ _fontSize      :: !Int
              , _fontFamily    :: !FontFamily

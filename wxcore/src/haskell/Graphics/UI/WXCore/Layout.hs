@@ -9,7 +9,7 @@
 	Stability   :  provisional
 	Portability :  portable
 
-Combinators to specify layout. (These combinators use wxWindows 'Sizer' objects).
+Combinators to specify layout. (These combinators use wxWidgets 'Sizer' objects).
 
 Layout can be specified using 'windowSetLayout'. For example:
 
@@ -118,7 +118,7 @@ title of the pages is determined from the label of the container widget.
 Note: /At the moment, extra space is divided evenly among stretchable layouts. We plan to add
 a (/@proportion :: Int -> Layout -> Layout@/) combinator in the future to stretch layouts
 according to a relative weight, but unfortunately, that entails implementing a better
-/'FlexGrid'/ sizer for wxWindows./
+/'FlexGrid'/ sizer for wxWidgets./
 -}
 -----------------------------------------------------------------------------------------
 module Graphics.UI.WXCore.Layout( -- * Types

@@ -1,13 +1,13 @@
 {-# LANGUAGE TypeSynonymInstances, FlexibleInstances, MultiParamTypeClasses, DeriveDataTypeable #-}
 --------------------------------------------------------------------------------
-{-|	Module      :  Controls
-	Copyright   :  (c) Daan Leijen 2003
-	               (c) Shelarcy (shelarcy@gmail.com) 2006
-	License     :  wxWindows
+{-| Module      :  Controls
+    Copyright   :  (c) Daan Leijen 2003
+                   (c) Shelarcy (shelarcy@gmail.com) 2006
+    License     :  wxWindows
 
-	Maintainer  :  wxhaskell-devel@lists.sourceforge.net
-	Stability   :  provisional
-	Portability :  portable
+    Maintainer  :  wxhaskell-devel@lists.sourceforge.net
+    Stability   :  provisional
+    Portability :  portable
 
 Defines common GUI controls.
 -}
@@ -204,7 +204,7 @@ instance Commanding (Button a) where
 -- bitmap.
 --
 -- * Instances: 'Commanding' -- 'Textual', 'Literate', 'Dimensions', 'Colored', 'Visible', 'Child',
---             'Able', 'Tipped', 'Identity', 'Styled', 'Reactive', 'Paint'.
+--             'Able', 'Tipped', 'Identity', 'Styled', 'Reactive', 'Paint', 'Pictured'.
 --
 bitmapButton :: Window a -> [Prop (BitmapButton ())] -> IO (BitmapButton ())
 bitmapButton parent props
@@ -218,7 +218,7 @@ bitmapButton parent props
 --   from a resource file.
 --
 -- * Instances: 'Commanding' -- 'Textual', 'Literate', 'Dimensions', 'Colored', 'Visible', 'Child',
---             'Able', 'Tipped', 'Identity', 'Styled', 'Reactive', 'Paint'.
+--             'Able', 'Tipped', 'Identity', 'Styled', 'Reactive', 'Paint', 'Pictured'.
 --
 bitmapButtonRes :: Window a -> String -> [Prop (BitmapButton ())] -> IO (BitmapButton ())
 bitmapButtonRes parent name props =
@@ -972,7 +972,7 @@ instance Selecting (SpinCtrl a) where
 --------------------------------------------------------------------------------}
 -- | Create a toggle button. 
 --
--- * Instances: 'Commanding',  -- 'Textual', 'Literate', 'Dimensions', 'Colored', 'Visible', 'Child',
+-- * Instances: 'Commanding', 'Checkable',  -- 'Textual', 'Literate', 'Dimensions', 'Colored', 'Visible', 'Child',
 --             'Able', 'Tipped', 'Identity', 'Styled', 'Reactive', 'Paint'.
 --
 toggleButton :: Window a -> [Prop (ToggleButton ())] -> IO (ToggleButton ())

@@ -4,11 +4,11 @@ the Haskell GUI mailing list. The program is specified as:
 
 I propose a simple program which pops up a window saying 'Hello World'
 with a button saying 'Bye' which you click and it changes the message
-to 'Goodbye'. if you click the button again the program exits.
+to 'Goodbye'. If you click the button again the program exits.
 
 When the button is clicked the first time, it calls "onCommand1". This function
 changes the text of the label and installs another event handler on the button
-that closes the main frame. (by default, wxWindows exits the gui when all
+that closes the main frame. (by default, wxWidgets exits the gui when all
 windows are closed).
 --------------------------------------------------------------------------------}
 module Main where

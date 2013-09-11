@@ -138,7 +138,7 @@ varTopId :: Var Id
 varTopId
   = unsafePerformIO (varCreate (wxID_HIGHEST+1))
 
--- | When creating a new window you may specify 'idAny' to let wxWindows
+-- | When creating a new window you may specify 'idAny' to let wxWidgets
 -- assign an unused identifier to it automatically. Furthermore, it can be
 -- used in an event connection to handle events for any identifier.
 idAny :: Id

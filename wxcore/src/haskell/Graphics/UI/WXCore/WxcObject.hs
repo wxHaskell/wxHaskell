@@ -42,7 +42,7 @@ import Foreign.Concurrent
    to encode the inheritance relation. When the type parameter is unit @()@, it denotes
    an object of exactly that class, when the parameter is a type variable @a@, it
    specifies an object that is at least an instance of that class. For example in 
-   wxWindows, we have the following class hierarchy:
+   wxWidgets, we have the following class hierarchy:
 
    > EvtHandler
    >   |- Window
@@ -67,7 +67,7 @@ import Foreign.Concurrent
 
    This means that we can use @windowSetClientSize@ on any window, including
    buttons and frames, but we can only use @controlSetLabel@ on controls, not
-   includeing frames. 
+   including frames.
 
    In wxHaskell, this works since a @Frame ()@ is actually a type synonym for
    @Window (CFrame ())@ (where @CFrame@ is an abstract data type). We can thus
@@ -76,12 +76,12 @@ import Foreign.Concurrent
    which is in turn a synonym for @Window (CControl (CButton ()))@. Note that
    we can\'t pass a frame to something that expects a value of type @Control a@.
    Of course, a @Window a@ is actually a type synonym for @EvtHandler (CWindow a)@.
-   If you study the documentation in "Graphics.UI.WXH.WxcClasses" closely, you
+   If you study the documentation in "Graphics.UI.WX.Classes" closely, you
    can discover where this chain ends :-).  
 
    Objects are not automatically deleted. Normally you can use a delete function
    like @windowDelete@ to delete an object. However, almost all objects in the
-   wxWindows library are automatically deleted by the library. The only objects
+   wxWidgets library are automatically deleted by the library. The only objects
    that should be used with care are resources as bitmaps, fonts and brushes.
 -}
 data Object a   = Object  !(Ptr a)
@@ -119,7 +119,7 @@ objectNull :: Object a
 objectNull
   = Object nullPtr
 
--- | Is this a managed object.
+-- | Is this a managed object?
 objectIsManaged :: Object a -> Bool
 objectIsManaged obj
   = case obj of
@@ -150,14 +150,14 @@ withObjectPtr obj f
                     do p <- wxManagedPtr_GetPtr mp
                        f p
 
--- | Finalize a managed object manually. (no effect on unmanaged objects)
+-- | Finalize a managed object manually. (No effect on unmanaged objects.)
 objectFinalize :: Object a -> IO ()
 objectFinalize obj
   = case obj of
       Object p   -> return ()
       Managed fp -> withForeignPtr fp $ wxManagedPtr_Finalize
                           
--- | Remove the finalizer on a managed object. (no effect on unmanaged objects)
+-- | Remove the finalizer on a managed object. (No effect on unmanaged objects.)
 objectNoFinalize :: Object a -> IO ()
 objectNoFinalize obj
   = case obj of

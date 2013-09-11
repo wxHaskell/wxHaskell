@@ -65,7 +65,7 @@ compileClassInfo _verbose moduleRoot moduleClassesName moduleClassTypesName modu
                                 , "     then True"
                                 , "     else unsafePerformIO (objectIsKindOf obj classInfo)"
                                 , ""
-                                , "-- | Test if an object is of a certain kind, based on a full wxWindows class name. (Use with care)." 
+                                , "-- | Test if an object is of a certain kind, based on a full wxWidgets class name. (Use with care)."
                                 , "{-# NOINLINE instanceOfName #-}"
                                 , "instanceOfName :: WxObject a -> String -> Bool"
                                 , "instanceOfName obj className "

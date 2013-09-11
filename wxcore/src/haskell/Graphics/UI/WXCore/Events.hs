@@ -8,7 +8,7 @@
 	Stability   :  provisional
 	Portability :  portable
 
-Dynamically set (and get) Haskell event handlers for basic wxWindows events.
+Dynamically set (and get) Haskell event handlers for basic wxWidgets events.
 Note that one should always call 'skipCurrentEvent' when an event is not
 processed in the event handler so that other eventhandlers can process the
 event.
@@ -2582,9 +2582,9 @@ appOnInit init
 
 
 ------------------------------------------------------------------------------------------
--- Attaching haskell data to arbitrary objects.
+-- Attaching Haskell data to arbitrary objects.
 ------------------------------------------------------------------------------------------
--- | Use attached haskell data locally. This makes it type-safe.
+-- | Use attached Haskell data locally. This makes it type-safe.
 objectWithClientData :: WxObject a -> b -> ((b -> IO ()) -> IO b -> IO c) -> IO c
 objectWithClientData object initx fun
   = do let setter x = objectSetClientData object (return ()) x
@@ -2595,7 +2595,7 @@ objectWithClientData object initx fun
        setter initx
        fun setter getter
 
--- | Attach haskell value to an arbitrary object. The 'IO' action is executed
+-- | Attach Haskell value to an arbitrary object. The 'IO' action is executed
 -- when the object is deleted. Note: 'evtHandlerSetClientData' is preferred when possible.
 objectSetClientData :: WxObject a -> IO () -> b -> IO ()
 objectSetClientData object onDelete x
@@ -2603,13 +2603,13 @@ objectSetClientData object onDelete x
        objectSetClientClosure object closure
        return ()
 
--- | Retrieve an attached haskell value.
+-- | Retrieve an attached Haskell value.
 unsafeObjectGetClientData :: WxObject a -> IO (Maybe b)
 unsafeObjectGetClientData object
   = do closure <- objectGetClientClosure object 
        unsafeClosureGetData closure
                 
--- | Use attached haskell data locally in a type-safe way.
+-- | Use attached Haskell data locally in a type-safe way.
 evtHandlerWithClientData :: EvtHandler a -> b -> ((b -> IO ()) -> IO b -> IO c) -> IO c
 evtHandlerWithClientData evtHandler initx fun
   = do let setter x = evtHandlerSetClientData evtHandler (return ()) x
@@ -2620,7 +2620,7 @@ evtHandlerWithClientData evtHandler initx fun
        setter initx
        fun setter getter
 
--- | Attach a haskell value to an object derived from 'EvtHandler'. The 'IO' action
+-- | Attach a Haskell value to an object derived from 'EvtHandler'. The 'IO' action
 -- executed when the object is deleted.
 evtHandlerSetClientData :: EvtHandler a -> IO () -> b -> IO ()
 evtHandlerSetClientData evtHandler onDelete x
@@ -2628,7 +2628,7 @@ evtHandlerSetClientData evtHandler onDelete x
        evtHandlerSetClientClosure evtHandler closure
        return ()
 
--- | Retrieve an attached haskell value, previously attached with 'evtHandlerSetClientData'.
+-- | Retrieve an attached Haskell value, previously attached with 'evtHandlerSetClientData'.
 unsafeEvtHandlerGetClientData :: EvtHandler a -> IO (Maybe b)
 unsafeEvtHandlerGetClientData evtHandler
   = do closure <- evtHandlerGetClientClosure evtHandler
@@ -2636,7 +2636,7 @@ unsafeEvtHandlerGetClientData evtHandler
 
 
 
--- | Attach a haskell value to tree item data. The 'IO' action
+-- | Attach a Haskell value to tree item data. The 'IO' action
 -- executed when the object is deleted.
 treeCtrlSetItemClientData :: TreeCtrl a -> TreeItem -> IO () -> b -> IO ()
 treeCtrlSetItemClientData treeCtrl item onDelete x
@@ -2644,7 +2644,7 @@ treeCtrlSetItemClientData treeCtrl item onDelete x
        treeCtrlSetItemClientClosure treeCtrl item closure
        return ()
 
--- | Retrieve an attached haskell value to a tree item, previously attached with 'treeCtrlSetItemClientData'.
+-- | Retrieve an attached Haskell value to a tree item, previously attached with 'treeCtrlSetItemClientData'.
 unsafeTreeCtrlGetItemClientData :: TreeCtrl a -> TreeItem  -> IO (Maybe b)
 unsafeTreeCtrlGetItemClientData treeCtrl item
   = do closure <- treeCtrlGetItemClientClosure treeCtrl item
@@ -2694,15 +2694,15 @@ withCurrentEvent f
         then f ev
         else return ()
 
--- | Pass the event on the next /wxWindows/ event handler, either on this window or its parent.
+-- | Pass the event on the next /wxWidgets/ event handler, either on this window or its parent.
 -- Always call this method when you do not process the event. /Note:/ The use of
 -- 'propagateEvent' is encouraged as it is a much better name than 'skipCurrentEvent'. This
--- function name is just for better compatibility with wxWindows :-)
+-- function name is just for better compatibility with wxWidgets :-)
 skipCurrentEvent :: IO ()
 skipCurrentEvent
   = withCurrentEvent (\event -> eventSkip event)
 
--- | Pass the event on the next /wxWindows/ event handler, either on this window or its parent.
+-- | Pass the event on the next /wxWidgets/ event handler, either on this window or its parent.
 -- Always call this method when you do not process the event. (This function just call 'skipCurrentEvent').
 propagateEvent :: IO ()
 propagateEvent
@@ -2754,7 +2754,7 @@ evtHandlerOnEventDisconnect object firstId lastId eventIds
 -- (@evtHandlerOnEventConnect firstId lastId eventIds state destroy handler object@) sets an event
 -- handler @handler@ on @object@. The eventhandler gets called whenever an event
 -- happens that is in the list @eventIds@ on an object with an 'Id' between @firstId@
--- and @lastId@ (use -1 for any object). The @state@ is any kind of haskell data
+-- and @lastId@ (use -1 for any object). The @state@ is any kind of Haskell data
 -- that is attached to this handler. It can be retrieved via 'unsafeGetHandlerState'.
 -- Normally, the @state@ is the event handler itself. This allows the current event
 -- handler to be retrieved via calls to 'buttonGetOnCommand' for example. The @destroy@
@@ -2794,7 +2794,7 @@ unsafeClosureGetData closure
                       return (Just x)
 
 
--- | Create a closure with a certain haskell state, a function that is called
+-- | Create a closure with a certain Haskell state, a function that is called
 -- when the closure is destroyed, and a function that is called when an event
 -- happens. The destroy function takes a boolean that is 'True' when the parent
 -- is deleted (and 'False' when the closure is just disconnected). The event

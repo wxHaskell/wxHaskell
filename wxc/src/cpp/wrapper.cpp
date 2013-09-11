@@ -227,7 +227,7 @@ EWXWEXPORT(wxClosure*,wxEvtHandler_GetClosure)(wxEvtHandler* evtHandler,int id,i
 
   //set the global variable 'getCallback' so HandleEvent
   //knows we just want to know the closure. Unfortunately, this
-  //seems the cleanest way to retrieve the callback in wxWindows.
+  //seems the cleanest way to retrieve the callback in wxWidgets.
   getCallback = &callback;
   // Bugfix: see www.mail-archive.com/wxhaskell-devel@lists.sourceforge.net/msg00577.html
   // On entry, Dynamic event table may have no bound events
@@ -311,8 +311,7 @@ EWXWEXPORT(void,ELJApp_SetIdleInterval)(int interval)
 /*-----------------------------------------------------------------------------
     C interface to the application.
 -----------------------------------------------------------------------------*/
-//int OnExit();
-//virtual void OnFatalException();
+
 EWXWEXPORT(int,ELJApp_MainLoop)()
 {
         return wxGetApp().MainLoop();

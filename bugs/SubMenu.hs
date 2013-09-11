@@ -2,7 +2,7 @@
 -
 The following code doesn't seem to work properly. Either the main entry
 (m1/mp1) or it's sub menu entry (ms1/mps1) do not seem to propagate the
-event when pressed. It is possible to make it working by uncomments the
+event when pressed. It is possible to make it working by uncommenting the
 lines where the menu commands are registered in the frame.
 -}
 

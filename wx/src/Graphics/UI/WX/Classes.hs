@@ -1,12 +1,12 @@
 {-# LANGUAGE MultiParamTypeClasses, FunctionalDependencies, DeriveDataTypeable, ScopedTypeVariables #-}
 --------------------------------------------------------------------------------
-{-|	Module      :  Classes
-	Copyright   :  (c) Daan Leijen 2003
-	License     :  wxWindows
+{-| Module      :  Classes
+    Copyright   :  (c) Daan Leijen 2003
+    License     :  wxWindows
 
-	Maintainer  :  wxhaskell-devel@lists.sourceforge.net
-	Stability   :  provisional
-	Portability :  portable
+    Maintainer  :  wxhaskell-devel@lists.sourceforge.net
+    Stability   :  provisional
+    Portability :  portable
 
 This modules defines attributes common to many widgets and
 organizes them into Haskell classes. Look at the instance definitions
@@ -287,9 +287,9 @@ class Checkable w where
   -- | Is the widget checked?
   checked   :: Attr w Bool
 
--- | The identity determines the wxWindows ID of a widget.
+-- | The identity determines the wxWidgets ID of a widget.
 class Identity w where
-  -- | The identity determines the wxWindows ID of a widget.
+  -- | The identity determines the wxWidgets ID of a widget.
   identity :: Attr w Int
 
 

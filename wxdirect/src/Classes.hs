@@ -7,7 +7,7 @@
     Stability   :  provisional
     Portability :  portable
 
-    Defines most of the classes in wxWindows.
+    Defines most of the classes in wxWidgets.
 -}
 -----------------------------------------------------------------------------------------
 module Classes( isClassName, isBuiltin, haskellClassDefs

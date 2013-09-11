@@ -1,12 +1,12 @@
 {-# LANGUAGE ExistentialQuantification #-}
 --------------------------------------------------------------------------------
-{-|	Module      :  Attributes
-	Copyright   :  (c) Daan Leijen 2003
-	License     :  wxWindows
+{-| Module      :  Attributes
+    Copyright   :  (c) Daan Leijen 2003
+    License     :  wxWindows
 
-	Maintainer  :  wxhaskell-devel@lists.sourceforge.net
-	Stability   :  provisional
-	Portability :  portable
+    Maintainer  :  wxhaskell-devel@lists.sourceforge.net
+    Stability   :  provisional
+    Portability :  portable
 
 
 Widgets @w@ can have attributes of type @a@ represented by the type 'Attr' @w a@.
