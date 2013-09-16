@@ -158,16 +158,18 @@ EWXWEXPORT(wxGraphicsMatrix*,wxGraphicsContext_CreateDefaultMatrix)( wxGraphicsC
   return NULL;
 #endif
 }
+*/
 
 EWXWEXPORT(wxGraphicsPath*,wxGraphicsContext_CreatePath)( wxGraphicsContext* self )
 {
 #ifdef wxUSE_GRAPHICS_CONTEXT
-  return self->CreatePath();
+  wxGraphicsPath *path = new wxGraphicsPath;
+  *path = self->CreatePath();
+  return path;
 #else
   return NULL;
 #endif
 }
-*/
 
 EWXWEXPORT(void,wxGraphicsContext_Clip)( wxGraphicsContext* self, const wxRegion* region )
 {

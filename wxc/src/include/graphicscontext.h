@@ -21,6 +21,7 @@ TClass(wxGraphicsContext)  wxGraphicsContext_CreateFromWindow( TClass(wxWindow) 
 void  wxGraphicsContext_Delete(TSelf(wxGraphicsContext) self);
 TClass(wxGraphicsContext)  wxGraphicsContext_CreateFromNative( void* context );
 TClass(wxGraphicsContext)  wxGraphicsContext_CreateFromNativeWindow( void* window );
+TClass(wxGraphicsPath)     wxGraphicsContext_CreatePath( TSelf(wxGraphicsContext) self);
 void  wxGraphicsContext_Clip( TSelf(wxGraphicsContext) self, TClass(wxRegion) region );
 void  wxGraphicsContext_ClipByRectangle( TSelf(wxGraphicsContext) self, TRectDouble(x,y,w,h) );
 void  wxGraphicsContext_ResetClip( TSelf(wxGraphicsContext) self );
