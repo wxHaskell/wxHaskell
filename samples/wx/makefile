@@ -13,14 +13,13 @@ APPS= BouncingBalls\
       ByeDemo\
       Controls\
       CustomControl\
-      DbBrowse\
-      DbConsole\
       FileBrowse\
       Grid\
       HelloWorld\
       ImageViewer\
       Layout\
       ListCtrl\
+      ListView\
       Minimal\
       Paint\
       Print\
@@ -28,6 +27,10 @@ APPS= BouncingBalls\
       TestTaskBarIcon \
       TimeFlows\
       TimeFlowsEx\
+
+#      DbBrowse\
+#      DbConsole\
+
 
 .PHONY: clean
 
