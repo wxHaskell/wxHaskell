@@ -19,6 +19,7 @@ APPS= BouncingBalls\
       ImageViewer\
       Layout\
       ListCtrl\
+      ListView\
       Minimal\
       Paint\
       Print\
@@ -27,6 +28,10 @@ APPS= BouncingBalls\
       TestTaskBarIcon \
       TimeFlows\
       TimeFlowsEx\
+
+#      DbBrowse\
+#      DbConsole\
+
 
 .PHONY: clean
 
