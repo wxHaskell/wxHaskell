@@ -22,6 +22,8 @@ void  wxGraphicsContext_Delete(TSelf(wxGraphicsContext) self);
 TClass(wxGraphicsContext)  wxGraphicsContext_CreateFromNative( void* context );
 TClass(wxGraphicsContext)  wxGraphicsContext_CreateFromNativeWindow( void* window );
 TClass(wxGraphicsPath)     wxGraphicsContext_CreatePath( TSelf(wxGraphicsContext) self);
+TClass(wxGraphicsMatrix)   wxGraphicsContext_CreateMatrix( TSelf(wxGraphicsContext) self, double a, double b, double c, double d, double tx , double ty );
+TClass(wxGraphicsMatrix)   wxGraphicsContext_CreateDefaultMatrix( TSelf(wxGraphicsContext) self);
 void  wxGraphicsContext_Clip( TSelf(wxGraphicsContext) self, TClass(wxRegion) region );
 void  wxGraphicsContext_ClipByRectangle( TSelf(wxGraphicsContext) self, TRectDouble(x,y,w,h) );
 void  wxGraphicsContext_ResetClip( TSelf(wxGraphicsContext) self );
@@ -51,6 +53,8 @@ void  wxGraphicsContext_SetPen( TSelf(wxGraphicsContext) self, TClass(wxPen) pen
 void  wxGraphicsContext_SetGraphicsPen( TSelf(wxGraphicsContext) self, TClass(wxGraphicsPen) pen );
 void  wxGraphicsContext_StrokeLine( TSelf(wxGraphicsContext) self, TPointDouble(x1,y1), TPointDouble(x2,y2) );
 void  wxGraphicsContext_StrokeLines( TSelf(wxGraphicsContext) self, size_t n, void* x, void* y, int style );
+void  wxGraphicsContext_PushState( TSelf(wxGraphicsContext) self );
+void  wxGraphicsContext_PopState( TSelf(wxGraphicsContext) self );
 
 /*-----------------------------------------------------------------------------
   GraphicsFont
