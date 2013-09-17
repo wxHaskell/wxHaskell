@@ -12,6 +12,7 @@
 -----------------------------------------------------------------------------------------}
 module Main where
 
+import Control.Exception (onException)
 import Graphics.UI.WX 
 
 main :: IO ()
@@ -107,7 +108,7 @@ imageViewer
            bmsize <- get bm size
            set sw [virtualSize := bmsize]
            repaint sw
-       `catch` \err -> repaint sw
+       `onException` repaint sw
 
     onPaint vbitmap dc viewArea
       = do mbBitmap <- get vbitmap value

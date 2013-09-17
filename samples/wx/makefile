@@ -13,8 +13,6 @@ APPS= BouncingBalls\
       ByeDemo\
       Controls\
       CustomControl\
-      DbBrowse\
-      DbConsole\
       FileBrowse\
       Grid\
       HelloWorld\
@@ -25,6 +23,7 @@ APPS= BouncingBalls\
       Paint\
       Print\
       Process\
+      PropertyGrid    \
       TestTaskBarIcon \
       TimeFlows\
       TimeFlowsEx\
