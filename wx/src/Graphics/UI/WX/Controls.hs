@@ -98,7 +98,7 @@ defaultStyle
 --
 -- * Instances: 'Form' -- 'Dimensions', 'Colored', 'Visible', 'Child',
 --             'Able', 'Tipped', 'Identity', 'Styled',
---             'Textual', 'Literate'
+--             'Textual', 'Literate', 'Reactive', 'Paint'
 panel :: Window a -> [Prop (Panel ())] -> IO (Panel ())
 panel parent props
   = panelEx parent (wxTAB_TRAVERSAL .+. defaultStyle) props
@@ -203,8 +203,8 @@ instance Commanding (Button a) where
 -- | Create a bitmap button. Use the 'image' attribute to set the
 -- bitmap.
 --
--- * Instances: 'Commanding' -- 'Textual', 'Literate', 'Dimensions', 'Colored', 'Visible', 'Child',
---             'Able', 'Tipped', 'Identity', 'Styled', 'Reactive', 'Paint', 'Pictured'.
+-- * Instances: 'Commanding', 'Pictured' -- 'Textual', 'Literate', 'Dimensions', 'Colored', 'Visible', 'Child',
+--             'Able', 'Tipped', 'Identity', 'Styled', 'Reactive', 'Paint'.
 --
 bitmapButton :: Window a -> [Prop (BitmapButton ())] -> IO (BitmapButton ())
 bitmapButton parent props
@@ -217,8 +217,8 @@ bitmapButton parent props
 -- | Complete the construction of a bitmap button instance which has been loaded
 --   from a resource file.
 --
--- * Instances: 'Commanding' -- 'Textual', 'Literate', 'Dimensions', 'Colored', 'Visible', 'Child',
---             'Able', 'Tipped', 'Identity', 'Styled', 'Reactive', 'Paint', 'Pictured'.
+-- * Instances: 'Commanding', 'Pictured' -- 'Textual', 'Literate', 'Dimensions', 'Colored', 'Visible', 'Child',
+--             'Able', 'Tipped', 'Identity', 'Styled', 'Reactive', 'Paint'.
 --
 bitmapButtonRes :: Window a -> String -> [Prop (BitmapButton ())] -> IO (BitmapButton ())
 bitmapButtonRes parent name props =

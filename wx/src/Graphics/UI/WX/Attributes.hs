@@ -93,6 +93,13 @@ data Prop w     = forall a. Attr w a := a         -- ^ Assign a value to an attr
                 | forall a. Attr w a ::= (w -> a) -- ^ Assign a value to an attribute with the widget as argument.
                 | forall a. Attr w a ::~ (w -> a -> a) -- ^ Apply an update function to an attribute with the widget as an argument.
 
+-- For debugging purposes
+instance Show a => Show (Prop a) where
+  show ((Attr string _ _ _ _) :=  _) = "Attr \"" ++ string ++ "\" _ _ _ _ :=  _"
+  show ((Attr string _ _ _ _) :~  _) = "Attr \"" ++ string ++ "\" _ _ _ _ :~  _"
+  show ((Attr string _ _ _ _) ::= _) = "Attr \"" ++ string ++ "\" _ _ _ _ ::= _"
+  show ((Attr string _ _ _ _) ::~ _) = "Attr \"" ++ string ++ "\" _ _ _ _ ::~ _"
+
 
 -- | An attribute that should be specified at creation time. Just for documentation purposes.
 type CreateAttr w a = Attr w a
@@ -107,6 +114,11 @@ type WriteAttr w a = Attr w a
 data Attr w a   = Attr String (Maybe (a -> Dynamic, Dynamic -> Maybe a))  -- name, dynamic conversion
                               (w -> IO a) (w -> a -> IO ())               -- getter setter 
                               (w -> (a -> a) -> IO a)                     -- updater      
+
+-- For debugging purposes
+instance Show a => Show (Attr w a) where
+  show (Attr string _ _ _ _) =
+    "Attr \"" ++ string ++ "\" _ _ _ _"
 
 
 -- | Cast attributes.
