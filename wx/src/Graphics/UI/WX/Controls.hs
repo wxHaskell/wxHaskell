@@ -200,7 +200,7 @@ buttonRes parent name props =
 instance Commanding (Button a) where
   command  = newEvent "command" buttonGetOnCommand buttonOnCommand
 
--- | Create a bitmap button. Use the 'image' attribute to set the
+-- | Create a bitmap button. Use the 'picture' attribute to set the
 -- bitmap.
 --
 -- * Instances: 'Commanding', 'Pictured' -- 'Textual', 'Literate', 'Dimensions', 'Colored', 'Visible', 'Child',
@@ -212,6 +212,7 @@ bitmapButton parent props
     initialWindow $ \id rect -> \props flags ->
     do bb <- bitmapButtonCreate parent id nullBitmap rect flags
        set bb props
+       windowReLayout bb
        return bb
 
 -- | Complete the construction of a bitmap button instance which has been loaded
@@ -1000,7 +1001,9 @@ bitmapToggleButton :: Window a -> [Prop (BitmapToggleButton ())] -> IO (BitmapTo
 bitmapToggleButton parent props
   = feed2 props defaultStyle $
     initialWindow $ \id rect -> \props flags ->
-    do bb <- bitmapToggleButtonCreate parent id nullBitmap rect flags
+    do img <- imageCreateFromPixels (Size 1 1) [black]
+       bm  <- bitmapCreateFromImage img (-1)
+       bb  <- bitmapToggleButtonCreate parent id bm rect flags
        set bb props
        return bb
 
