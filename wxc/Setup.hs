@@ -1,7 +1,10 @@
+
+{-# LANGUAGE CPP #-}
+
 import Control.Monad (mapM_, when)
 import Data.Functor  ( (<$>) )
-import Data.List (foldl', intersperse, intercalate, nub, lookup, isPrefixOf)
-import Data.Maybe (fromJust, isNothing)
+import Data.List (foldl', intersperse, intercalate, nub, lookup, isPrefixOf, isInfixOf)
+import Data.Maybe (fromJust, isNothing, isJust, listToMaybe)
 import Distribution.PackageDescription
 import Distribution.Simple
 import Distribution.Simple.InstallDirs (InstallDirs(..))
@@ -13,10 +16,13 @@ import Distribution.Simple.Utils (installOrdinaryFile)
 import Distribution.System (OS (..), Arch (..), buildOS, buildArch)
 import Distribution.Verbosity (normal, verbose)
 import System.Cmd (system)
-import System.Directory (createDirectoryIfMissing, doesFileExist, findExecutable, getCurrentDirectory, getModificationTime)
-import System.Environment (getEnv)
+import System.Directory ( createDirectoryIfMissing, doesFileExist
+                        , findExecutable,           getCurrentDirectory
+                        , getDirectoryContents,     getModificationTime
+                        )
+import System.Environment (lookupEnv)
 import System.Exit (ExitCode (..), exitFailure)
-import System.FilePath.Posix ((</>), (<.>), replaceExtension, takeFileName, dropFileName, addExtension)
+import System.FilePath ((</>), (<.>), replaceExtension, takeFileName, dropFileName, addExtension)
 import System.IO (hPutStrLn, stderr)
 import System.IO.Unsafe (unsafePerformIO)
 import qualified System.Process as Process
@@ -30,6 +36,11 @@ readProcess cmd args stdin =
   `E.catch` \(E.SomeException err) -> do
     hPutStrLn stderr $ "readProcess failed: " ++ show err
     E.throwIO err
+
+
+whenM :: Monad m => m Bool -> m () -> m ()
+whenM mp e = mp >>= \p -> when p e
+
 
 main :: IO ()
 main = defaultMainWithHooks simpleUserHooks { confHook = myConfHook, buildHook = myBuildHook, instHook = myInstHook }
@@ -47,11 +58,13 @@ includeDirectory = "include"
 -- Comment out type signature because of a Cabal API change from 1.6 to 1.7
 myConfHook (pkg0, pbi) flags = do
 
-    wxConfigMissing <- isNothing <$> findExecutable "wx-config"
-    when wxConfigMissing $
+    whenM (isNothing <$> findExecutable "wx-config") $
       do
         putStrLn "Error: wx-config not found, please install wx-config before installing wxc"
         exitFailure
+
+    whenM bitnessMismatch
+      exitFailure
 
     lbi <- confHook simpleUserHooks (pkg0, pbi) flags
     let lpd       = localPkgDescr lbi
@@ -74,6 +87,145 @@ myConfHook (pkg0, pbi) flags = do
     let lpd' = lpd { library = Just lib' }
 
     return $ lbi { localPkgDescr = lpd' }
+
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+
+data Bitness
+  = Bits32
+  | Bits64
+  | Universal
+  | Unknown
+  deriving Eq
+
+
+instance Show Bitness where
+  show Bits32    = "32"
+  show Bits64    = "64"
+  show Universal = "Universal"
+  show Unknown   = "Unknown"
+
+
+data CheckResult
+  = OK
+  | NotOK Bitness Bitness
+  | NotChecked
+  deriving Eq
+
+{-
+   Extract bitness info from a dynamic library and compare to the
+   bitness of this program.
+   Preconditions (when buildArch == I386 || buildArch == X86_64):
+    - Command "file" must exist
+    - The specified file must exist
+-}
+checkBitness :: FilePath -> IO CheckResult
+checkBitness file =
+  if thisBitness == Unknown
+    then return NotChecked
+    else compareBitness . readBitness <$> readProcess "file" [file] ""
+  where
+    compareBitness :: Bitness -> CheckResult
+    compareBitness thatBitness =
+      if thatBitness == Unknown
+        then NotChecked
+        else
+          if thisBitness == thatBitness ||
+             thatBitness == Universal
+            then OK
+            else NotOK thisBitness thatBitness
+
+    thisBitness =
+      case buildArch of
+        I386   -> Bits32
+        X86_64 -> Bits64
+        _      -> Unknown
+
+    readBitness :: String -> Bitness
+    readBitness string
+      | anyInString [ " i386",   " 80386"
+                    , " 32-bit", "AMD386"  ] = Bits32
+      | anyInString [ " x86_64", " 64-bit" ] = Bits64
+      | anyInString [ "universal binary"   ] = Universal
+      | otherwise                            = Unknown
+      where
+        anyInString :: [String] -> Bool
+        anyInString strings = any (`isInfixOf` string) strings
+
+{-
+   Return True if this program is 32 bit and the wxWidgets dynamic
+   libraries are 64 bits or vice versa. Also, print a result message.
+
+   If there is insufficient data, or the OS is not handled, return
+   False, to prevent unnecessary abortion of the install procedure
+   N.B. If the installation procedure is simplified, we cannot
+   use the file-command on Windows anymore, as it is part of MSYS
+   N.B. This does not work if we are cross-compiling
+-}
+bitnessMismatch :: IO Bool
+bitnessMismatch =
+  case buildOS of
+    Windows ->
+      do
+        fileCommandPresent <- isJust <$> findExecutable "file"
+        if fileCommandPresent
+          then check
+          else
+            do
+              putStrLn "No file command present, bitness not checked"
+              return False -- No check on bitness, just continue installing
+
+    Linux   -> check
+    OSX     -> check
+    _       -> return False -- Other OSes are not checked
+  where
+    check =
+      do
+        maybeWxwin <- lookupEnv "WXWIN"
+        maybeWxcfg <- lookupEnv "WXCFG"
+        if isNothing maybeWxwin || isNothing maybeWxcfg
+          then return False -- Insufficient data, just continue installing
+          else check2 (fromJust maybeWxwin) (fromJust maybeWxcfg)
+
+    check2 wxwin wxcfg =
+      do
+        let path = normalisePath $ wxwin </> "lib" </> wxcfg </> ".."
+        maybeDynamicLibraryName <- getDynamicLibraryName path
+        case maybeDynamicLibraryName of
+          Nothing                 ->
+            putStrLn "Could not find a dynamic library to check bitness, continuing installation" >>
+            return False
+          Just dynamicLibraryName ->
+            check3 path dynamicLibraryName
+
+    check3 path dynamicLibraryName =
+      do
+        bitnessCheckResult <- checkBitness $ path </> dynamicLibraryName
+        case bitnessCheckResult of
+          NotOK thisBitness thatBitness ->
+            do
+              putStrLn $ "Error: The bitness does not match,"
+                         ++ " wxHaskell is being compiled as "
+                         ++ show thisBitness   ++ " bit, the file "
+                         ++ dynamicLibraryName ++ " is "
+                         ++ show thatBitness   ++ " bit."
+              return True
+          OK         ->
+            do
+              putStrLn $ "The bitness is correct"
+              return False
+          NotChecked ->
+            do
+              putStrLn $ "The bitness is not checked"
+              return False
+
+    getDynamicLibraryName :: FilePath -> IO (Maybe String)
+    getDynamicLibraryName path =
+      listToMaybe . filter isLibrary <$> getDirectoryContents path
+        `E.onException` return Nothing
+        where
+          isLibrary x = any (`isPrefixOf` x) ["libwx_base", "wxbase"] &&
+                        any (`isInfixOf`  x) [".dll", ".dylib", ".so."]
+
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
