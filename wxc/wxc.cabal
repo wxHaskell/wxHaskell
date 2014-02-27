@@ -1,5 +1,5 @@
 name:         wxc
-version:      0.90.1.0
+version:      0.90.1.1
 license:      OtherLicense
 license-file: LICENSE
 maintainer:   wxhaskell-devel@lists.sourceforge.net
@@ -159,7 +159,7 @@ library
 
   build-depends:
     base >= 4 && < 5,
-    wxdirect >= 0.90.1.0
+    wxdirect >= 0.90.1.1
 
   x-dll-sources:
     src/cpp/apppath.cpp

@@ -233,7 +233,7 @@ bitnessMismatch =
 readWxConfig :: IO String
 readWxConfig = do
     -- Try to force version and see if we have it
-    let wxRequiredVersion = "2.9"
+    let wxRequiredVersion = "3.0"
 
     -- The Windows port of wx-config doesn't let you specify a version, nor query the full version,
     -- accordingly we just check what version is installed (which is returned with --release)
