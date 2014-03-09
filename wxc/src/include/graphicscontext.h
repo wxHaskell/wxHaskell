@@ -17,6 +17,7 @@ void  wxGraphicsBrush_Delete(TSelf(wxGraphicsBrush) self);
   GraphicsContext
 -----------------------------------------------------------------------------*/
 TClass(wxGraphicsContext)  wxGraphicsContext_Create( TClass(wxWindowDC) dc );
+TClass(wxGraphicsContext)  wxGraphicsContext_CreateFromMemory( TClass(wxMemoryDC) dc );
 TClass(wxGraphicsContext)  wxGraphicsContext_CreateFromWindow( TClass(wxWindow) window );
 void  wxGraphicsContext_Delete(TSelf(wxGraphicsContext) self);
 TClass(wxGraphicsContext)  wxGraphicsContext_CreateFromNative( void* context );

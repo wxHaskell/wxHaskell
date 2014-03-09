@@ -43,6 +43,15 @@ EWXWEXPORT(wxGraphicsContext*,wxGraphicsContext_Create)( const wxWindowDC* dc )
 #endif
 }
 
+EWXWEXPORT(wxGraphicsContext*,wxGraphicsContext_CreateFromMemory)( const wxMemoryDC* dc )
+{
+#ifdef wxUSE_GRAPHICS_CONTEXT
+  return wxGraphicsContext::Create(*dc);
+#else
+  return NULL;
+#endif
+}
+
 EWXWEXPORT(wxGraphicsContext*,wxGraphicsContext_CreateFromWindow)( wxWindow* window )
 {
 #ifdef wxUSE_GRAPHICS_CONTEXT

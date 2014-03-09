@@ -21,6 +21,7 @@ module Graphics.UI.WXCore.Draw
         , DrawState, dcEncapsulate, dcGetDrawState, dcSetDrawState, drawStateDelete
         -- ** Double buffering
         , dcBuffer, dcBufferWithRef, dcBufferWithRefEx
+        , dcBufferWithRefExContext
         -- * Scrolled windows
         , windowGetViewStart, windowGetViewRect, windowCalcUnscrolledPosition
         -- * Font
@@ -841,6 +842,86 @@ dcBufferWithRefEx dc clear mbVar view draw
                                  clear (downcastDC memdc)
 				 -- and finally do the drawing!
                                  draw (downcastDC memdc) -- down cast
+                   )
+           -- blit the memdc into the owner dc.
+           dcBlit dc view memdc (rectTopLeft view) wxCOPY False
+           return ()
+
+-- | Optimized double buffering with graphicsContext. Takes a /clear/
+-- routine as its first argument.  Normally this is something like
+-- '\dc -> dcClearRect dc viewArea' but on certain platforms, like
+-- MacOS X, special handling is necessary.
+dcBufferWithRefExContext :: WindowDC a -> (DC () -> IO ()) -> Maybe (Var (Bitmap ())) -> Rect -> (DC () -> GraphicsContext () -> IO ()) -> IO ()
+dcBufferWithRefExContext dc clear mbVar view draw
+  | rectSize view == sizeZero = return ()
+dcBufferWithRefExContext dc clear mbVar view draw
+  = bracket (initBitmap)
+            (doneBitmap)
+            (\bitmap ->
+             if (bitmap==objectNull)
+              then drawUnbuffered
+              else bracket (do p <- memoryDCCreateCompatible dc; return (objectCast p))
+                           (\memdc -> when (memdc/=objectNull) (memoryDCDelete memdc))
+                           (\memdc -> if (memdc==objectNull)
+                                       then drawUnbuffered
+                                       else do memoryDCSelectObject memdc bitmap
+                                               drawBuffered memdc
+                                               memoryDCSelectObject memdc nullBitmap
+                           )
+            )
+    where
+     initBitmap
+       = case mbVar of
+           Nothing  -> bitmapCreateEmpty (rectSize view) (-1)
+           Just v   -> do bitmap <- varGet v
+                          size   <- if (bitmap==objectNull)
+                                     then return sizeZero
+                                     else do bw <- bitmapGetWidth bitmap
+                                             bh <- bitmapGetHeight bitmap
+                                             return (Size bw bh)
+                          -- re-use the bitmap if possible
+                          if (sizeEncloses size (rectSize view) && bitmap /= objectNull)
+                            then return bitmap
+                            else do when (bitmap/=objectNull) (bitmapDelete bitmap)
+                                    varSet v objectNull
+                                    -- new size a bit larger to avoid multiple reallocs
+                                    let (Size w h) = rectSize view
+                                        neww       = div (w*105) 100
+                                        newh       = div (h*105) 100
+                                    bm <- bitmapCreateEmpty (sz neww newh) (-1)
+                                    varSet v bm
+                                    return bm
+
+     doneBitmap bitmap
+       = case mbVar of
+           Nothing -> when (bitmap/=objectNull) (bitmapDelete bitmap)
+           Just v  -> return ()
+
+
+     drawUnbuffered
+       = do clear (downcastDC dc)
+            gc <- graphicsContextCreate dc
+            draw (downcastDC dc) gc
+            graphicsContextDelete gc
+
+     drawBuffered memdc
+      = do -- set the device origin for scrolled windows
+           dcSetDeviceOrigin memdc (pointFromVec (vecNegate (vecFromPoint (rectTopLeft view))))
+           dcSetClippingRegion memdc view
+           -- dcBlit memdc view dc (rectTopLeft view) wxCOPY False
+	   bracket (dcGetBackground dc)
+                   (\brush -> do dcSetBrush memdc nullBrush
+                                 brushDelete brush)
+                   (\brush -> do -- set the background to the owner brush
+                                 dcSetBackground memdc brush
+                                 if (wxToolkit == WxMac)
+				  then withBrushStyle brushTransparent (dcSetBrush memdc)
+				  else dcSetBrush memdc brush
+                                 clear (downcastDC memdc)
+				 -- and finally do the drawing!
+                                 gc <- graphicsContextCreateFromMemory memdc
+                                 draw (downcastDC memdc) gc
+                                 graphicsContextDelete gc
                    )
            -- blit the memdc into the owner dc.
            dcBlit dc view memdc (rectTopLeft view) wxCOPY False
