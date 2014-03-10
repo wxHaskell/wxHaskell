@@ -51,7 +51,7 @@ convInt32 = fromInteger . toInteger
 
 -- This paint function gets the current glCanvas for knowing where to draw in.
 -- It is possible to have multiple GL windows in your application.
-paintGL :: GLCanvas a -> DC() -> WX.Rect -> [WX.Rect]-> IO ()
+paintGL :: GLCanvas a -> DC b -> WX.Rect -> [WX.Rect]-> IO ()
 paintGL glWindow dc myrect _ = do
    myInit
    reshape $ convWG $ rectSize myrect
