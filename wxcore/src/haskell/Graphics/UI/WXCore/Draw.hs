@@ -816,10 +816,10 @@ dcBufferedAux withWinDC withMemoryDC dc clear mbVar view draw
            Nothing  -> bitmapCreateEmpty (rectSize view) (-1)
            Just v   -> do bitmap <- varGet v
                           size   <- if (bitmap==objectNull)
-                                     then return sizeZero
-                                     else do bw <- bitmapGetWidth bitmap
-                                             bh <- bitmapGetHeight bitmap
-                                             return (Size bw bh)
+                                    then return sizeZero
+                                    else do bw <- bitmapGetWidth bitmap
+                                            bh <- bitmapGetHeight bitmap
+                                            return (Size bw bh)
                           -- re-use the bitmap if possible
                           if (sizeEncloses size (rectSize view) && bitmap /= objectNull)
                             then return bitmap
@@ -829,9 +829,11 @@ dcBufferedAux withWinDC withMemoryDC dc clear mbVar view draw
                                     let (Size w h) = rectSize view
                                         neww       = div (w*105) 100
                                         newh       = div (h*105) 100
-                                    bm <- bitmapCreateEmpty (sz neww newh) (-1)
-                                    varSet v bm
-                                    return bm
+                                    if (w > 0 && h > 0) then
+                                      do bm <- bitmapCreateEmpty (sz neww newh) (-1)
+                                         varSet v bm
+                                         return bm
+                                      else return objectNull
 
      doneBitmap bitmap
        = case mbVar of
