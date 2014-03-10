@@ -16,7 +16,7 @@ TClassDefExtend(wxGraphicsRenderer,wxGraphicsObject);
 TClass(wxGCDC)  wxGcdc_Create(TClass(wxWindowDC) dc);
 TClass(wxGCDC)  wxGcdc_CreateFromMemory(TClass(wxMemoryDC) dc);
 TClass(wxGCDC)  wxGcdc_CreateFromPrinter(TClass(wxPrinterDC) dc);
-TClass(wxGraphicsContext)  wxGcdc_GetGraphicsContext(TClass(wxGCDC) self);
+TClass(wxGraphicsContext)  wxGcdc_GetGraphicsContext(TSelf(wxGCDC) self);
 void wxGcdc_SetGraphicsContext(TClass(wxGCDC) self, TClass(wxGraphicsContext) gc);
 void wxGcdc_Delete(TClass(wxGCDC) self);
 
@@ -36,6 +36,7 @@ TClass(wxGraphicsContext)  wxGraphicsContext_CreateFromWindow( TClass(wxWindow) 
 void  wxGraphicsContext_Delete(TSelf(wxGraphicsContext) self);
 TClass(wxGraphicsContext)  wxGraphicsContext_CreateFromNative( void* context );
 TClass(wxGraphicsContext)  wxGraphicsContext_CreateFromNativeWindow( void* window );
+TClass(wxGraphicsPath)  wxGraphicsContext_CreatePath( TSelf(wxGraphicsContext) self );
 void  wxGraphicsContext_Clip( TSelf(wxGraphicsContext) self, TClass(wxRegion) region );
 void  wxGraphicsContext_ClipByRectangle( TSelf(wxGraphicsContext) self, TRectDouble(x,y,w,h) );
 void  wxGraphicsContext_ResetClip( TSelf(wxGraphicsContext) self );
@@ -99,7 +100,6 @@ TBool  wxGraphicsObject_IsNull(TSelf(wxGraphicsObject) self);
 /*-----------------------------------------------------------------------------
   GraphicsPath
 -----------------------------------------------------------------------------*/
-TClass(wxGraphicsPath)  wxGraphicsPath_Create( );
 void  wxGraphicsPath_Delete(TSelf(wxGraphicsPath) self);
 void  wxGraphicsPath_MoveToPoint(TSelf(wxGraphicsPath) self, TPointDouble(x,y));
 void  wxGraphicsPath_AddArc(TSelf(wxGraphicsPath) self, TPointDouble(x,y), double r, double startAngle, double endAngle, TBool clockwise );
@@ -135,3 +135,4 @@ TClass(wxGraphicsContext)  wxGraphicsRenderer_CreateContext( TClass(wxWindowDC) 
 TClass(wxGraphicsContext)  wxGraphicsRenderer_CreateContextFromWindow( TClass(wxWindow) window );
 TClass(wxGraphicsContext)  wxGraphicsRenderer_CreateContextFromNativeContext( void* context );
 TClass(wxGraphicsContext)  wxGraphicsRenderer_CreateContextFromNativeWindow( void* window );
+TClass(wxGraphicsPath)  wxGraphicsRenderer_CreatePath( TSelf(wxGraphicsRenderer) self );

@@ -233,16 +233,18 @@ EWXWEXPORT(wxGraphicsMatrix*,wxGraphicsContext_CreateDefaultMatrix)( wxGraphicsC
   return NULL;
 #endif
 }
+*/
 
 EWXWEXPORT(wxGraphicsPath*,wxGraphicsContext_CreatePath)( wxGraphicsContext* self )
 {
 #ifdef wxUSE_GRAPHICS_CONTEXT
-  return self->CreatePath();
+   wxGraphicsPath *path = new wxGraphicsPath;
+   *path = self->CreatePath();
+   return path;
 #else
   return NULL;
 #endif
 }
-*/
 
 EWXWEXPORT(void,wxGraphicsContext_Clip)( wxGraphicsContext* self, const wxRegion* region )
 {
@@ -707,15 +709,6 @@ EWXWEXPORT(void,wxGraphicsMatrix_TransformDistance)( wxGraphicsMatrix* self, wxD
 /*-----------------------------------------------------------------------------
   GraphicsPath
 -----------------------------------------------------------------------------*/
-EWXWEXPORT(wxGraphicsPath*,wxGraphicsPath_Create)( )
-{
-#ifdef wxUSE_GRAPHICS_CONTEXT
-  return new wxGraphicsPath;
-#else
-  return NULL;
-#endif
-}
-
 EWXWEXPORT(void,wxGraphicsPath_Delete)(wxGraphicsPath* self)  
 {
 #ifdef wxUSE_GRAPHICS_CONTEXT
@@ -1007,16 +1000,17 @@ EWXWEXPORT(wxGraphicsMatrix,wxGraphicsRenderer_CreateMatrix)( wxGraphicsRenderer
   return NULL;
 #endif
 }
+*/
 
-EWXWEXPORT(wxGraphicsPath,wxGraphicsRenderer_CreatePath)( wxGraphicsRenderer* self )
+EWXWEXPORT(wxGraphicsPath*,wxGraphicsRenderer_CreatePath)( wxGraphicsRenderer* self)
 {
 #ifdef wxUSE_GRAPHICS_CONTEXT
-  return self->CreatePath();
+   wxGraphicsPath *path = new wxGraphicsPath;
+   *path = self->CreatePath();
+   return path;
 #else
   return NULL;
 #endif
 }
-*/
-
 
 }
