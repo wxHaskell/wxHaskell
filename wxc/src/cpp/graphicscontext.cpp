@@ -15,6 +15,7 @@
 
 #ifdef wxUSE_GRAPHICS_CONTEXT
 #include "wx/graphics.h"
+#include "wx/dcgraph.h"
 #endif
 
 #ifndef wxUSE_GRAPHICS_CONTEXT
@@ -27,10 +28,66 @@
 # define wxGraphicsPath         void
 # define wxGraphicsPen          void
 # define wxGraphicsRenderer     void
+# define wxGcdc                void
 #endif
 
 extern "C" {
+/*-----------------------------------------------------------------------------
+  GCDC
+-----------------------------------------------------------------------------*/
 
+EWXWEXPORT(wxGCDC*,wxGcdc_Create)( const wxWindowDC* dc )
+{
+#ifdef wxUSE_GRAPHICS_CONTEXT
+  return new wxGCDC(*dc);
+#else
+  return NULL;
+#endif
+}
+
+EWXWEXPORT(wxGCDC*,wxGcdc_CreateFromMemory)( const wxMemoryDC* dc )
+{
+#ifdef wxUSE_GRAPHICS_CONTEXT
+  return new wxGCDC(*dc);
+#else
+  return NULL;
+#endif
+}
+
+EWXWEXPORT(wxGCDC*,wxGcdc_CreateFromPrinter)( const wxPrinterDC* dc )
+{
+#ifdef wxUSE_GRAPHICS_CONTEXT
+  return new wxGCDC(*dc);
+#else
+  return NULL;
+#endif
+}
+
+EWXWEXPORT(wxGraphicsContext*,wxGcdc_GetGraphicsContext)( const wxGCDC *self )
+{
+#ifdef wxUSE_GRAPHICS_CONTEXT
+   return self->GetGraphicsContext();
+#else
+  return NULL;
+#endif
+}
+
+EWXWEXPORT(void,wxGcdc_SetGraphicsContext)( wxGCDC *self,  wxGraphicsContext *gc)
+{
+#ifdef wxUSE_GRAPHICS_CONTEXT
+  self->SetGraphicsContext(gc);
+#else
+  return;
+#endif
+}
+
+EWXWEXPORT(void,wxGcdc_Delete)(wxGCDC* self)  
+{
+#ifdef wxUSE_GRAPHICS_CONTEXT
+  if (self) delete self;
+#endif
+}
+  
 /*-----------------------------------------------------------------------------
   GraphicsContext
 -----------------------------------------------------------------------------*/
@@ -44,6 +101,15 @@ EWXWEXPORT(wxGraphicsContext*,wxGraphicsContext_Create)( const wxWindowDC* dc )
 }
 
 EWXWEXPORT(wxGraphicsContext*,wxGraphicsContext_CreateFromMemory)( const wxMemoryDC* dc )
+{
+#ifdef wxUSE_GRAPHICS_CONTEXT
+  return wxGraphicsContext::Create(*dc);
+#else
+  return NULL;
+#endif
+}
+
+EWXWEXPORT(wxGraphicsContext*,wxGraphicsContext_CreateFromPrinter)( const wxPrinterDC* dc )
 {
 #ifdef wxUSE_GRAPHICS_CONTEXT
   return wxGraphicsContext::Create(*dc);
@@ -952,6 +1018,5 @@ EWXWEXPORT(wxGraphicsPath,wxGraphicsRenderer_CreatePath)( wxGraphicsRenderer* se
 }
 */
 
+
 }
-
-

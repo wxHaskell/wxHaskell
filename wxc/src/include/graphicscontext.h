@@ -1,3 +1,4 @@
+TClassDefExtend(wxGCDC,wxDC);
 TClassDefExtend(wxGraphicsObject,wxObject);
 TClassDefExtend(wxGraphicsBrush,wxGraphicsObject);
 TClassDefExtend(wxGraphicsContext,wxGraphicsObject);
@@ -6,6 +7,18 @@ TClassDefExtend(wxGraphicsMatrix,wxGraphicsObject);
 TClassDefExtend(wxGraphicsPath,wxGraphicsObject);
 TClassDefExtend(wxGraphicsPen,wxGraphicsObject);
 TClassDefExtend(wxGraphicsRenderer,wxGraphicsObject);
+
+
+/*-----------------------------------------------------------------------------
+  GCDC
+-----------------------------------------------------------------------------*/
+
+TClass(wxGCDC)  wxGcdc_Create(TClass(wxWindowDC) dc);
+TClass(wxGCDC)  wxGcdc_CreateFromMemory(TClass(wxMemoryDC) dc);
+TClass(wxGCDC)  wxGcdc_CreateFromPrinter(TClass(wxPrinterDC) dc);
+TClass(wxGraphicsContext)  wxGcdc_GetGraphicsContext(TClass(wxGCDC) self);
+void wxGcdc_SetGraphicsContext(TClass(wxGCDC) self, TClass(wxGraphicsContext) gc);
+void wxGcdc_Delete(TClass(wxGCDC) self);
 
 /*-----------------------------------------------------------------------------
   GraphicsBrush
@@ -18,6 +31,7 @@ void  wxGraphicsBrush_Delete(TSelf(wxGraphicsBrush) self);
 -----------------------------------------------------------------------------*/
 TClass(wxGraphicsContext)  wxGraphicsContext_Create( TClass(wxWindowDC) dc );
 TClass(wxGraphicsContext)  wxGraphicsContext_CreateFromMemory( TClass(wxMemoryDC) dc );
+TClass(wxGraphicsContext)  wxGraphicsContext_CreateFromPrinter( TClass(wxPrinterDC) dc );
 TClass(wxGraphicsContext)  wxGraphicsContext_CreateFromWindow( TClass(wxWindow) window );
 void  wxGraphicsContext_Delete(TSelf(wxGraphicsContext) self);
 TClass(wxGraphicsContext)  wxGraphicsContext_CreateFromNative( void* context );

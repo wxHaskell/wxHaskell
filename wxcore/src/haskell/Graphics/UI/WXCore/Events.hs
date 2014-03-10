@@ -54,7 +54,7 @@ module Graphics.UI.WXCore.Events
         , windowOnActivate
         , windowOnPaint
         , windowOnPaintRaw
-        , windowOnPaintContext
+        , windowOnPaintGc
         , windowOnContextMenu
         , windowOnScroll
         , htmlWindowOnHtmlEvent
@@ -111,7 +111,7 @@ module Graphics.UI.WXCore.Events
         , windowGetOnActivate
         , windowGetOnPaint
         , windowGetOnPaintRaw
-        , windowGetOnPaintContext
+        , windowGetOnPaintGc
         , windowGetOnContextMenu
         , windowGetOnScroll
         , htmlWindowGetOnHtmlEvent
@@ -1037,10 +1037,10 @@ windowGetOnPaintRaw :: Window a -> IO (PaintDC () -> Rect -> [Rect] -> IO ())
 windowGetOnPaintRaw window
   = unsafeWindowGetHandlerState window wxEVT_PAINT (\dc rect region -> return ())
 
--- | Get the current graphicsContext paint event handler. 
-windowGetOnPaintContext :: Window a -> IO (DC () -> GraphicsContext () -> Rect -> IO ())
-windowGetOnPaintContext window
-  = unsafeWindowGetHandlerState window wxEVT_PAINT (\dc gc view -> return ())
+-- | Get the current paint event handler.
+windowGetOnPaintGc :: Window a -> IO (GCDC () -> Rect -> IO ())
+windowGetOnPaintGc window
+  = unsafeWindowGetHandlerState window wxEVT_PAINT (\dc view -> return ())
 
 
 -- | Set an event handler for paint events. The implementation uses an 
@@ -1075,20 +1075,19 @@ windowOnPaint window paintHandler
                         -- and repaint with buffer
                         dcBufferWithRefEx paintDC clear (Just v) view (\dc -> paintHandler dc view))
 
--- | Set an event handler for paint events, and also pass in a
--- graphicsContext. The implementation uses an intermediate buffer for
--- non-flickering redraws.  The device context ('DC') is always
--- cleared before the paint handler is called. The paint handler also
--- gets the currently visible view area as an argument (adjusted for
--- scrolling).  Note: you can not set both a 'windowOnPaintRaw' and
--- 'windowOnPaint' handler!
-windowOnPaintContext :: Window a -> (DC () -> GraphicsContext () -> Rect -> IO ()) -> IO ()
-windowOnPaintContext window paintHandler
+-- | Set an event handler for GCDC paint events. The implementation uses an 
+-- intermediate buffer for non-flickering redraws. 
+-- The device context ('GCDC')
+-- is always cleared before the paint handler is called. The paint handler
+-- also gets the currently visible view area as an argument (adjusted for scrolling).
+-- Note: you can not set both a 'windowOnPaintRaw' and 'windowOnPaint' handler!
+windowOnPaintGc :: Window a -> (GCDC () -> Rect -> IO ()) -> IO ()
+windowOnPaintGc window paintHandler
   | wxToolkit == WxMac  = windowOnPaintRaw window
-                          (\dc view _ -> do
-                              gc <- graphicsContextCreate dc
-                              paintHandler (downcastDC dc) gc view
-                              graphicsContextDelete gc)
+                          (\dc_ view _ -> do
+                            dc <- gcdcCreate dc_
+                            paintHandler dc view
+                            gcdcDelete dc)
   | otherwise
   = do v <- varCreate objectNull
        windowOnEventEx window [wxEVT_PAINT] paintHandler (destroy v) (onPaint v)
@@ -1110,9 +1109,7 @@ windowOnPaintContext window paintHandler
                         let clear dc  | wxToolkit == WxMSW  = dcClearRect dc view
                                       | otherwise           = dcClear dc
                         -- and repaint with buffer
-                        dcBufferWithRefExContext paintDC clear (Just v) view (\dc gc -> paintHandler dc gc view))
-
-
+                        dcBufferWithRefExGcdc paintDC clear (Just v) view (\dc -> paintHandler dc view))
 
 -- | Get the current paint event handler.
 windowGetOnPaint :: Window a -> IO (DC () -> Rect -> IO ())

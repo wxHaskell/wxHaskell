@@ -436,5 +436,5 @@ instance Reactive (Window a) where
 instance Paint (Window a) where
   paint     = newEvent "paint" windowGetOnPaint (\w h -> windowOnPaint w h)
   paintRaw  = newEvent "paintRaw" windowGetOnPaintRaw (\w h -> windowOnPaintRaw w h)
-  paintContext = newEvent "paint" windowGetOnPaintContext (\w h -> windowOnPaintContext w h)
+  paintGc   = newEvent "paintGc" windowGetOnPaintGc (\w h -> windowOnPaintGc w h)
   repaint w = windowRefresh w False

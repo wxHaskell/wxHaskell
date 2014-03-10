@@ -21,7 +21,7 @@ module Graphics.UI.WXCore.Draw
         , DrawState, dcEncapsulate, dcGetDrawState, dcSetDrawState, drawStateDelete
         -- ** Double buffering
         , dcBuffer, dcBufferWithRef, dcBufferWithRefEx
-        , dcBufferWithRefExContext
+        , dcBufferWithRefExGcdc
         -- * Scrolled windows
         , windowGetViewStart, windowGetViewRect, windowCalcUnscrolledPosition
         -- * Font
@@ -758,7 +758,7 @@ getFullTextExtent dc txt
 -- Uses a 'MemoryDC' to draw into memory first and than blit the result to
 -- the device context. The memory area allocated is the minimal size necessary
 -- to accomodate the rectangle, but is re-allocated on each invokation.
-dcBuffer :: DC a -> Rect -> (DC () -> IO ()) -> IO ()
+dcBuffer :: WindowDC a -> Rect -> (DC () -> IO ()) -> IO ()
 dcBuffer dc r draw
   = dcBufferWithRef dc Nothing r draw
 
@@ -767,7 +767,7 @@ dcBuffer dc r draw
 -- to re-use an allocated bitmap if possible. The 'Rect' argument specifies the
 -- the current logical view rectangle. The last argument is called to draw on the
 -- memory 'DC'. 
-dcBufferWithRef :: DC a -> Maybe (Var (Bitmap ())) -> Rect -> (DC () -> IO ()) -> IO ()
+dcBufferWithRef :: WindowDC a -> Maybe (Var (Bitmap ())) -> Rect -> (DC () -> IO ()) -> IO ()
 dcBufferWithRef dc mbVar viewArea draw
   = dcBufferWithRefEx dc (\dc -> dcClearRect dc viewArea) mbVar viewArea draw
 
@@ -775,86 +775,29 @@ dcBufferWithRef dc mbVar viewArea draw
 -- | Optimized double buffering. Takes a /clear/ routine as its first argument.
 -- Normally this is something like '\dc -> dcClearRect dc viewArea' but on certain platforms, like
 -- MacOS X, special handling is necessary.
-dcBufferWithRefEx :: DC a -> (DC () -> IO ()) -> Maybe (Var (Bitmap ())) -> Rect -> (DC () -> IO ()) -> IO ()
-dcBufferWithRefEx dc clear mbVar view draw
-  | rectSize view == sizeZero = return ()
-dcBufferWithRefEx dc clear mbVar view draw
-  = bracket (initBitmap)
-            (doneBitmap)
-            (\bitmap ->
-             if (bitmap==objectNull)
-              then drawUnbuffered
-              else bracket (do p <- memoryDCCreateCompatible dc; return (objectCast p))
-                           (\memdc -> when (memdc/=objectNull) (memoryDCDelete memdc))
-                           (\memdc -> if (memdc==objectNull)
-                                       then drawUnbuffered
-                                       else do memoryDCSelectObject memdc bitmap
-                                               drawBuffered memdc
-                                               memoryDCSelectObject memdc nullBitmap
-                           )
-            )
-    where
-     initBitmap
-       = case mbVar of
-           Nothing  -> bitmapCreateEmpty (rectSize view) (-1)
-           Just v   -> do bitmap <- varGet v
-                          size   <- if (bitmap==objectNull)
-                                     then return sizeZero
-                                     else do bw <- bitmapGetWidth bitmap
-                                             bh <- bitmapGetHeight bitmap
-                                             return (Size bw bh)
-                          -- re-use the bitmap if possible
-                          if (sizeEncloses size (rectSize view) && bitmap /= objectNull)
-                            then return bitmap
-                            else do when (bitmap/=objectNull) (bitmapDelete bitmap)
-                                    varSet v objectNull
-                                    -- new size a bit larger to avoid multiple reallocs
-                                    let (Size w h) = rectSize view
-                                        neww       = div (w*105) 100
-                                        newh       = div (h*105) 100
-                                    bm <- bitmapCreateEmpty (sz neww newh) (-1)
-                                    varSet v bm
-                                    return bm
+dcBufferWithRefEx :: WindowDC a -> (DC () -> IO ()) -> Maybe (Var (Bitmap ()))
+                  -> Rect -> (DC () -> IO ()) -> IO ()
+dcBufferWithRefEx = dcBufferedAux simpleDraw simpleDraw
+  where simpleDraw dc draw = draw $ downcastDC dc
 
-     doneBitmap bitmap
-       = case mbVar of
-           Nothing -> when (bitmap/=objectNull) (bitmapDelete bitmap)
-           Just v  -> return ()
-
-
-     drawUnbuffered
-       = do clear (downcastDC dc)
-            draw (downcastDC dc) -- down cast
-
-     drawBuffered memdc
-      = do -- set the device origin for scrolled windows
-           dcSetDeviceOrigin memdc (pointFromVec (vecNegate (vecFromPoint (rectTopLeft view))))
-           dcSetClippingRegion memdc view
-           -- dcBlit memdc view dc (rectTopLeft view) wxCOPY False
-	   bracket (dcGetBackground dc)
-                   (\brush -> do dcSetBrush memdc nullBrush
-                                 brushDelete brush)
-                   (\brush -> do -- set the background to the owner brush
-                                 dcSetBackground memdc brush
-                                 if (wxToolkit == WxMac)
-				  then withBrushStyle brushTransparent (dcSetBrush memdc)
-				  else dcSetBrush memdc brush
-                                 clear (downcastDC memdc)
-				 -- and finally do the drawing!
-                                 draw (downcastDC memdc) -- down cast
-                   )
-           -- blit the memdc into the owner dc.
-           dcBlit dc view memdc (rectTopLeft view) wxCOPY False
-           return ()
-
--- | Optimized double buffering with graphicsContext. Takes a /clear/
--- routine as its first argument.  Normally this is something like
--- '\dc -> dcClearRect dc viewArea' but on certain platforms, like
+-- | Optimized double buffering with a GCDC. Takes a /clear/ routine as its first argument.
+-- Normally this is something like '\dc -> dcClearRect dc viewArea' but on certain platforms, like
 -- MacOS X, special handling is necessary.
-dcBufferWithRefExContext :: WindowDC a -> (DC () -> IO ()) -> Maybe (Var (Bitmap ())) -> Rect -> (DC () -> GraphicsContext () -> IO ()) -> IO ()
-dcBufferWithRefExContext dc clear mbVar view draw
+dcBufferWithRefExGcdc :: WindowDC a -> (DC () -> IO ()) -> Maybe (Var (Bitmap ()))
+                      -> Rect -> (GCDC () -> IO b) -> IO ()
+dcBufferWithRefExGcdc =
+  dcBufferedAux (withGC gcdcCreate) (withGC gcdcCreateFromMemory)
+    where withGC create dc_ draw = do
+            dc <- create dc_
+            draw dc
+            gcdcDelete dc
+
+dcBufferedAux :: (WindowDC a -> f -> IO ()) -> (MemoryDC c -> f -> IO ())
+              -> WindowDC a -> (DC () -> IO ()) -> Maybe (Var (Bitmap ()))
+              -> Rect -> f -> IO ()
+dcBufferedAux _ _  _ _ _ view _
   | rectSize view == sizeZero = return ()
-dcBufferWithRefExContext dc clear mbVar view draw
+dcBufferedAux withWinDC withMemoryDC dc clear mbVar view draw
   = bracket (initBitmap)
             (doneBitmap)
             (\bitmap ->
@@ -863,12 +806,10 @@ dcBufferWithRefExContext dc clear mbVar view draw
               else bracket (do p <- memoryDCCreateCompatible dc; return (objectCast p))
                            (\memdc -> when (memdc/=objectNull) (memoryDCDelete memdc))
                            (\memdc -> if (memdc==objectNull)
-                                       then drawUnbuffered
-                                       else do memoryDCSelectObject memdc bitmap
-                                               drawBuffered memdc
-                                               memoryDCSelectObject memdc nullBitmap
-                           )
-            )
+                                      then drawUnbuffered
+                                      else do memoryDCSelectObject memdc bitmap
+                                              drawBuffered memdc
+                                              memoryDCSelectObject memdc nullBitmap))
     where
      initBitmap
        = case mbVar of
@@ -900,9 +841,7 @@ dcBufferWithRefExContext dc clear mbVar view draw
 
      drawUnbuffered
        = do clear (downcastDC dc)
-            gc <- graphicsContextCreate dc
-            draw (downcastDC dc) gc
-            graphicsContextDelete gc
+            withWinDC dc draw
 
      drawBuffered memdc
       = do -- set the device origin for scrolled windows
@@ -919,10 +858,9 @@ dcBufferWithRefExContext dc clear mbVar view draw
 				  else dcSetBrush memdc brush
                                  clear (downcastDC memdc)
 				 -- and finally do the drawing!
-                                 gc <- graphicsContextCreateFromMemory memdc
-                                 draw (downcastDC memdc) gc
-                                 graphicsContextDelete gc
+                                 withMemoryDC memdc draw
                    )
            -- blit the memdc into the owner dc.
            dcBlit dc view memdc (rectTopLeft view) wxCOPY False
            return ()
+
