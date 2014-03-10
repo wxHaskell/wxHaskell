@@ -72,7 +72,7 @@ module Graphics.UI.WX.Events
              , closing, idle, resize, focus, activate
              , Paint
              , paint, paintRaw, repaint
-             , paintContext, paintRawContext
+             , paintContext
              -- * Event filters
              -- ** Mouse filters
              , enter, leave, motion, drag
@@ -166,7 +166,7 @@ class Paint w where
   paint     :: Event w (DC () -> Rect -> IO ())
   -- | Paint directly to the on-screen device context. Takes the current
   -- view rectangle and a list of dirty rectangles as arguments.\
-  paintRaw  :: Event w (DC () -> Rect -> [Rect] -> IO ())
+  paintRaw  :: Event w (PaintDC () -> Rect -> [Rect] -> IO ())
   -- | Paint double buffered to a device context, using a
   -- graphicsContext. The context is always cleared before
   -- drawing. Takes the current view rectangle (adjusted for
@@ -175,8 +175,6 @@ class Paint w where
   -- | Paint directly to the on-screen device context, using a
   -- graphicsContext.  Takes the current view rectangle and a list of
   -- dirty rectangles as arguments.\
-  paintRawContext :: Event w (DC () -> GraphicsContext () -> Rect -> [Rect] -> IO ())
-  -- | Emit a paint event to the specified widget.
   repaint   :: w -> IO ()
 
 
