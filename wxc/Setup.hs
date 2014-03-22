@@ -229,28 +229,39 @@ bitnessMismatch =
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
--- Make sure the right version of wx widgets is installed and return the 
+-- Find the most recent version of wxWidgets;
+-- abort the setup procedure when no proper version of wxWidgets is found
 readWxConfig :: IO String
 readWxConfig = do
-    -- Try to force version and see if we have it
-    let wxRequiredVersion = "2.9"
+    -- Try to find an acceptable version of wxWidgets
+    -- (a version that can be handled by this version of wxHaskell)
+    let wxAcceptableVersions = ["3.0", "2.9"] -- Preferred version first
 
     -- The Windows port of wx-config doesn't let you specify a version, nor query the full version,
     -- accordingly we just check what version is installed (which is returned with --release)
-    wxVersion <- case buildOS of
-      Windows -> readProcess "wx-config" ["--release"] ""
-      _       -> readProcess "wx-config" ["--version=" ++ wxRequiredVersion, "--version-full"] ""
+    wxVersions <- case buildOS of
+      Windows -> sequence [readProcess "wx-config" ["--release"] ""]
+      _       -> mapM readVersion wxAcceptableVersions
+                 where readVersion x = readProcess "wx-config" ["--version=" ++ x, "--version-full"] ""
 
-    if wxRequiredVersion `isPrefixOf` wxVersion 
-      then putStrLn ("Configuring wxc to build against wxWidgets " ++ wxVersion)
-      else error ("This version of wxc requires wxWidgets " ++ wxRequiredVersion ++ " to be available")
+    case [(x, y) | x <- wxAcceptableVersions, 
+                   y <- wxVersions, 
+                   x `isPrefixOf` y
+         ] of
+      [] ->
+        error ("This version of wxc requires one of the following wxWidgets versions to be available: " 
+               ++ show wxAcceptableVersions
+              )
+      ((wxVersion, wxFullVersion) : _) ->
+        do
+          putStrLn ("Configuring wxc to build against wxWidgets " ++ wxFullVersion)
 
-    -- The Windows port of wx-config doesn't let you specify a version (yet)
-    output <- case buildOS of
-      -- TODO: Nasty Windows hack: wx-config-win barfs if --cppflags comes after --libs :-(
-      Windows -> readProcess "wx-config" ["--cppflags", "--libs", "all"] ""
-      _       -> readProcess "wx-config" ["--version=" ++ wxRequiredVersion, "--libs", "all", "--cppflags"] ""
-    return output
+          -- The Windows port of wx-config doesn't let you specify a version (yet)
+          case buildOS of
+            -- TODO: Nasty Windows hack: wx-config-win barfs if --cppflags comes after --libs :-(
+            Windows -> readProcess "wx-config" ["--cppflags", "--libs", "all"] ""
+            _       -> readProcess "wx-config" ["--version=" ++ wxVersion, "--libs", "all", "--cppflags"] ""
+
 
 parseWxConfig :: String -> BuildInfo
 parseWxConfig s =
@@ -278,27 +289,26 @@ myBuildHook :: PackageDescription -> LocalBuildInfo -> UserHooks -> BuildFlags -
 myBuildHook pkg_descr local_bld_info user_hooks bld_flags =
     do
     -- Extract the custom fields customFieldsPD where field name is x-cpp-dll-sources
-    let lib = fromJust (library pkg_descr)
-        lib_bi = libBuildInfo lib
+    let lib       = fromJust (library pkg_descr)
+        lib_bi    = libBuildInfo lib
         custom_bi = customFieldsBI lib_bi
-        dll_name = fromJust (lookup "x-dll-name" custom_bi)
-        dll_srcs = (lines . fromJust) (lookup "x-dll-sources" custom_bi)
-        dll_libs = (lines . fromJust) (lookup "x-dll-extra-libraries" custom_bi)
-        cc_opts = ccOptions lib_bi
-        ld_opts = ldOptions lib_bi
-        inc_dirs = includeDirs lib_bi
-        lib_dirs = extraLibDirs lib_bi
-        libs = extraLibs lib_bi
-        bld_dir = buildDir local_bld_info
-        progs = withPrograms local_bld_info
-        gcc = fromJust (lookupProgram (simpleProgram "gcc") progs)
-        ver = (pkgVersion . package) pkg_descr
+        dll_name  = fromJust (lookup "x-dll-name" custom_bi)
+        dll_srcs  = (lines . fromJust) (lookup "x-dll-sources" custom_bi)
+        dll_libs  = (lines . fromJust) (lookup "x-dll-extra-libraries" custom_bi)
+        cc_opts   = ccOptions lib_bi
+        ld_opts   = ldOptions lib_bi
+        inc_dirs  = includeDirs lib_bi
+        lib_dirs  = extraLibDirs lib_bi
+        libs      = extraLibs lib_bi
+        bld_dir   = buildDir local_bld_info
+        progs     = withPrograms local_bld_info
+        gcc       = fromJust (lookupProgram (simpleProgram "gcc") progs)
+        ver       = (pkgVersion . package) pkg_descr
         inst_lib_dir = libdir $ absoluteInstallDirs pkg_descr local_bld_info NoCopyDest
     -- Compile C/C++ sources - output directory is dist/build/src/cpp
     putStrLn "Building wxc"
     objs <- mapM (compileCxx gcc cc_opts inc_dirs bld_dir) dll_srcs
     -- Link C/C++ sources as a DLL - output directory is dist/build
-    putStrLn "Linking wxc"
     linkSharedLib gcc ld_opts lib_dirs (libs ++ dll_libs) objs ver bld_dir dll_name inst_lib_dir
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
@@ -329,8 +339,8 @@ linkCxxOpts :: Version -- ^ Version information to be used for Unix shared libra
             -> String -- ^ Absolute path of the shared library
             -> [String] -- ^ List of options which can be applied to 'runProgram'
 linkCxxOpts ver out_dir basename basepath =
-    let dll_pathname = normalisePath (out_dir </> addExtension basename ".dll")
-        implib_pathname = normalisePath (out_dir </> "lib" ++ addExtension basename ".a") in
+    -- let dll_pathname = normalisePath (out_dir </> addExtension basename ".dll")
+    --     implib_ pathname = normalisePath (out_dir </> "lib" ++ addExtension basename ".a") in
     case buildOS of
       Windows -> ["--dll", "-shared", 
                   "-o", out_dir </> sharedLibName ver basename,
@@ -384,25 +394,44 @@ needsCompiling src obj =
 
 -- | Create a dynamically linked library using the configured ld.
 linkSharedLib :: ConfiguredProgram -- ^ Program used to perform linking
-              -> [String] -- ^ Linker options supplied by Cabal
-              -> [FilePath] -- ^ Library directories
-              -> [String] -- ^ Libraries
-              -> [String] -- ^ Objects
-              -> Version -- ^ wxCore version (wxC has same version number)
-              -> FilePath -- ^ Directory in which library will be generated
-              -> String -- ^ Name of the shared library
-              -> String -- ^ Absolute path of the shared library
+              -> [String]          -- ^ Linker options supplied by Cabal
+              -> [FilePath]        -- ^ Library directories
+              -> [String]          -- ^ Libraries
+              -> [String]          -- ^ Objects
+              -> Version           -- ^ wxCore version (wxC has same version number)
+              -> FilePath          -- ^ Directory in which library will be generated
+              -> String            -- ^ Name of the shared library
+              -> String            -- ^ Absolute path of the shared library
               -> IO ()
 linkSharedLib gcc opts lib_dirs libs objs ver out_dir dll_name dll_path =
     do
     let lib_dirs' = map (\d -> "-L" ++ normalisePath d) lib_dirs
-        out_dir' = normalisePath out_dir
-        opts' = opts ++ linkCxxOpts ver (out_dir') dll_name dll_path
-        objs' = map normalisePath objs
-        libs' = ["-lstdc++"] ++ map ("-l" ++) libs
-    runProgram verbose gcc (opts' ++ objs' ++ lib_dirs' ++ libs')
-    --system $ (unwords ([show . locationPath . programLocation $ gcc] ++ opts' ++ objs' ++ lib_dirs' ++ libs'))
-    return ()
+        out_dir'  = normalisePath out_dir
+        opts'     = opts ++ linkCxxOpts ver out_dir' dll_name dll_path
+        objs'     = map normalisePath objs
+        libs'     = ["-lstdc++"] ++ map ("-l" ++) libs
+        target    = out_dir' </> sharedLibName ver dll_name
+    link <- linkingNeeded target objs' 
+    when link $
+      do
+        putStrLn "Linking wxc"
+        runProgram verbose gcc (opts' ++ objs' ++ lib_dirs' ++ libs')
+      --system $ (unwords ([show . locationPath . programLocation $ gcc] ++ opts' ++ objs' ++ lib_dirs' ++ libs'))
+
+
+-- | Check if one of the input files is more recent then the output file 
+linkingNeeded :: FilePath -> [FilePath] -> IO Bool
+linkingNeeded output input = 
+  do
+    fileExists <- doesFileExist output
+    if not fileExists 
+      then return True
+      else 
+        do
+          mostRecentModificationTime <- maximum <$> mapM getModificationTime input
+          outputModificationTime     <- getModificationTime output
+          return $ mostRecentModificationTime > outputModificationTime
+
 
 -- | The 'normalise' implementation in System.FilePath does not meet the requirements of
 -- calling and/or running external programs on Windows particularly well as it does not
