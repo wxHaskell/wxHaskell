@@ -130,7 +130,7 @@ iconGetSize icon
 {-----------------------------------------------------------------------------------------
   Cursors
 -----------------------------------------------------------------------------------------}
--- | Load an cursor (see 'cursorCreateFromFile') and automatically delete it
+-- | Load a cursor (see 'cursorCreateFromFile') and automatically delete it
 -- after use.
 withCursorFromFile :: FilePath -> (Cursor () -> IO a) -> IO a
 withCursorFromFile fname f
@@ -138,8 +138,8 @@ withCursorFromFile fname f
             (cursorDelete)
             f
 
--- | Load an cursor from an icon file (ico,xbm,xpm,gif).
--- For a reason, this function is incomatible with 'iconCreateFromFile'.
+-- | Load a cursor from an icon file (ico,xbm,xpm,gif).
+-- For a reason, this function is incompatible with 'iconCreateFromFile'.
 cursorCreateFromFile :: String -> IO (Cursor ())
 cursorCreateFromFile fname = imageCreateFromFile fname >>= cursorCreateFromImage
 
