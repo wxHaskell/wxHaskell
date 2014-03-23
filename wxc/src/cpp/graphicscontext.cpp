@@ -138,13 +138,16 @@ EWXWEXPORT(wxGraphicsFont*,wxGraphicsContext_CreateFontWithColour)( wxGraphicsCo
   return NULL;
 #endif
 }
+*/
 
 EWXWEXPORT(wxGraphicsMatrix*,wxGraphicsContext_CreateMatrix)( wxGraphicsContext* self,
-                                                              wxDouble a, wxDouble b, wxDouble c, wxDouble d,
-                                                              wxDouble tx , wxDouble ty )
+                                                              double a,double b,double c, double d,
+                                                              double tx ,double ty )
 {
 #ifdef wxUSE_GRAPHICS_CONTEXT
-  return self->CreateMatrix(a, b, c, d, tx, ty);
+  wxGraphicsMatrix *matrix = new wxGraphicsMatrix;
+  *matrix = self->CreateMatrix(a, b, c, d, tx, ty);
+  return matrix;
 #else
   return NULL;
 #endif
@@ -153,7 +156,9 @@ EWXWEXPORT(wxGraphicsMatrix*,wxGraphicsContext_CreateMatrix)( wxGraphicsContext*
 EWXWEXPORT(wxGraphicsMatrix*,wxGraphicsContext_CreateDefaultMatrix)( wxGraphicsContext* self )
 {
 #ifdef wxUSE_GRAPHICS_CONTEXT
-  return self->CreateMatrix(1.0, 0.0, 0.0, 1.0, 0.0, 0.0);
+  wxGraphicsMatrix *matrix = new wxGraphicsMatrix;
+  *matrix = self->CreateMatrix(1.0, 0.0, 0.0, 1.0, 0.0, 0.0);
+  return matrix;
 #else
   return NULL;
 #endif
@@ -162,12 +167,13 @@ EWXWEXPORT(wxGraphicsMatrix*,wxGraphicsContext_CreateDefaultMatrix)( wxGraphicsC
 EWXWEXPORT(wxGraphicsPath*,wxGraphicsContext_CreatePath)( wxGraphicsContext* self )
 {
 #ifdef wxUSE_GRAPHICS_CONTEXT
-  return self->CreatePath();
+  wxGraphicsPath *path = new wxGraphicsPath;
+  *path = self->CreatePath();
+  return path;
 #else
   return NULL;
 #endif
 }
-*/
 
 EWXWEXPORT(void,wxGraphicsContext_Clip)( wxGraphicsContext* self, const wxRegion* region )
 {
@@ -440,6 +446,20 @@ EWXWEXPORT(void,wxGraphicsContext_StrokeLinesStartAndEnd)( wxGraphicsContext* se
 {
 #ifdef wxUSE_GRAPHICS_CONTEXT
   self->StrokeLines(n, beginPoints, endPoints);
+#endif
+}
+
+EWXWEXPORT(void,wxGraphicsContext_PushState)( wxGraphicsContext* self)
+{
+#ifdef wxUSE_GRAPHICS_CONTEXT
+  self->PushState();
+#endif
+}
+
+EWXWEXPORT(void,wxGraphicsContext_PopState)( wxGraphicsContext* self)
+{
+#ifdef wxUSE_GRAPHICS_CONTEXT
+  self->PopState();
 #endif
 }
 
