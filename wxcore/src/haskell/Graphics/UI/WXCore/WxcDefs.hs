@@ -2493,39 +2493,6 @@ import Data.Bits
 -- | A flag can be combined with other flags to a bit mask.
 type BitFlag = Int
 
-wxBU_EXACTFIT :: BitFlag
-wxBU_EXACTFIT = 1
-
-wxTE_PROCESS_ENTER :: BitFlag
-wxTE_PROCESS_ENTER = 1024
-
-wxTE_PASSWORD :: BitFlag
-wxTE_PASSWORD = 2048
-
-wxTE_RICH2 :: BitFlag
-wxTE_RICH2 = 32768
-
-wxTE_AUTO_URL :: BitFlag
-wxTE_AUTO_URL = 4096
-
-wxTE_NOHIDESEL :: BitFlag
-wxTE_NOHIDESEL = 8192
-
-wxTE_LEFT :: BitFlag
-wxTE_LEFT = 0
-
-wxTE_RIGHT :: BitFlag
-wxTE_RIGHT = 512
-
-wxTE_CENTRE :: BitFlag
-wxTE_CENTRE = 256
-
-wxTE_LINEWRAP :: BitFlag
-wxTE_LINEWRAP = 16384
-
-wxTE_WORDWRAP :: BitFlag
-wxTE_WORDWRAP = 0
-
 wxEXEC_ASYNC :: BitFlag
 wxEXEC_ASYNC = 0
 
@@ -2694,26 +2661,78 @@ wxIMAGE_LIST_SMALL = 1
 wxIMAGE_LIST_STATE :: Int
 wxIMAGE_LIST_STATE = 2
 
-wxTB_HORIZONTAL :: Int
-wxTB_HORIZONTAL = 4
 
-wxTB_NOALIGN :: Int
-wxTB_NOALIGN = 1024
+-- wxToolBar style flags
 
-wxTB_NODIVIDER :: Int
-wxTB_NODIVIDER = 512
+-- lay out the toolbar horizontally
+wxTB_HORIZONTAL  :: Int
+wxTB_HORIZONTAL  = wxHORIZONTAL    -- == 0x0004
+wxTB_TOP         :: Int
+wxTB_TOP         = wxTB_HORIZONTAL
 
-wxTB_NOICONS :: Int
-wxTB_NOICONS = 128
+-- lay out the toolbar vertically
+wxTB_VERTICAL    :: Int
+wxTB_VERTICAL    = wxVERTICAL      -- == 0x0008
 
-wxTB_TEXT :: Int
-wxTB_TEXT = 256
+wxTB_LEFT        :: Int
+wxTB_LEFT        = wxTB_VERTICAL
 
-wxTB_VERTICAL :: Int
-wxTB_VERTICAL = 8
+-- show 3D buttons (wxToolBarSimple only)
+wxTB_3DBUTTONS   :: Int
+wxTB_3DBUTTONS   = 0x0010
+
+-- "flat" buttons (Win32/GTK only)
+wxTB_FLAT        :: Int
+wxTB_FLAT        = 0x0020
+
+-- dockable toolbar (GTK only)
+wxTB_DOCKABLE    :: Int
+wxTB_DOCKABLE    = 0x0040
+
+-- don't show the icons (they're shown by default)
+wxTB_NOICONS     :: Int
+wxTB_NOICONS     = 0x0080
+
+-- show the text (not shown by default)
+wxTB_TEXT        :: Int
+wxTB_TEXT        = 0x0100
+
+-- don't show the divider between toolbar and the window (Win32 only)
+wxTB_NODIVIDER   :: Int
+wxTB_NODIVIDER   = 0x0200
+
+-- no automatic alignment (Win32 only useless)
+wxTB_NOALIGN     :: Int
+wxTB_NOALIGN     = 0x0400
+
+-- show the text and the icons alongside not vertically stacked (Win32/GTK)
+wxTB_HORZ_LAYOUT :: Int
+wxTB_HORZ_LAYOUT = 0x0800
+
+wxTB_HORZ_TEXT   :: Int
+wxTB_HORZ_TEXT   = wxTB_HORZ_LAYOUT .|. wxTB_TEXT
+
+-- don't show the toolbar short help tooltips
+wxTB_NO_TOOLTIPS   :: Int
+wxTB_NO_TOOLTIPS   = 0x1000
+
+-- lay out toolbar at the bottom of the window
+wxTB_BOTTOM        :: Int
+wxTB_BOTTOM        = 0x2000
+
+-- lay out toolbar at the right edge of the window
+wxTB_RIGHT         :: Int
+wxTB_RIGHT         = 0x4000
+
+wxTB_DEFAULT_STYLE :: Int
+wxTB_DEFAULT_STYLE = wxTB_HORIZONTAL .|. wxTB_FLAT
+
+-- End wxToolBar style flags
+
 
 wxADJUST_MINSIZE :: Int
 wxADJUST_MINSIZE = 32768
+{-# DEPRECATED wxADJUST_MINSIZE "Don't use this" #-}
 
 wxDB_TYPE_NAME_LEN :: Int
 wxDB_TYPE_NAME_LEN = 40
@@ -3129,6 +3148,8 @@ wxEAST = 32
 wxALL :: Int
 wxALL = 240
 
+-- enum wxAlignment
+
 wxALIGN_NOT :: Int
 wxALIGN_NOT = 0
 
@@ -3162,6 +3183,24 @@ wxALIGN_CENTER = 2304
 wxALIGN_CENTRE :: Int
 wxALIGN_CENTRE = 2304
 
+-- End enum wxAlignment
+
+-- enum wxSizerFlagBits
+
+wxFIXED_MINSIZE :: Int
+wxFIXED_MINSIZE                = 0x8000
+
+wxRESERVE_SPACE_EVEN_IF_HIDDEN :: Int
+wxRESERVE_SPACE_EVEN_IF_HIDDEN = 0x0002
+
+-- a mask to extract wxSizerFlagBits from combination of flags
+wxSIZER_FLAG_BITS_MASK :: Int
+wxSIZER_FLAG_BITS_MASK         = 0x8002
+
+-- End enum wxSizerFlagBits
+
+-- enum wxStretch
+
 wxSTRETCH_NOT :: Int
 wxSTRETCH_NOT = 0
 
@@ -3177,34 +3216,47 @@ wxEXPAND = 8192
 wxSHAPED :: Int
 wxSHAPED = 16384
 
+wxTILE :: Int
+wxTILE = wxSHAPED .|. wxFIXED_MINSIZE
+
+-- a mask to extract stretch from the combination of flags
+wxSTRETCH_MASK = 0x7000 -- sans wxTILE
+
+-- End enum wxStretch
+
+-- enum wxBorder
+
+{-
+ - Window (Frame/dialog/subwindow/panel item) style flags
+ -}
 wxVSCROLL :: Int
-wxVSCROLL = (-2147483648)
+wxVSCROLL = 0x80000000
 
 wxHSCROLL :: Int
-wxHSCROLL = 1073741824
+wxHSCROLL = 0x40000000
 
 wxCAPTION :: Int
-wxCAPTION = 536870912
+wxCAPTION = 0x20000000
 
 -- | Deprecated
 wxDOUBLE_BORDER :: Int
 wxDOUBLE_BORDER = 268435456
--- DEPRECATED wxDOUBLE_BORDER "Use wxBORDER_THEME" #-}
+{-# DEPRECATED wxDOUBLE_BORDER "Use wxBORDER_THEME" #-}
 
 -- | Deprecated
 wxSUNKEN_BORDER :: Int
 wxSUNKEN_BORDER = 134217728
--- DEPRECATED wxSUNKEN_BORDER "Use wxBORDER_SUNKEN" #-}
+{-# DEPRECATED wxSUNKEN_BORDER "Use wxBORDER_SUNKEN" #-}
 
 -- | Deprecated
 wxRAISED_BORDER :: Int
 wxRAISED_BORDER = 67108864
--- DEPRECATED wxRAISED_BORDER "Use wxBORDER_RAISED" #-}
+{-# DEPRECATED wxRAISED_BORDER "Use wxBORDER_RAISED" #-}
 
 -- | Deprecated
 wxSTATIC_BORDER :: Int
 wxSTATIC_BORDER = 16777216
--- DEPRECATED wxSTATIC_BORDER "Use wxBORDER_STATIC" #-}
+{-# DEPRECATED wxSTATIC_BORDER "Use wxBORDER_STATIC" #-}
 
 wxBORDER :: Int
 wxBORDER = 33554432
@@ -3247,6 +3299,8 @@ wxBORDER_THEME  = 0x10000000
 -- | A mask to extract border style from the combination of flags
 wxBORDER_MASK   :: Int
 wxBORDER_MASK   = 0x1f200000
+
+-- End enum wxBorder
 
 
 wxTRANSPARENT_WINDOW :: Int
@@ -3333,15 +3387,6 @@ wxED_BUTTONS_RIGHT = 2
 wxED_STATIC_LINE :: Int
 wxED_STATIC_LINE = 1
 
-wxTB_3DBUTTONS :: Int
-wxTB_3DBUTTONS = 16
-
-wxTB_FLAT :: Int
-wxTB_FLAT = 32
-
-wxTB_DOCKABLE :: Int
-wxTB_DOCKABLE = 64
-
 wxMB_DOCKABLE :: Int
 wxMB_DOCKABLE = 1
 
@@ -3375,23 +3420,342 @@ wxLB_NEEDED_SB = 512
 wxLB_ALWAYS_SB :: Int
 wxLB_ALWAYS_SB = 1024
 
-wxTE_READONLY :: Int
-wxTE_READONLY = 16
-
-wxTE_MULTILINE :: Int
-wxTE_MULTILINE = 32
-
-wxTE_PROCESS_TAB :: Int
-wxTE_PROCESS_TAB = 64
-
-wxTE_RICH :: Int
-wxTE_RICH = 128
+-- ----------------------------------------------------------------------------
+-- wxTextCtrl style flags
+-- ----------------------------------------------------------------------------
 
 wxTE_NO_VSCROLL :: Int
-wxTE_NO_VSCROLL = 256
+wxTE_NO_VSCROLL =     0x0002
 
+wxTE_READONLY :: Int
+wxTE_READONLY =       0x0010
+wxTE_MULTILINE :: Int
+wxTE_MULTILINE =      0x0020
+wxTE_PROCESS_TAB :: Int
+wxTE_PROCESS_TAB =    0x0040
+
+-- alignment flags
+wxTE_LEFT :: Int
+wxTE_LEFT =           0x0000                    -- 0x0000
+wxTE_CENTER :: Int
+wxTE_CENTER =         wxALIGN_CENTER_HORIZONTAL -- 0x0100
+wxTE_RIGHT :: Int
+wxTE_RIGHT =          wxALIGN_RIGHT             -- 0x0200
+wxTE_CENTRE :: Int
+wxTE_CENTRE =         wxTE_CENTER
+
+-- this style means to use RICHEDIT control and does something only under wxMSW
+-- and Win32 and is silently ignored under all other platforms
+wxTE_RICH :: Int
+wxTE_RICH =           0x0080
+
+wxTE_PROCESS_ENTER :: Int
+wxTE_PROCESS_ENTER =  0x0400
+{-# DEPRECATED wxTE_PROCESS_ENTER "Don't use this" #-}
+
+wxTE_PASSWORD :: Int
+wxTE_PASSWORD =       0x0800
+{-# DEPRECATED wxTE_PASSWORD "Don't use this" #-}
+
+-- automatically detect the URLs and generate the events when mouse is
+-- moved/clicked over an URL
+--
+-- this is for Win32 richedit and wxGTK2 multiline controls only so far
+wxTE_AUTO_URL :: Int
+wxTE_AUTO_URL =       0x1000
+
+-- by default, the Windows text control doesn't show the selection when it
+-- doesn't have focus - use this style to force it to always show it
+wxTE_NOHIDESEL :: Int
+wxTE_NOHIDESEL =      0x2000
+
+-- use wxHSCROLL to not wrap text at all, wxTE_CHARWRAP to wrap it at any
+-- position and wxTE_WORDWRAP to wrap at words boundary
+--
+-- if no wrapping style is given at all, the control wraps at word boundary
+wxTE_DONTWRAP :: Int
+wxTE_DONTWRAP =       wxHSCROLL
+wxTE_CHARWRAP :: Int
+wxTE_CHARWRAP =       0x4000  -- wrap at any position
+wxTE_WORDWRAP :: Int
+wxTE_WORDWRAP =       0x0001  -- wrap only at words boundaries
+wxTE_BESTWRAP :: Int
+wxTE_BESTWRAP =       0x0000  -- this is the default
+
+-- if WXWIN_COMPATIBILITY_2_6
+-- obsolete synonym
+wxTE_LINEWRAP :: Int
+wxTE_LINEWRAP =       wxTE_CHARWRAP
+{-# DEPRECATED wxTE_LINEWRAP "Don't use this" #-}
+-- endif -- WXWIN_COMPATIBILITY_2_6
+
+-- if WXWIN_COMPATIBILITY_2_8
+-- this style is (or at least should be) on by default now, don't use it
 wxTE_AUTO_SCROLL :: Int
-wxTE_AUTO_SCROLL = 512
+wxTE_AUTO_SCROLL =    0
+{-# DEPRECATED wxTE_AUTO_SCROLL "Don't use this" #-}
+-- endif -- WXWIN_COMPATIBILITY_2_8
+
+-- force using RichEdit version 2.0 or 3.0 instead of 1.0 (default) for
+-- wxTE_RICH controls - can be used together with or instead of wxTE_RICH
+wxTE_RICH2 :: Int
+wxTE_RICH2 =          0x8000
+
+-- reuse wxTE_RICH2's value for CAPEDIT control on Windows CE
+-- #if defined(__SMARTPHONE__) || defined(__POCKETPC__)
+-- wxTE_CAPITALIZE :: Int
+-- wxTE_CAPITALIZE =     wxTE_RICH2
+-- #else
+wxTE_CAPITALIZE :: Int
+wxTE_CAPITALIZE =     0
+-- #endif
+
+-- ----------------------------------------------------------------------------
+-- wxTextCtrl file types
+-- ----------------------------------------------------------------------------
+
+wxTEXT_TYPE_ANY :: Int
+wxTEXT_TYPE_ANY =     0
+
+-- ----------------------------------------------------------------------------
+-- wxTextCtrl::HitTest return values
+-- ----------------------------------------------------------------------------
+
+-- the point asked is ...
+-- enum wxTextCtrlHitTestResult
+wxTE_HT_UNKNOWN :: Int
+wxTE_HT_UNKNOWN = -2    -- this means HitTest() is simply not implemented
+wxTE_HT_BEFORE :: Int
+wxTE_HT_BEFORE  = -1    -- either to the left or upper
+wxTE_HT_ON_TEXT :: Int
+wxTE_HT_ON_TEXT = 0     -- directly on
+wxTE_HT_BELOW :: Int
+wxTE_HT_BELOW   = 1     -- below [the last line]
+wxTE_HT_BEYOND :: Int
+wxTE_HT_BEYOND  = 2     -- after [the end of line]
+-- ... the character returned
+
+-- ----------------------------------------------------------------------------
+-- Types for wxTextAttr
+-- ----------------------------------------------------------------------------
+
+-- Alignment
+
+-- enum wxTextAttrAlignment
+wxTEXT_ALIGNMENT_DEFAULT   :: Int 
+wxTEXT_ALIGNMENT_DEFAULT   = 0
+wxTEXT_ALIGNMENT_LEFT      :: Int
+wxTEXT_ALIGNMENT_LEFT      = 1
+wxTEXT_ALIGNMENT_CENTRE    :: Int
+wxTEXT_ALIGNMENT_CENTRE    = 2
+wxTEXT_ALIGNMENT_CENTER    :: Int
+wxTEXT_ALIGNMENT_CENTER    = wxTEXT_ALIGNMENT_CENTRE
+wxTEXT_ALIGNMENT_RIGHT     :: Int
+wxTEXT_ALIGNMENT_RIGHT     = 3
+wxTEXT_ALIGNMENT_JUSTIFIED :: Int
+wxTEXT_ALIGNMENT_JUSTIFIED = 4
+
+-- Flags to indicate which attributes are being applied
+-- enum wxTextAttrFlags
+wxTEXT_ATTR_TEXT_COLOUR          :: Int
+wxTEXT_ATTR_TEXT_COLOUR          = 0x00000001
+wxTEXT_ATTR_BACKGROUND_COLOUR    :: Int
+wxTEXT_ATTR_BACKGROUND_COLOUR    = 0x00000002
+
+wxTEXT_ATTR_FONT_FACE            :: Int
+wxTEXT_ATTR_FONT_FACE            = 0x00000004
+wxTEXT_ATTR_FONT_POINT_SIZE      :: Int
+wxTEXT_ATTR_FONT_POINT_SIZE      = 0x00000008
+wxTEXT_ATTR_FONT_PIXEL_SIZE      :: Int
+wxTEXT_ATTR_FONT_PIXEL_SIZE      = 0x10000000
+wxTEXT_ATTR_FONT_WEIGHT          :: Int
+wxTEXT_ATTR_FONT_WEIGHT          = 0x00000010
+wxTEXT_ATTR_FONT_ITALIC          :: Int
+wxTEXT_ATTR_FONT_ITALIC          = 0x00000020
+wxTEXT_ATTR_FONT_UNDERLINE       :: Int
+wxTEXT_ATTR_FONT_UNDERLINE       = 0x00000040
+wxTEXT_ATTR_FONT_STRIKETHROUGH   :: Int
+wxTEXT_ATTR_FONT_STRIKETHROUGH   = 0x08000000
+wxTEXT_ATTR_FONT_ENCODING        :: Int
+wxTEXT_ATTR_FONT_ENCODING        = 0x02000000
+wxTEXT_ATTR_FONT_FAMILY          :: Int
+wxTEXT_ATTR_FONT_FAMILY          = 0x04000000
+wxTEXT_ATTR_FONT_SIZE :: Int
+wxTEXT_ATTR_FONT_SIZE = 
+  wxTEXT_ATTR_FONT_POINT_SIZE .|.
+  wxTEXT_ATTR_FONT_PIXEL_SIZE
+wxTEXT_ATTR_FONT :: Int
+wxTEXT_ATTR_FONT =
+  wxTEXT_ATTR_FONT_FACE .|.
+  wxTEXT_ATTR_FONT_SIZE .|.
+  wxTEXT_ATTR_FONT_WEIGHT .|.
+  wxTEXT_ATTR_FONT_ITALIC .|.
+  wxTEXT_ATTR_FONT_UNDERLINE .|.
+  wxTEXT_ATTR_FONT_STRIKETHROUGH .|.
+  wxTEXT_ATTR_FONT_ENCODING .|.
+  wxTEXT_ATTR_FONT_FAMILY 
+
+wxTEXT_ATTR_ALIGNMENT            :: Int
+wxTEXT_ATTR_ALIGNMENT            = 0x00000080
+wxTEXT_ATTR_LEFT_INDENT          :: Int
+wxTEXT_ATTR_LEFT_INDENT          = 0x00000100
+wxTEXT_ATTR_RIGHT_INDENT         :: Int
+wxTEXT_ATTR_RIGHT_INDENT         = 0x00000200
+wxTEXT_ATTR_TABS                 :: Int
+wxTEXT_ATTR_TABS                 = 0x00000400
+wxTEXT_ATTR_PARA_SPACING_AFTER   :: Int
+wxTEXT_ATTR_PARA_SPACING_AFTER   = 0x00000800
+wxTEXT_ATTR_PARA_SPACING_BEFORE  :: Int
+wxTEXT_ATTR_PARA_SPACING_BEFORE  = 0x00001000
+wxTEXT_ATTR_LINE_SPACING         :: Int
+wxTEXT_ATTR_LINE_SPACING         = 0x00002000
+wxTEXT_ATTR_CHARACTER_STYLE_NAME :: Int
+wxTEXT_ATTR_CHARACTER_STYLE_NAME = 0x00004000
+wxTEXT_ATTR_PARAGRAPH_STYLE_NAME :: Int
+wxTEXT_ATTR_PARAGRAPH_STYLE_NAME = 0x00008000
+wxTEXT_ATTR_LIST_STYLE_NAME      :: Int
+wxTEXT_ATTR_LIST_STYLE_NAME      = 0x00010000
+
+wxTEXT_ATTR_BULLET_STYLE         :: Int
+wxTEXT_ATTR_BULLET_STYLE         = 0x00020000
+wxTEXT_ATTR_BULLET_NUMBER        :: Int
+wxTEXT_ATTR_BULLET_NUMBER        = 0x00040000
+wxTEXT_ATTR_BULLET_TEXT          :: Int
+wxTEXT_ATTR_BULLET_TEXT          = 0x00080000
+wxTEXT_ATTR_BULLET_NAME          :: Int
+wxTEXT_ATTR_BULLET_NAME          = 0x00100000
+
+wxTEXT_ATTR_BULLET :: Int
+wxTEXT_ATTR_BULLET =
+  wxTEXT_ATTR_BULLET_STYLE .|.
+  wxTEXT_ATTR_BULLET_NUMBER .|.
+  wxTEXT_ATTR_BULLET_TEXT .|.
+  wxTEXT_ATTR_BULLET_NAME
+
+
+wxTEXT_ATTR_URL                  :: Int
+wxTEXT_ATTR_URL                  = 0x00200000
+wxTEXT_ATTR_PAGE_BREAK           :: Int
+wxTEXT_ATTR_PAGE_BREAK           = 0x00400000
+wxTEXT_ATTR_EFFECTS              :: Int
+wxTEXT_ATTR_EFFECTS              = 0x00800000
+wxTEXT_ATTR_OUTLINE_LEVEL        :: Int
+wxTEXT_ATTR_OUTLINE_LEVEL        = 0x01000000
+
+{-!
+* Character and paragraph combined styles
+-}
+
+wxTEXT_ATTR_CHARACTER :: Int
+wxTEXT_ATTR_CHARACTER =
+  wxTEXT_ATTR_FONT .|.
+  wxTEXT_ATTR_EFFECTS .|.
+  wxTEXT_ATTR_BACKGROUND_COLOUR .|.
+  wxTEXT_ATTR_TEXT_COLOUR .|.
+  wxTEXT_ATTR_CHARACTER_STYLE_NAME .|.
+  wxTEXT_ATTR_URL
+
+wxTEXT_ATTR_PARAGRAPH :: Int
+wxTEXT_ATTR_PARAGRAPH = 
+  wxTEXT_ATTR_ALIGNMENT .|.
+  wxTEXT_ATTR_LEFT_INDENT .|.
+  wxTEXT_ATTR_RIGHT_INDENT .|.
+  wxTEXT_ATTR_TABS .|.
+  wxTEXT_ATTR_PARA_SPACING_BEFORE .|.
+  wxTEXT_ATTR_PARA_SPACING_AFTER .|.
+  wxTEXT_ATTR_LINE_SPACING .|.
+  wxTEXT_ATTR_BULLET .|.
+  wxTEXT_ATTR_PARAGRAPH_STYLE_NAME .|.
+  wxTEXT_ATTR_LIST_STYLE_NAME .|.
+  wxTEXT_ATTR_OUTLINE_LEVEL .|.
+  wxTEXT_ATTR_PAGE_BREAK
+
+wxTEXT_ATTR_ALL :: Int
+wxTEXT_ATTR_ALL =
+  wxTEXT_ATTR_CHARACTER .|.
+  wxTEXT_ATTR_PARAGRAPH
+
+{-!
+* Styles for wxTextAttr::SetBulletStyle
+-}
+-- enum wxTextAttrBulletStyle
+wxTEXT_ATTR_BULLET_STYLE_NONE            :: Int
+wxTEXT_ATTR_BULLET_STYLE_NONE            = 0x00000000
+wxTEXT_ATTR_BULLET_STYLE_ARABIC          :: Int
+wxTEXT_ATTR_BULLET_STYLE_ARABIC          = 0x00000001
+wxTEXT_ATTR_BULLET_STYLE_LETTERS_UPPER   :: Int
+wxTEXT_ATTR_BULLET_STYLE_LETTERS_UPPER   = 0x00000002
+wxTEXT_ATTR_BULLET_STYLE_LETTERS_LOWER   :: Int
+wxTEXT_ATTR_BULLET_STYLE_LETTERS_LOWER   = 0x00000004
+wxTEXT_ATTR_BULLET_STYLE_ROMAN_UPPER     :: Int
+wxTEXT_ATTR_BULLET_STYLE_ROMAN_UPPER     = 0x00000008
+wxTEXT_ATTR_BULLET_STYLE_ROMAN_LOWER     :: Int
+wxTEXT_ATTR_BULLET_STYLE_ROMAN_LOWER     = 0x00000010
+wxTEXT_ATTR_BULLET_STYLE_SYMBOL          :: Int
+wxTEXT_ATTR_BULLET_STYLE_SYMBOL          = 0x00000020
+wxTEXT_ATTR_BULLET_STYLE_BITMAP          :: Int
+wxTEXT_ATTR_BULLET_STYLE_BITMAP          = 0x00000040
+wxTEXT_ATTR_BULLET_STYLE_PARENTHESES     :: Int
+wxTEXT_ATTR_BULLET_STYLE_PARENTHESES     = 0x00000080
+wxTEXT_ATTR_BULLET_STYLE_PERIOD          :: Int
+wxTEXT_ATTR_BULLET_STYLE_PERIOD          = 0x00000100
+wxTEXT_ATTR_BULLET_STYLE_STANDARD        :: Int
+wxTEXT_ATTR_BULLET_STYLE_STANDARD        = 0x00000200
+wxTEXT_ATTR_BULLET_STYLE_RIGHT_PARENTHESIS :: Int
+wxTEXT_ATTR_BULLET_STYLE_RIGHT_PARENTHESIS = 0x00000400
+wxTEXT_ATTR_BULLET_STYLE_OUTLINE         :: Int
+wxTEXT_ATTR_BULLET_STYLE_OUTLINE         = 0x00000800
+
+wxTEXT_ATTR_BULLET_STYLE_ALIGN_LEFT      :: Int
+wxTEXT_ATTR_BULLET_STYLE_ALIGN_LEFT      = 0x00000000
+wxTEXT_ATTR_BULLET_STYLE_ALIGN_RIGHT     :: Int
+wxTEXT_ATTR_BULLET_STYLE_ALIGN_RIGHT     = 0x00001000
+wxTEXT_ATTR_BULLET_STYLE_ALIGN_CENTRE    :: Int
+wxTEXT_ATTR_BULLET_STYLE_ALIGN_CENTRE    = 0x00002000
+
+wxTEXT_ATTR_BULLET_STYLE_CONTINUATION    :: Int
+wxTEXT_ATTR_BULLET_STYLE_CONTINUATION    = 0x00004000
+
+{-!
+* Styles for wxTextAttr::SetTextEffects
+-}
+-- enum wxTextAttrEffects
+wxTEXT_ATTR_EFFECT_NONE                  :: Int
+wxTEXT_ATTR_EFFECT_NONE                  = 0x00000000
+wxTEXT_ATTR_EFFECT_CAPITALS              :: Int
+wxTEXT_ATTR_EFFECT_CAPITALS              = 0x00000001
+wxTEXT_ATTR_EFFECT_SMALL_CAPITALS        :: Int
+wxTEXT_ATTR_EFFECT_SMALL_CAPITALS        = 0x00000002
+wxTEXT_ATTR_EFFECT_STRIKETHROUGH         :: Int
+wxTEXT_ATTR_EFFECT_STRIKETHROUGH         = 0x00000004
+wxTEXT_ATTR_EFFECT_DOUBLE_STRIKETHROUGH  :: Int
+wxTEXT_ATTR_EFFECT_DOUBLE_STRIKETHROUGH  = 0x00000008
+wxTEXT_ATTR_EFFECT_SHADOW                :: Int
+wxTEXT_ATTR_EFFECT_SHADOW                = 0x00000010
+wxTEXT_ATTR_EFFECT_EMBOSS                :: Int
+wxTEXT_ATTR_EFFECT_EMBOSS                = 0x00000020
+wxTEXT_ATTR_EFFECT_OUTLINE               :: Int
+wxTEXT_ATTR_EFFECT_OUTLINE               = 0x00000040
+wxTEXT_ATTR_EFFECT_ENGRAVE               :: Int
+wxTEXT_ATTR_EFFECT_ENGRAVE               = 0x00000080
+wxTEXT_ATTR_EFFECT_SUPERSCRIPT           :: Int
+wxTEXT_ATTR_EFFECT_SUPERSCRIPT           = 0x00000100
+wxTEXT_ATTR_EFFECT_SUBSCRIPT             :: Int
+wxTEXT_ATTR_EFFECT_SUBSCRIPT             = 0x00000200
+
+{-!
+* Line spacing values
+-}
+-- enum wxTextAttrLineSpacing
+wxTEXT_ATTR_LINE_SPACING_NORMAL         :: Int
+wxTEXT_ATTR_LINE_SPACING_NORMAL         = 10
+wxTEXT_ATTR_LINE_SPACING_HALF           :: Int
+wxTEXT_ATTR_LINE_SPACING_HALF           = 15
+wxTEXT_ATTR_LINE_SPACING_TWICE          :: Int
+wxTEXT_ATTR_LINE_SPACING_TWICE          = 20
+
+--End wxTextCtrl style flags
+
 
 wxPROCESS_ENTER :: Int
 wxPROCESS_ENTER = 1024
@@ -3447,12 +3811,10 @@ wxSL_BOTH = 1024
 wxSL_SELRANGE :: Int
 wxSL_SELRANGE = 2048
 
-wxBU_AUTODRAW :: Int
-wxBU_AUTODRAW = 4
 
-wxBU_NOAUTODRAW :: Int
-wxBU_NOAUTODRAW = 0
+-- wxAnyButton specific flags
 
+-- These flags affect label alignment
 wxBU_LEFT :: Int
 wxBU_LEFT = 64
 
@@ -3464,6 +3826,34 @@ wxBU_RIGHT = 256
 
 wxBU_BOTTOM :: Int
 wxBU_BOTTOM = 512
+
+wxBU_ALIGN_MASK :: Int
+wxBU_ALIGN_MASK = wxBU_LEFT .|. wxBU_TOP .|. wxBU_RIGHT .|. wxBU_BOTTOM
+
+-- These two flags are obsolete
+wxBU_AUTODRAW :: Int
+wxBU_AUTODRAW = 4
+{-# DEPRECATED wxBU_AUTODRAW "Don't use this" #-}
+
+wxBU_NOAUTODRAW :: Int
+wxBU_NOAUTODRAW = 0
+{-# DEPRECATED wxBU_NOAUTODRAW "Don't use this" #-}
+
+-- by default, the buttons will be created with some (system dependent)
+-- minimal size to make them look nicer, giving this style will make them as
+-- small as possible
+wxBU_EXACTFIT :: Int
+wxBU_EXACTFIT = 0x0001
+
+-- this flag can be used to disable using the text label in the button: it is
+-- mostly useful when creating buttons showing bitmap and having stock id as
+-- without it both the standard label corresponding to the stock id and the
+-- bitmap would be shown
+wxBU_NOTEXT :: Int
+wxBU_NOTEXT = 0x0002
+
+-- End wxAnyButton specific flags
+
 
 wxLC_VRULES :: Int
 wxLC_VRULES = 1
@@ -3855,51 +4245,67 @@ wxSIZE_NO_ADJUSTMENTS = 8
 
 wxSOLID :: Int
 wxSOLID = 100
+{-# DEPRECATED wxSOLID "Don't use this" #-}
 
 wxDOT :: Int
 wxDOT = 101
+{-# DEPRECATED wxDOT "Don't use this" #-}
 
 wxLONG_DASH :: Int
 wxLONG_DASH = 102
+{-# DEPRECATED wxLONG_DASH "Don't use this" #-}
 
 wxSHORT_DASH :: Int
 wxSHORT_DASH = 103
+{-# DEPRECATED wxSHORT_DASH "Don't use this" #-}
 
 wxDOT_DASH :: Int
 wxDOT_DASH = 104
+{-# DEPRECATED wxDOT_DASH "Don't use this" #-}
 
 wxUSER_DASH :: Int
 wxUSER_DASH = 105
+{-# DEPRECATED wxUSER_DASH "Don't use this" #-}
 
 wxTRANSPARENT :: Int
 wxTRANSPARENT = 106
+{-# DEPRECATED wxTRANSPARENT "Don't use this" #-}
 
 wxSTIPPLE_MASK_OPAQUE :: Int
 wxSTIPPLE_MASK_OPAQUE = 107
+{-# DEPRECATED wxSTIPPLE_MASK_OPAQUE "Don't use this" #-}
 
 wxSTIPPLE_MASK :: Int
 wxSTIPPLE_MASK = 108
+{-# DEPRECATED wxSTIPPLE_MASK "Don't use this" #-}
 
 wxSTIPPLE :: Int
 wxSTIPPLE = 110
+{-# DEPRECATED wxSTIPPLE "Don't use this" #-}
 
 wxBDIAGONAL_HATCH :: Int
 wxBDIAGONAL_HATCH = 111
+{-# DEPRECATED wxBDIAGONAL_HATCH "Don't use this" #-}
 
 wxCROSSDIAG_HATCH :: Int
 wxCROSSDIAG_HATCH = 112
+{-# DEPRECATED wxCROSSDIAG_HATCH "Don't use this" #-}
 
 wxFDIAGONAL_HATCH :: Int
 wxFDIAGONAL_HATCH = 113
+{-# DEPRECATED wxFDIAGONAL_HATCH "Don't use this" #-}
 
 wxCROSS_HATCH :: Int
 wxCROSS_HATCH = 114
+{-# DEPRECATED wxCROSS_HATCH "Don't use this" #-}
 
 wxHORIZONTAL_HATCH :: Int
 wxHORIZONTAL_HATCH = 115
+{-# DEPRECATED wxHORIZONTAL_HATCH "Don't use this" #-}
 
 wxVERTICAL_HATCH :: Int
 wxVERTICAL_HATCH = 116
+{-# DEPRECATED wxVERTICAL_HATCH "Don't use this" #-}
 
 wxJOIN_BEVEL :: Int
 wxJOIN_BEVEL = 120
@@ -3991,62 +4397,72 @@ wxTOOL_LEFT = 3
 wxTOOL_RIGHT :: Int
 wxTOOL_RIGHT = 4
 
+-- enum wxDataFormatId
+--  the values of the format constants should be the same as corresponding
+--  CF_XXX constants in Windows API
+
 wxDF_INVALID :: Int
-wxDF_INVALID = 1
+wxDF_INVALID  = 0
 
 wxDF_TEXT :: Int
-wxDF_TEXT = 2
+wxDF_TEXT     = 1   -- CF_TEXT
 
 wxDF_BITMAP :: Int
-wxDF_BITMAP = 3
+wxDF_BITMAP   = 2   -- CF_BITMAP
 
 wxDF_METAFILE :: Int
-wxDF_METAFILE = 4
+wxDF_METAFILE = 3   -- CF_METAFILEPICT
 
 wxDF_SYLK :: Int
-wxDF_SYLK = 5
+wxDF_SYLK     = 4
 
 wxDF_DIF :: Int
-wxDF_DIF = 6
+wxDF_DIF      = 5
 
 wxDF_TIFF :: Int
-wxDF_TIFF = 7
+wxDF_TIFF     = 6
 
 wxDF_OEMTEXT :: Int
-wxDF_OEMTEXT = 8
+wxDF_OEMTEXT  = 7   -- CF_OEMTEXT
 
 wxDF_DIB :: Int
-wxDF_DIB = 9
+wxDF_DIB      = 8   -- CF_DIB
 
 wxDF_PALETTE :: Int
-wxDF_PALETTE = 10
+wxDF_PALETTE  = 9
 
 wxDF_PENDATA :: Int
-wxDF_PENDATA = 11
+wxDF_PENDATA  = 10
 
 wxDF_RIFF :: Int
-wxDF_RIFF = 12
+wxDF_RIFF     = 11
 
 wxDF_WAVE :: Int
-wxDF_WAVE = 13
+wxDF_WAVE     = 12
 
 wxDF_UNICODETEXT :: Int
-wxDF_UNICODETEXT = 14
+wxDF_UNICODETEXT = 13
 
 wxDF_ENHMETAFILE :: Int
-wxDF_ENHMETAFILE = 15
+wxDF_ENHMETAFILE = 14
 
 wxDF_FILENAME :: Int
-wxDF_FILENAME = 16
+wxDF_FILENAME    = 15  -- CF_HDROP
 
 wxDF_LOCALE :: Int
-wxDF_LOCALE = 17
+wxDF_LOCALE      = 16
 
 wxDF_PRIVATE :: Int
-wxDF_PRIVATE = 18
+wxDF_PRIVATE     = 20
+
+wxDF_HTML :: Int
+wxDF_HTML        = 30 -- Note: does not correspond to CF_ constant
 
 wxDF_MAX :: Int
-wxDF_MAX = 19
+wxDF_MAX         = 31
+
+-- End enum wxDataFormatId
+
 
 wxMM_TEXT :: Int
 wxMM_TEXT = 1
@@ -4881,45 +5297,59 @@ wxTREE_HITTEST_ONITEM = 80
 
 wxDEFAULT :: Int
 wxDEFAULT = 70
+{-# DEPRECATED wxDEFAULT "Don't use this" #-}
 
 wxDECORATIVE :: Int
 wxDECORATIVE = 71
+{-# DEPRECATED wxDECORATIVE "Don't use this" #-}
 
 wxROMAN :: Int
 wxROMAN = 72
+{-# DEPRECATED wxROMAN "Don't use this" #-}
 
 wxSCRIPT :: Int
 wxSCRIPT = 73
+{-# DEPRECATED wxSCRIPT "Don't use this" #-}
 
 wxSWISS :: Int
 wxSWISS = 74
+{-# DEPRECATED wxSWISS "Don't use this" #-}
 
 wxMODERN :: Int
 wxMODERN = 75
+{-# DEPRECATED wxMODERN "Don't use this" #-}
 
 wxTELETYPE :: Int
 wxTELETYPE = 76
+{-# DEPRECATED wxTELETYPE "Don't use this" #-}
 
 wxVARIABLE :: Int
 wxVARIABLE = 80
+{-# DEPRECATED wxVARIABLE "Don't use this" #-}
 
 wxFIXED :: Int
 wxFIXED = 81
+{-# DEPRECATED wxFIXED "Don't use this" #-}
 
 wxNORMAL :: Int
 wxNORMAL = 90
+{-# DEPRECATED wxNORMAL "Don't use this" #-}
 
 wxLIGHT :: Int
 wxLIGHT = 91
+{-# DEPRECATED wxLIGHT "Don't use this" #-}
 
 wxBOLD :: Int
 wxBOLD = 92
+{-# DEPRECATED wxBOLD "Don't use this" #-}
 
 wxITALIC :: Int
 wxITALIC = 93
+{-# DEPRECATED wxITALIC "Don't use this" #-}
 
 wxSLANT :: Int
 wxSLANT = 94
+{-# DEPRECATED wxSLANT "Don't use this" #-}
 
 wxBLUE_BRUSH :: Int
 wxBLUE_BRUSH = 0
