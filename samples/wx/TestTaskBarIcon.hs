@@ -9,7 +9,7 @@ import System.Process
 main = start gui
 
 gui = do f <- frame [text := "Main Window"]
-         icn <-iconCreateDefault
+         icn <- iconCreateFromFile "../bitmaps/wxwin.ico" (Size 16 16)
          
          
          tbi <- taskBarIconCreate
@@ -20,7 +20,8 @@ gui = do f <- frame [text := "Main Window"]
                               on command := do taskBarIconDelete tbi
                                                close f]
          set f [layout := margin 5 $
-                          hfloatRight $ widget btClose ]
+                          hfloatRight $ widget btClose 
+               ]
          
 
 onTaskBarEvt f tbi TaskBarIconRightDown =
