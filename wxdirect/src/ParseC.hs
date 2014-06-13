@@ -39,7 +39,10 @@ readHeaderFile fname =
     includeDirectories <- getIncludeDirectories
     putStrLn ("Preprocessing and parsing file: " ++ fname ++ 
               ",\n  using include directories: " ++ (unwords includeDirectories)) 
-    flattenComments . filter (not . isPrefixOf "#") . lines <$>
+    flattenComments .
+      filter (not . isPrefixOf "//") .
+      filter (not . isPrefixOf "#")  .
+      lines <$>
       readProcess 
         "cpp"
         ( includeDirectories ++ 
