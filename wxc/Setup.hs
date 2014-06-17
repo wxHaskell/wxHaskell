@@ -242,7 +242,9 @@ readWxConfig = do
     wxVersions <- case buildOS of
       Windows -> sequence [readProcess "wx-config" ["--release"] ""]
       _       -> mapM readVersion wxAcceptableVersions
-                 where readVersion x = readProcess "wx-config" ["--version=" ++ x, "--version-full"] ""
+                 where readVersion x = E.catch (readProcess "wx-config" ["--version=" ++ x, "--version-full"] "") handleError
+                       handleError :: IOError -> IO String
+                       handleError _ = return ""
 
     case [(x, y) | x <- wxAcceptableVersions, 
                    y <- wxVersions, 
