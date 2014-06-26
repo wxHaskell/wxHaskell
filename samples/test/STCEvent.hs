@@ -25,11 +25,11 @@ handler _ STCUpdateUI = return ()
 handler _ STCStyleNeeded = return ()
 handler _ STCPainted = return ()
 handler stc e = do logMessage $ show e
-                  case e of
+                   case e of
                     (STCDwellStart xy) -> do
                       pos <- styledTextCtrlPositionFromPoint stc xy
                       styledTextCtrlCallTipShow stc pos calltiptext
                     (STCDwellEnd xy) -> do
                       active <- styledTextCtrlCallTipActive stc
                       when active $ styledTextCtrlCallTipCancel stc
-                        _ -> return ()
+                    _ -> return ()

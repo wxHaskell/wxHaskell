@@ -290,7 +290,7 @@ parseWxConfig s =
 myBuildHook :: PackageDescription -> LocalBuildInfo -> UserHooks -> BuildFlags -> IO ()
 myBuildHook pkg_descr local_bld_info user_hooks bld_flags =
     do
-    -- Extract the custom fields customFieldsPD where field name is x-cpp-dll-sources
+    -- Extract the custom fields customFieldsPD where field name is x-dll-sources
     let lib       = fromJust (library pkg_descr)
         lib_bi    = libBuildInfo lib
         custom_bi = customFieldsBI lib_bi
