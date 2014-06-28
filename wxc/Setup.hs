@@ -11,10 +11,14 @@ import Distribution.Simple.InstallDirs (InstallDirs(..))
 import Distribution.Simple.LocalBuildInfo (LocalBuildInfo, localPkgDescr, installedPkgs, withPrograms, buildDir, absoluteInstallDirs)
 import Distribution.Simple.PackageIndex(SearchResult (..), searchByName )
 import Distribution.Simple.Program (ConfiguredProgram (..), lookupProgram, runProgram, simpleProgram, locationPath)
-import Distribution.Simple.Setup (ConfigFlags, BuildFlags, InstallFlags, CopyDest(..), fromFlag, installVerbosity)
+import Distribution.Simple.Setup ( BuildFlags, ConfigFlags
+                                 , CopyDest(..), CopyFlags, copyVerbosity
+                                 , InstallFlags, installVerbosity
+                                 , fromFlag
+                                 )
 import Distribution.Simple.Utils (installOrdinaryFile)
 import Distribution.System (OS (..), Arch (..), buildOS, buildArch)
-import Distribution.Verbosity (normal, verbose)
+import Distribution.Verbosity (Verbosity, normal, verbose)
 import System.Cmd (system)
 import System.Directory ( createDirectoryIfMissing, doesFileExist
                         , findExecutable,           getCurrentDirectory
@@ -43,7 +47,12 @@ whenM mp e = mp >>= \p -> when p e
 
 
 main :: IO ()
-main = defaultMainWithHooks simpleUserHooks { confHook = myConfHook, buildHook = myBuildHook, instHook = myInstHook }
+main = defaultMainWithHooks simpleUserHooks
+     { confHook = myConfHook
+     , buildHook = myBuildHook
+     , copyHook = myCopyHook
+     , instHook = myInstHook
+     }
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
@@ -470,11 +479,20 @@ ldconfig path = case buildOS of
                 ExitSuccess -> return ()
                 otherwise -> error "Couldn't execute ldconfig, ensure it is on your path"
 
+myCopyHook :: PackageDescription -> LocalBuildInfo -> UserHooks -> CopyFlags -> IO ()
+myCopyHook = hookHelper (fromFlag . copyVerbosity) (copyHook simpleUserHooks)
+
 myInstHook :: PackageDescription -> LocalBuildInfo -> UserHooks -> InstallFlags -> IO ()
-myInstHook pkg_descr local_bld_info user_hooks inst_flags = 
+myInstHook = hookHelper (fromFlag . installVerbosity) (instHook simpleUserHooks)
+
+hookHelper ::
+    (a -> Verbosity) ->
+    (PackageDescription -> LocalBuildInfo -> UserHooks -> a -> IO ()) ->
+    PackageDescription -> LocalBuildInfo -> UserHooks -> a -> IO ()
+hookHelper verbosity origHook pkg_descr local_bld_info user_hooks flags =
     do
-    -- Perform simpleUserHooks instHook (to copy installIncludes)
-    instHook simpleUserHooks pkg_descr local_bld_info user_hooks inst_flags
+    -- Perform simpleUserHooks (copyHook/instHook => to copy installIncludes)
+    origHook pkg_descr local_bld_info user_hooks flags
 
     -- Copy shared library
     let bld_dir = buildDir local_bld_info
@@ -488,6 +506,6 @@ myInstHook pkg_descr local_bld_info user_hooks inst_flags =
 
         inst_lib_dir = libdir $ absoluteInstallDirs pkg_descr local_bld_info NoCopyDest
 
-    installOrdinaryFile (fromFlag (installVerbosity inst_flags)) (bld_dir </> lib_name) (inst_lib_dir </> lib_name)
+    installOrdinaryFile (verbosity flags) (bld_dir </> lib_name) (inst_lib_dir </> lib_name)
     ldconfig inst_lib_dir
 
