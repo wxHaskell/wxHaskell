@@ -216,10 +216,10 @@ data Border = BorderSimple    -- ^ Displays a thin border around the window.
 instance BitMask Border where
   assocBitMask
     = [(BorderSimple, wxBORDER)
-      ,(BorderDouble, wxDOUBLE_BORDER)
-      ,(BorderSunken, wxSUNKEN_BORDER)
-      ,(BorderRaised, wxRAISED_BORDER)
-      ,(BorderStatic, wxSTATIC_BORDER)
+      ,(BorderDouble, wxBORDER_THEME)
+      ,(BorderSunken, wxBORDER_SUNKEN)
+      ,(BorderRaised, wxBORDER_RAISED)
+      ,(BorderStatic, wxBORDER_STATIC)
       ,(BorderNone,   0)]
 
 

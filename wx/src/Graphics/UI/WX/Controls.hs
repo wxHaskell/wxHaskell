@@ -208,7 +208,7 @@ instance Commanding (Button a) where
 --
 bitmapButton :: Window a -> [Prop (BitmapButton ())] -> IO (BitmapButton ())
 bitmapButton parent props
-  = feed2 props wxBU_AUTODRAW $
+  = feed2 props 0 $
     initialWindow $ \id rect -> \props flags ->
     do bb <- bitmapButtonCreate parent id nullBitmap rect flags
        set bb props
@@ -258,7 +258,7 @@ instance BitMask Align where
 instance BitMask Wrap where
   assocBitMask
     = [(WrapNone, wxHSCROLL)
-      ,(WrapLine, wxTE_LINEWRAP)
+      ,(WrapLine, wxTE_CHARWRAP)
       ,(WrapWord, wxTE_WORDWRAP)]
 
 
