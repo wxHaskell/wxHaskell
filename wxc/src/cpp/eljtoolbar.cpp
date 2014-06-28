@@ -23,15 +23,24 @@ EWXWEXPORT(void,wxToolBar_AddSeparator)(wxToolBar* self)
 	self->AddSeparator ();
 }
 
-EWXWEXPORT(void,wxToolBar_AddTool)(wxToolBar* self,int id,wxBitmap* bmp,wxString* shelp,wxString* lhelp)
+EWXWEXPORT(void, wxToolBar_AddTool)(wxToolBar* self, int toolid, const wxString& label, const wxBitmap& bitmap, const wxBitmap& bmpDisabled, wxItemKind kind = wxITEM_NORMAL, const wxString& shortHelp = wxEmptyString, const wxString& longHelp = wxEmptyString, wxObject *data = NULL)
 {
-	self->AddTool (id,*bmp,*shelp,*lhelp);
+    // the full AddTool() function
+    //
+    // If bmpDisabled is wxNullBitmap, a shadowed version of the normal bitmap
+    // is created and used as the disabled image.
+    self->AddTool(toolid,
+                  label,
+                  bitmap,
+                  bmpDisabled,
+                  wxITEM_NORMAL,
+                  shortHelp,
+                  longHelp,
+                  data);
 }
 
-EWXWEXPORT(void,wxToolBar_AddToolEx)(wxToolBar* self,int id,wxBitmap* bmp1,wxBitmap* bmp2,bool tgl,int x,int y,wxObject* dat,wxString* shelp,wxString* lhelp)
-{
-	self->AddTool (id,*bmp1,*bmp2, tgl, x, y, dat,*shelp,*lhelp);
-}
+// Obsolete
+// EWXWEXPORT(void,wxToolBar_AddToolEx)(wxToolBar* self,int id,wxBitmap* bmp1,wxBitmap* bmp2,bool tgl,int x,int y,wxObject* dat,wxString* shelp,wxString* lhelp)
 
 EWXWEXPORT(bool,wxToolBar_DeleteTool)(wxToolBar* self,int id)
 {
@@ -113,10 +122,8 @@ EWXWEXPORT(void,wxToolBar_InsertSeparator)(wxToolBar* self,int pos)
 	self->InsertSeparator ((size_t)pos);
 }
 
-EWXWEXPORT(void,wxToolBar_InsertTool)(wxToolBar* self,int pos,int id,wxBitmap* bmp1,wxBitmap* bmp2,bool tgl,wxObject* dat,wxString* shelp,wxString* lhelp)
-{
-	self->InsertTool ((size_t)pos, id,*bmp1,*bmp2, tgl, dat,*shelp,*lhelp);
-}
+// Obsolete
+// EWXWEXPORT(void,wxToolBar_InsertTool)(wxToolBar* self,int pos,int id,wxBitmap* bmp1,wxBitmap* bmp2,bool tgl,wxObject* dat,wxString* shelp,wxString* lhelp)
 
 EWXWEXPORT(bool,wxToolBar_Realize)(wxToolBar* self)
 {

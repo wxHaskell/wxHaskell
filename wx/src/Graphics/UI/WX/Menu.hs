@@ -268,7 +268,7 @@ instance Able (MenuItem a) where
 
 instance Textual (MenuItem a) where
   text
-    = reflectiveAttr "text" menuItemGetText menuItemSetText
+    = reflectiveAttr "text" menuItemGetItemLabel menuItemSetItemLabel
 
 instance Help (MenuItem a) where
   help  = newAttr "help" menuItemGetHelp menuItemSetHelp

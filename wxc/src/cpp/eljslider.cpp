@@ -34,10 +34,8 @@ EWXWEXPORT(int,wxSlider_GetMax)(void* _obj)
 	return ((wxSlider*)_obj)->GetMax();
 }
 	
-EWXWEXPORT(void,wxSlider_SetTickFreq)(void* _obj, int n, int pos)
-{
-	((wxSlider*)_obj)->SetTickFreq(n, pos);
-}
+// Obsolete
+// EWXWEXPORT(void,wxSlider_SetTickFreq)(void* _obj, int n, int pos)
 	
 EWXWEXPORT(int,wxSlider_GetTickFreq)(void* _obj)
 {

@@ -392,7 +392,8 @@ void       wxLog_RemoveTraceMask( TSelf(wxLog) _obj, TClass(wxString) str );
 void       wxLog_Resume( TSelf(wxLog) _obj );
 TClass(wxLog)  wxLog_SetActiveTarget( TSelf(wxLog) pLogger );
 void       wxLog_SetTimestamp( TSelf(wxLog) _obj, TStringVoid ts );
-void       wxLog_SetTraceMask( TSelf(wxLog) _obj, int ulMask );
+// Obsolete
+// void       wxLog_SetTraceMask( TSelf(wxLog) _obj, int ulMask );
 void       wxLog_SetVerbose( TSelf(wxLog) _obj, TBoolInt bVerbose );
 void       wxLog_Suspend( TSelf(wxLog) _obj );
 

@@ -101,9 +101,10 @@ EWXWEXPORT(wxWindow*,wxSizerItem_GetWindow)(wxSizerItem* self)
 	return self->GetWindow();
 }
 	
-EWXWEXPORT(void,wxSizerItem_SetWindow)(wxSizerItem* self,wxWindow* window)
+// EWXWEXPORT(void,wxSizerItem_SetWindow)(wxSizerItem* self,wxWindow* window)
+EWXWEXPORT(void, wxSizerItem_AssignWindow)(wxSizerItem* self, wxWindow* window)
 {
-	self->SetWindow(window);
+	self->AssignWindow(window);
 }
 	
 EWXWEXPORT(void*,wxSizerItem_GetSizer)(wxSizerItem* self)
@@ -111,9 +112,10 @@ EWXWEXPORT(void*,wxSizerItem_GetSizer)(wxSizerItem* self)
 	return (void*)self->GetSizer();
 }
 	
-EWXWEXPORT(void,wxSizerItem_SetSizer)(wxSizerItem* self,wxSizer* sizer)
+// EWXWEXPORT(void,wxSizerItem_SetSizer)(wxSizerItem* self,wxSizer* sizer)
+EWXWEXPORT(void, wxSizerItem_AssignSizer)(wxSizerItem* self, wxSizer* sizer)
 {
-	self->SetSizer(sizer);
+	self->AssignSizer(sizer);
 }
 	
 #if (wxVERSION_NUMBER < 2800)
@@ -194,9 +196,10 @@ EWXWEXPORT(void,wxSizerItem_SetProportion)(wxSizerItem* self,int proportion)
 	self->SetProportion(proportion);
 }
 
-EWXWEXPORT(void,wxSizerItem_SetSpacer)(wxSizerItem* self,int width,int height)
+// EWXWEXPORT(void,wxSizerItem_SetSpacer)(wxSizerItem* self,int width,int height)
+EWXWEXPORT(void, wxSizerItem_AssignSpacer)(wxSizerItem* self, int width, int height)
 {
-	self->SetSpacer(wxSize(width, height));
+	self->AssignSpacer(wxSize(width, height));
 }
 
 EWXWEXPORT(void,wxSizerItem_Show)(wxSizerItem* self,int show)
@@ -474,10 +477,9 @@ EWXWEXPORT(bool,wxSizer_Replace)(wxSizer* self,int oldindex,wxSizerItem* newsz)
 	return self->Replace((size_t) oldindex,newsz);
 }
 
-EWXWEXPORT(void,wxSizer_SetVirtualSizeHints)(wxSizer* self,wxWindow* window)
-{
-	self->SetVirtualSizeHints(window);
-}
+/* Deprecated; replace with wxSizer_FitInside
+// EWXWEXPORT(void,wxSizer_SetVirtualSizeHints)(wxSizer* self,wxWindow* window)
+*/
 
 EWXWEXPORT(bool,wxSizer_ShowWindow)(wxSizer* self,wxWindow* window,bool show,bool recursive)
 {

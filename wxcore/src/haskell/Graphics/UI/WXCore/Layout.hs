@@ -710,7 +710,6 @@ vsplit :: SplitterWindow a -> Int -> Int -> Layout -> Layout -> Layout
 vsplit
   = split False
 
-
 split :: Bool -> SplitterWindow a -> Int -> Int -> Layout -> Layout -> Layout
 split splitHorizontal splitter sashWidth paneWidth pane1 pane2
   = Splitter optionsDefault (downcastSplitterWindow splitter) pane1 pane2 splitHorizontal sashWidth paneWidth
@@ -857,7 +856,8 @@ sizerFromLayout parent layout
 
     insert container (Splitter options splitter pane1 pane2 splitHorizontal sashWidth paneWidth)
       = do splitterWindowSetMinimumPaneSize splitter 20
-           splitterWindowSetSashSize splitter sashWidth
+           -- splitterWindowSetSashSize is obsolete
+           -- splitterWindowSetSashSize splitter sashWidth
            sizerAddWindowWithOptions container splitter options
            if splitHorizontal
             then splitterWindowSplitHorizontally splitter win1 win2 paneWidth
@@ -883,7 +883,8 @@ sizerFromLayout parent layout
               WidgetContainer options win layout -> windowSetLayout win layout
               Splitter options splitter pane1 pane2 splitHorizontal sashWidth paneWidth 
                                       ->  do splitterWindowSetMinimumPaneSize splitter 20
-                                             splitterWindowSetSashSize splitter sashWidth
+                                             -- splitterWindowSetSashSize is obsolete
+                                             -- splitterWindowSetSashSize splitter sashWidth
                                              -- sizerAddWindowWithOptions container splitter options
                                              let win1 = getWinFromLayout pane1
                                                  win2 = getWinFromLayout pane2
@@ -995,11 +996,15 @@ sizerFromLayout parent layout
           MarginLeft   -> wxLEFT
           MarginBottom -> wxBOTTOM
           MarginRight  -> wxRIGHT
-    
-    flagsAdjustMinSize window options
+ 
+--  wxADJUST_MINSIZE is deprecated 
+    flagsAdjustMinSize window options = 0
+{-
       = if (adjustMinSize options) 
          then wxADJUST_MINSIZE
          else 0
+-}
+
 {-      
         case minSize options of
           Nothing | -- dleijen: unfortunately, wxADJUST_MINSIZE has bugs for certain controls:

@@ -12,7 +12,7 @@ EWXWEXPORT(void*,wxIconBundle_CreateDefault)()
 	
 EWXWEXPORT(void*,wxIconBundle_CreateFromFile)(wxString* file,int type)
 {
-	return (void*)new wxIconBundle(*file, (long)type);
+	return (void*)new wxIconBundle(*file, (wxBitmapType)type);
 }
 	
 EWXWEXPORT(void*,wxIconBundle_CreateFromIcon)(void* icon)
@@ -32,7 +32,7 @@ EWXWEXPORT(void,wxIconBundle_Delete)(void* _obj)
 	
 EWXWEXPORT(void,wxIconBundle_AddIconFromFile)(void* _obj,wxString* file,int type)
 {
-	((wxIconBundle*)_obj)->AddIcon(*file, (long)type);
+	((wxIconBundle*)_obj)->AddIcon(*file, (wxBitmapType)type);
 }
 	
 EWXWEXPORT(void,wxIconBundle_AddIcon)(void* _obj,void* icon)

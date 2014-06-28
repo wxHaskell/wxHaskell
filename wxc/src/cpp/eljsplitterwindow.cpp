@@ -58,10 +58,8 @@ EWXWEXPORT(bool,wxSplitterWindow_IsSplit)(wxSplitterWindow* self)
 	return self->IsSplit();
 }
 	
-EWXWEXPORT(void,wxSplitterWindow_SetSashSize)(void* self,int width)
-{
-	((wxSplitterWindow*)self)->SetSashSize(width);
-}
+// Obsolete
+// EWXWEXPORT(void,wxSplitterWindow_SetSashSize)(void* self,int width)
 	
 EWXWEXPORT(void,wxSplitterWindow_SetBorderSize)(void* self,int width)
 {

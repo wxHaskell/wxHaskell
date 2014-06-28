@@ -102,11 +102,6 @@ EWXWEXPORT(void,ELJLog_DontCreateOnDemand)(ELJLog* self)
 	self->DontCreateOnDemand();
 }
 	
-EWXWEXPORT(void,ELJLog_SetTraceMask)(ELJLog* self,int ulMask)
-{
-	self->SetTraceMask((wxTraceMask)ulMask);
-}
-	
 EWXWEXPORT(void,ELJLog_AddTraceMask)(ELJLog* self,void* str)
 {
 	self->AddTraceMask((const wxChar*)str);
