@@ -353,7 +353,7 @@ linkCxxOpts ver out_dir basename basepath =
     -- let dll_pathname = normalisePath (out_dir </> addExtension basename ".dll")
     --     implib_ pathname = normalisePath (out_dir </> "lib" ++ addExtension basename ".a") in
     case buildOS of
-      Windows -> ["--dll", "-shared", 
+      Windows -> ["-Wl,--dll", "-shared", 
                   "-o", out_dir </> sharedLibName ver basename,
                   "-Wl,--out-implib," ++ "lib" ++ addExtension basename ".a",
                   "-Wl,--export-all-symbols", "-Wl,--enable-auto-import"]
