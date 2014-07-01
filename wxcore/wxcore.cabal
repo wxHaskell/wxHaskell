@@ -71,8 +71,8 @@ library
     filepath,
     parsec,
     stm,
-    wxc >= 0.90.1.1,
-    wxdirect >= 0.90.1.1,
+    wxc >= 0.91,
+    wxdirect >= 0.91,
     directory,
     time
 
