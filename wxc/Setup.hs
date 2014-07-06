@@ -19,7 +19,7 @@ import Distribution.Simple.Setup ( BuildFlags, ConfigFlags
 import Distribution.Simple.Utils (installOrdinaryFile)
 import Distribution.System (OS (..), Arch (..), buildOS, buildArch)
 import Distribution.Verbosity (Verbosity, normal, verbose)
-import System.Cmd (system)
+import System.Process (system)
 import System.Directory ( createDirectoryIfMissing, doesFileExist
                         , findExecutable,           getCurrentDirectory
                         , getDirectoryContents,     getModificationTime
