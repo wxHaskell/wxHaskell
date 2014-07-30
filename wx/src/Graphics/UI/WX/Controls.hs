@@ -61,6 +61,8 @@ module Graphics.UI.WX.Controls
       , ImageList, imageList, imageListFromFiles
       -- ** MediaCtrl
       , MediaCtrlBackend(..), MediaCtrl, mediaCtrl, mediaCtrlWithBackend, mediaCtrlEx
+      -- ** Wizard
+      , Wizard, wizard, wizardEx, wizardPageSimple, runWizard, next, prev, chain
       -- ** StyledTextCtrl
       , StyledTextCtrl, stcEvent, styledTextCtrl, styledTextCtrlEx
       -- ** PropertyGrid
@@ -79,6 +81,7 @@ import Graphics.UI.WX.Variable (variable)
 import Graphics.UI.WX.Window
 
 import Control.Monad (forM_)
+import Data.Maybe (fromMaybe, isJust, fromJust)
 import Data.Dynamic  -- for "alignment"
 import System.Info (os)
 
@@ -1329,6 +1332,59 @@ mediaCtrlEx parent style back props
 instance Media (MediaCtrl a) where
   play media = unitIO (mediaCtrlPlay media)
   stop media = unitIO (mediaCtrlStop media)
+
+{--------------------------------------------------------------------------------
+  Wizard
+--------------------------------------------------------------------------------}
+
+-- wxcore contains getters for next/prev, but how do we fix the conflicting types?
+-- For the time being, the getters are omitted.
+next :: WriteAttr (WizardPageSimple a) (Maybe (WizardPageSimple b))
+next = writeAttr "next" setter
+  where
+    setter w p = wizardPageSimpleSetNext w (fromMaybe objectNull p)
+prev :: WriteAttr (WizardPageSimple a) (Maybe (WizardPageSimple b))
+prev = writeAttr "prev" setter
+  where
+    setter w p = wizardPageSimpleSetPrev w (fromMaybe objectNull p)
+
+-- | Chain together all given wizard pages.
+chain :: [WizardPageSimple a] -> IO ()
+chain ws = chain1 Nothing ws
+  where
+    chain1 pr (w:ws) = do
+      when (isJust pr) (set w [prev := pr])
+      when (not $ null ws) (set w [next := Just $ head ws])
+      chain1 (Just w) ws
+    chain1 pr [] = return ()
+
+-- | Create an empty wizard.
+wizard :: Window a -> [Prop (Wizard ())] -> IO (Wizard ())
+wizard parent props
+  = wizardEx parent (wxCAPTION .-. wxSYSTEM_MENU .-. wxCLOSE_BOX) props
+
+wizardEx :: Window a -> Style -> [Prop (Wizard ())] -> IO (Wizard ())
+wizardEx parent style props
+  = feed2 props style $
+    initialWindow $ \id rect ->
+    initialText   $ \txt -> \props flags ->
+    do b <- wizardCreate parent id txt nullBitmap rect
+       set b props
+       return b
+
+-- | Create an empty simple wizard page.
+wizardPageSimple :: Wizard a -> [Prop (WizardPageSimple ())] -> IO (WizardPageSimple ())
+wizardPageSimple parent props
+  = do
+    w <- wizardPageSimpleCreate parent
+    set w props
+    return w
+ 
+-- | Run the wizard.
+-- IMPORTANT: `windowDestroy` needs to be called on the wizard when it is no longer used. After
+-- `windowDestroy` has been called, the wizard or any of its children must not be accessed anymore.
+runWizard :: Wizard a -> WizardPage b -> IO Bool
+runWizard wiz page = wizardRunWizard wiz page >>= return . (/=0)
 
 {--------------------------------------------------------------------------------
   wxStyledTextCtrl
