@@ -29,13 +29,12 @@ APPS= BouncingBalls\
       TimeFlows\
       TimeFlowsEx\
 
-#      DbBrowse\
-#      DbConsole\
 
-
-.PHONY: clean
+.PHONY: all
 
 all: $(APPS)
+
+.PHONY: clean
 
 clean:
 	rm -rf $(APPS) *.o *.hi *.app *exe *.manifest

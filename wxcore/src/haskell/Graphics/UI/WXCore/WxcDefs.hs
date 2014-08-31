@@ -3434,7 +3434,7 @@ wxSTRETCH_MASK = 0x7000 -- sans wxTILE
  - Window (Frame/dialog/subwindow/panel item) style flags
  -}
 wxVSCROLL :: Int
-wxVSCROLL = 0x80000000
+wxVSCROLL = fromIntegral (0x80000000 :: Integer) -- Casting to remove a compiler warning about Int being too big
 
 wxHSCROLL :: Int
 wxHSCROLL = 0x40000000

@@ -5,7 +5,7 @@ The wxHaskell libraries are distributed under the wxWindows library
 license. The documentation is subject to the wxWidgets documentation 
 license.
 
-See "http://www.wxwidgets.org/newlicen.htm" for the legal description 
+See "https://www.wxwidgets.org/about/licence/" for the legal description 
 of the license, which is also included in this document.
 
 The wxWindows library licence is essentially the L-GPL (Library General 
