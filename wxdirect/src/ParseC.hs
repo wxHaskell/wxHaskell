@@ -39,15 +39,18 @@ readHeaderFile fname =
     includeDirectories <- getIncludeDirectories
     putStrLn ("Preprocessing and parsing file: " ++ fname ++ 
               ",\n  using include directories: " ++ (unwords includeDirectories)) 
-    flattenComments . filter (not . isPrefixOf "#") . lines <$>
+    flattenComments .
+      filter (not . isPrefixOf "//") .
+      filter (not . isPrefixOf "#")  .
+      lines <$>
       readProcess 
         "cpp"
         ( includeDirectories ++ 
-          [fname              -- The file to process
-          , "-C"              -- Keep the comments
+          [ "-C"              -- Keep the comments
           , "-DWXC_TYPES_H"   -- Make sure wxc_types.h is not included, 
                               -- so the type macros are not replaced 
                               -- (the parser scans for certain macros)
+          , fname             -- The file to process
           ]
         )
         ""

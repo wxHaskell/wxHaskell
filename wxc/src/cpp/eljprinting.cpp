@@ -396,7 +396,7 @@ EWXWEXPORT(void,wxPrintData_SetCollate)(wxPrintData* self,bool flag)
 	
 EWXWEXPORT(void,wxPrintData_SetOrientation)(wxPrintData* self,int orient)
 {
-	self->SetOrientation(orient);
+	self->SetOrientation((wxPrintOrientation) orient);
 }
 	
 EWXWEXPORT(void,wxPrintData_SetPrinterName)(wxPrintData* self,wxString* name)

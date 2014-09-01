@@ -268,7 +268,7 @@ instance Able (MenuItem a) where
 
 instance Textual (MenuItem a) where
   text
-    = reflectiveAttr "text" menuItemGetText menuItemSetText
+    = reflectiveAttr "text" menuItemGetItemLabel menuItemSetItemLabel
 
 instance Help (MenuItem a) where
   help  = newAttr "help" menuItemGetHelp menuItemSetHelp
@@ -301,13 +301,13 @@ menuId id
   1) As an "on command" on the menu item itself. 
   2) With an "on (menu xxx)" on a window. 
 
-  Unfortunately, wxWindows does not support method (1) for menus that are
+  Unfortunately, wxWidgets does not support method (1) for menus that are
   part of a menubar and assumes they are set on using (2) on the associated
-  frame. We can't tell whether a menu is part of a menubar or popupmenu untill
-  the user sets it. Thus we both set the eventhandlers always directly on the
+  frame. We can't tell whether a menu is part of a menubar or popup menu until
+  the user sets it. Thus we both set the event handlers always directly on the
   top level menu (this is good enough for popup menus) and we maintain 
   a list of menu item id's and associated event handler as client data on the
-  top level menu. When the menu is set as part of a menubar, we install the
+  top level menu. When the menu is set as part of a menu bar, we install the
   handlers on the associated frame.
 --------------------------------------------------------------------------------}
 instance Commanding (MenuItem a) where
@@ -326,7 +326,7 @@ menuItemOnCommand item io
        topmenu <- menuItemGetTopMenu item
        -- always set it on the menu itself (has only effect on popup menus)
        evtHandlerOnMenuCommand topmenu id io
-       -- update the haskell event handler list for delayed frame installation
+       -- update the Haskell event handler list for delayed frame installation
        menuUpdateEvtHandlers topmenu (insert id io)
        -- and set it directly on the frame if already instantiated. 
        frame   <- menuGetFrame topmenu
@@ -443,7 +443,7 @@ toolBarEx parent showText showDivider props
 --
 -- * Events: 'tool'
 --
--- * Instances: 'Textual', 'Able', 'Help', 'Tipped', 'Checkable', 'Identity', 'Commanding'.
+-- * Instances: 'Able', 'Help', 'Tipped', 'Checkable', 'Identity', 'Commanding'.
 --
 data ToolBarItem  = ToolBarItem (ToolBar ()) Id Bool
 
@@ -526,7 +526,7 @@ tool (ToolBarItem toolbar id isToggle)
       = evtHandlerOnMenuCommand w id io
 
 -- | Create a tool bar item based on a menu. Takes a a relevant menu
--- item, a label and an image file (bmp,png,gif,ico,etc.) as arguments. The image
+-- item, a label and an image file (bmp, png, gif, ico, etc.) as arguments. The image
 -- file is normally 16x15 pixels.
 -- The toolbar item will fire the relevant menu items just as if the menu has been selected.
 -- Checkable menus will give a checkable toolbar item. Beware though that checkable tools
@@ -555,7 +555,7 @@ toolMenuFromBitmap toolbar menuitem label bitmap props
 
 -- | Create an /orphan/ toolbar item that is unassociated with a menu. Takes a 
 -- label, a flag that is 'True' when the item is 'checkable' and a path to an image
--- (bmp,png,gif,ico,etc.) as arguments.
+-- (bmp, png, gif, ico, etc.) as arguments.
 toolItem :: ToolBar a -> String -> Bool -> FilePath -> [Prop ToolBarItem] -> IO ToolBarItem
 toolItem toolbar label isCheckable bitmapPath props
   = withBitmapFromFile bitmapPath $ \bitmap ->
@@ -586,11 +586,11 @@ toolControl toolbar control
 data StatusField  = SF (Var Int) (Var (StatusBar ())) (Var Int) (Var String)
 
 -- | The status width attribute determines the width of a status bar field.
--- A negative width makes the field strechable. The width than determines
--- the amount of stretch in relation with other fields. The default 
+-- A negative width makes the field stretchable. The width than determines
+-- the amount of stretch in relation to other fields. The default
 -- status width is @-1@, ie. all fields stretch evenly.
 --
--- Here is an example of a statusbar
+-- Here is an example of a status bar
 -- with three fields, where the last field is 50 pixels wide, the first takes
 -- 66% of the remaining space and the second field 33%.
 --

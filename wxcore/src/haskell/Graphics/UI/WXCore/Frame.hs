@@ -42,12 +42,12 @@ import Graphics.UI.WXCore.Types
 
 
 -- | The default frame style for a normal top-level 'Frame'.
-frameDefaultStyle :: Int
+frameDefaultStyle :: Style
 frameDefaultStyle
   = wxDEFAULT_FRAME_STYLE .|. wxCLIP_CHILDREN -- .|. wxNO_FULL_REPAINT_ON_RESIZE 
 
 -- | The default frame style for a normal 'Dialog'.
-dialogDefaultStyle :: Int
+dialogDefaultStyle :: Style
 dialogDefaultStyle
   = wxCAPTION .|. wxSYSTEM_MENU .|. wxTAB_TRAVERSAL .|. wxCLOSE_BOX .|. wxCLIP_CHILDREN 
     -- .|. wxNO_FULL_REPAINT_ON_RESIZE 

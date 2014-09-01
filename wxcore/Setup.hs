@@ -11,7 +11,7 @@ import Distribution.Simple.Program.Types
 import Distribution.Simple.Setup (ConfigFlags, BuildFlags)
 import Distribution.System (OS (..), Arch (..), buildOS, buildArch)
 import Distribution.Verbosity (normal, verbose)
-import System.Cmd (system)
+import System.Process (system)
 import System.Directory (createDirectoryIfMissing, doesFileExist, getCurrentDirectory, getModificationTime)
 import System.Environment (getEnv)
 import System.FilePath ((</>), (<.>), replaceExtension, takeFileName, dropFileName, addExtension, takeDirectory)

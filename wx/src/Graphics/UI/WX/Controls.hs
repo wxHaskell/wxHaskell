@@ -1,13 +1,13 @@
 {-# LANGUAGE TypeSynonymInstances, FlexibleInstances, MultiParamTypeClasses, DeriveDataTypeable #-}
 --------------------------------------------------------------------------------
-{-|	Module      :  Controls
-	Copyright   :  (c) Daan Leijen 2003
-	               (c) Shelarcy (shelarcy@gmail.com) 2006
-	License     :  wxWindows
+{-| Module      :  Controls
+    Copyright   :  (c) Daan Leijen 2003
+                   (c) Shelarcy (shelarcy@gmail.com) 2006
+    License     :  wxWindows
 
-	Maintainer  :  wxhaskell-devel@lists.sourceforge.net
-	Stability   :  provisional
-	Portability :  portable
+    Maintainer  :  wxhaskell-devel@lists.sourceforge.net
+    Stability   :  provisional
+    Portability :  portable
 
 Defines common GUI controls.
 -}
@@ -98,7 +98,7 @@ defaultStyle
 --
 -- * Instances: 'Form' -- 'Dimensions', 'Colored', 'Visible', 'Child',
 --             'Able', 'Tipped', 'Identity', 'Styled',
---             'Textual', 'Literate'
+--             'Textual', 'Literate', 'Reactive', 'Paint'
 panel :: Window a -> [Prop (Panel ())] -> IO (Panel ())
 panel parent props
   = panelEx parent (wxTAB_TRAVERSAL .+. defaultStyle) props
@@ -200,24 +200,25 @@ buttonRes parent name props =
 instance Commanding (Button a) where
   command  = newEvent "command" buttonGetOnCommand buttonOnCommand
 
--- | Create a bitmap button. Use the 'image' attribute to set the
+-- | Create a bitmap button. Use the 'picture' attribute to set the
 -- bitmap.
 --
--- * Instances: 'Commanding' -- 'Textual', 'Literate', 'Dimensions', 'Colored', 'Visible', 'Child',
+-- * Instances: 'Commanding', 'Pictured' -- 'Textual', 'Literate', 'Dimensions', 'Colored', 'Visible', 'Child',
 --             'Able', 'Tipped', 'Identity', 'Styled', 'Reactive', 'Paint'.
 --
 bitmapButton :: Window a -> [Prop (BitmapButton ())] -> IO (BitmapButton ())
 bitmapButton parent props
-  = feed2 props wxBU_AUTODRAW $
+  = feed2 props 0 $
     initialWindow $ \id rect -> \props flags ->
     do bb <- bitmapButtonCreate parent id nullBitmap rect flags
        set bb props
+       windowReLayout bb
        return bb
 
 -- | Complete the construction of a bitmap button instance which has been loaded
 --   from a resource file.
 --
--- * Instances: 'Commanding' -- 'Textual', 'Literate', 'Dimensions', 'Colored', 'Visible', 'Child',
+-- * Instances: 'Commanding', 'Pictured' -- 'Textual', 'Literate', 'Dimensions', 'Colored', 'Visible', 'Child',
 --             'Able', 'Tipped', 'Identity', 'Styled', 'Reactive', 'Paint'.
 --
 bitmapButtonRes :: Window a -> String -> [Prop (BitmapButton ())] -> IO (BitmapButton ())
@@ -257,7 +258,7 @@ instance BitMask Align where
 instance BitMask Wrap where
   assocBitMask
     = [(WrapNone, wxHSCROLL)
-      ,(WrapLine, wxTE_LINEWRAP)
+      ,(WrapLine, wxTE_CHARWRAP)
       ,(WrapWord, wxTE_WORDWRAP)]
 
 
@@ -735,7 +736,7 @@ singleListBoxRes parent name props =
 --
 multiListBox :: Window a -> [Prop (MultiListBox ())] -> IO (MultiListBox ())
 multiListBox parent props
-  = feed2 props (wxLB_MULTIPLE .+. wxLB_EXTENDED .+. wxHSCROLL .+. wxLB_NEEDED_SB) $
+  = feed2 props (wxLB_EXTENDED .+. wxHSCROLL .+. wxLB_NEEDED_SB) $
     initialWindow $ \id rect ->
     initialSorted $ \props flags ->
     do lb <- listBoxCreate parent id rect [] flags
@@ -972,7 +973,7 @@ instance Selecting (SpinCtrl a) where
 --------------------------------------------------------------------------------}
 -- | Create a toggle button. 
 --
--- * Instances: 'Commanding',  -- 'Textual', 'Literate', 'Dimensions', 'Colored', 'Visible', 'Child',
+-- * Instances: 'Commanding', 'Checkable',  -- 'Textual', 'Literate', 'Dimensions', 'Colored', 'Visible', 'Child',
 --             'Able', 'Tipped', 'Identity', 'Styled', 'Reactive', 'Paint'.
 --
 toggleButton :: Window a -> [Prop (ToggleButton ())] -> IO (ToggleButton ())
@@ -1000,7 +1001,9 @@ bitmapToggleButton :: Window a -> [Prop (BitmapToggleButton ())] -> IO (BitmapTo
 bitmapToggleButton parent props
   = feed2 props defaultStyle $
     initialWindow $ \id rect -> \props flags ->
-    do bb <- bitmapToggleButtonCreate parent id nullBitmap rect flags
+    do img <- imageCreateFromPixels (Size 1 1) [black]
+       bm  <- bitmapCreateFromImage img (-1)
+       bb  <- bitmapToggleButtonCreate parent id bm rect flags
        set bb props
        return bb
 

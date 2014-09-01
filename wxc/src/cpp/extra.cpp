@@ -2321,10 +2321,8 @@ EWXWEXPORT(void,wxLog_DontCreateOnDemand)(wxLog* self)
 	self->DontCreateOnDemand();
 }
 
-EWXWEXPORT(void,wxLog_SetTraceMask)(wxLog* self,int ulMask)
-{
-	self->SetTraceMask((wxTraceMask)ulMask);
-}
+// Obsolete
+// EWXWEXPORT(void,wxLog_SetTraceMask)(wxLog* self,int ulMask)
 
 EWXWEXPORT(void,wxLog_AddTraceMask)(wxLog* self,void* str)
 {

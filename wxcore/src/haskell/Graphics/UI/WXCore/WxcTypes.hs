@@ -9,7 +9,7 @@
 	Stability   :  provisional
 	Portability :  portable
 
-Basic types and marshaling code for the wxWindows C library.
+Basic types and marshalling code for the wxWidgets C library.
 -}
 -----------------------------------------------------------------------------------------
 module Graphics.UI.WXCore.WxcTypes(
@@ -247,7 +247,7 @@ pointZero
   = Point 0 0
 
 -- | A `null' point is not a legal point (x and y are -1) and can be used for some
--- wxWindows functions to select a default point.
+-- wxWidgets functions to select a default point.
 pointNull :: (Num a) => Point2 a
 pointNull
   = Point (-1) (-1)
@@ -351,7 +351,7 @@ sizeZero
   = Size 0 0
 
 -- | A `null' size is not a legal size (width and height are -1) and can be used for some
--- wxWindows functions to select a default size.
+-- wxWidgets functions to select a default size.
 sizeNull :: (Num a) => Size2D a
 sizeNull
   = Size (-1) (-1)
@@ -446,7 +446,7 @@ vecZero
   = Vector 0 0
 
 -- | A `null' vector has a delta x and y of -1 and can be used for some
--- wxWindows functions to select a default vector.
+-- wxWidgets functions to select a default vector.
 vecNull :: (Num a) => Vector2 a
 vecNull
   = Vector (-1) (-1)
@@ -556,7 +556,7 @@ rectZero
   = Rect 0 0 0 0
 
 -- | An `null' rectangle is not a valid rectangle (@Rect -1 -1 -1 -1@) but can
--- used for some wxWindows functions to select a default rectangle. (i.e. 'frameCreate').
+-- used for some wxWidgets functions to select a default rectangle. (i.e. 'frameCreate').
 rectNull :: (Num a) => Rect2D a
 rectNull
   = Rect (-1) (-1) (-1) (-1)
@@ -947,7 +947,7 @@ ptrCast p
 -----------------------------------------------------------------------------------------}
 -- | A @Managed a@ is a pointer to an object of type @a@, just like 'Object'. However,
 -- managed objects are automatically deleted when garbage collected. This is used for
--- certain classes that are not managed by the wxWindows library, like 'Bitmap's
+-- certain classes that are not managed by the wxWidgets library, like 'Bitmap's
 type Managed a  = ForeignPtr a
 
 -- | Create a managed object. Takes a finalizer as argument. This is normally a

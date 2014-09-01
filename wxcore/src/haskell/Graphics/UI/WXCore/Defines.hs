@@ -7,7 +7,7 @@
 	Stability   :  provisional
 	Portability :  portable
 
-Exports standard /defines/ of wxWindows.
+Exports standard /defines/ of wxWidgets.
 -}
 -----------------------------------------------------------------------------------------
 module Graphics.UI.WXCore.Defines(
@@ -27,7 +27,7 @@ import System.IO.Unsafe( unsafePerformIO )
   
 --------------------------------------------------------------------------------}
 
--- | wxWindows library kinds.
+-- | wxWidgets library kinds.
 data WxToolkit  = WxGTK         -- ^ GTK
                 | WxMac         -- ^ MacOS
                 | WxMSW         -- ^ Any windows
@@ -40,7 +40,7 @@ data WxToolkit  = WxGTK         -- ^ GTK
                 deriving (Eq,Show,Enum)
 
 {-# NOINLINE wxToolkit #-}
--- | Get the current wxWindows library kind.
+-- | Get the current wxWidgets library kind.
 wxToolkit :: WxToolkit
 wxToolkit
   = unsafePerformIO $ findDefine WxUnknown toolkits
@@ -67,7 +67,7 @@ findDefine def ((name,val):xs)
 
 
 {-# NOINLINE wxVersion #-}
--- | Return the version of the wxWIndows library. It is composed of the major
+-- | Return the version of the wxWidgets library. It is composed of the major
 -- version times 1000, plus the minor version times 100, plus the release number.
 -- For example, version 2.1.15 would be 2115.
 wxVersion :: Int

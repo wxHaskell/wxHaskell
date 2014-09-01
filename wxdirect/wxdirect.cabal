@@ -1,5 +1,5 @@
 name:         wxdirect
-version:      0.90.1.0
+version:      0.91.0.0
 license:      BSD3
 license-file: LICENSE
 author:       Daan Leijen
@@ -10,7 +10,7 @@ description:
   wxHaskell is a portable and native GUI library for Haskell. It is built on
   top of wxWidgets, a comprehensive C++ library that is portable across all
   major GUI platforms, including GTK, Windows, X11, and MacOS X. This version
-  works with wxWidgets 2.9 only.
+  works with wxWidgets 2.9 and 3.0.
 homepage:     http://haskell.org/haskellwiki/WxHaskell
 
 cabal-version: >= 1.2
@@ -51,7 +51,7 @@ executable wxdirect
     strict,
     time       >= 1.0   && < 1.5,
     filepath   <  1.4,
-    process    >= 1.1   && < 1.2
+    process    >= 1.1   && < 1.3
 
   if flag(splitBase)
     build-depends:

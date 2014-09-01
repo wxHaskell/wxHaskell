@@ -48,15 +48,15 @@ EWXWEXPORT(void,wxMenuBar_EnableTop)(wxMenuBar* self,int pos,bool enable)
 	self->EnableTop((size_t) pos, enable);
 }
 	
-EWXWEXPORT(void,wxMenuBar_SetLabelTop)(wxMenuBar* self,int pos,wxString* label)
+EWXWEXPORT(void, wxMenuBar_SetMenuLabel)(wxMenuBar* self, int pos, wxString* label)
 {
-	self->SetLabelTop((size_t) pos,*label);
+	self->SetMenuLabel((size_t) pos,*label);
 }
 	
-EWXWEXPORT(wxString*,wxMenuBar_GetLabelTop)(wxMenuBar* self,int pos)
+EWXWEXPORT(wxString*, wxMenuBar_GetMenuLabel)(wxMenuBar* self, int pos)
 {
 	wxString *result = new wxString();
-	*result = self->GetLabelTop((size_t) pos);
+	*result = self->GetMenuLabel((size_t) pos);
 	return result;
 }
 	

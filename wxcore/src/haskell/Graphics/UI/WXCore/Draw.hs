@@ -153,7 +153,7 @@ windowCalcUnscrolledPosition window p
 -- some degree of portability. The '_fontFace' can be used to specify the exact (platform
 -- dependent) font. 
 --
--- Note that the original wxWindows @FontStyle@ is renamed to @FontShape@.
+-- Note that the original wxWidgets @FontStyle@ is renamed to @FontShape@.
 data FontStyle
   = FontStyle{ _fontSize      :: !Int
              , _fontFamily    :: !FontFamily
@@ -198,6 +198,7 @@ data FontFamily
   | FontScript        -- ^ Hand writing font.
   | FontSwiss         -- ^ Sans-serif font.
   | FontModern        -- ^ Fixed pitch font.
+  | FontTeletype      -- ^ A teletype (i.e. monospaced) font
   deriving (Eq,Show)
 
 -- | The font style.
@@ -256,24 +257,25 @@ fontCreateFromStyle (FontStyle size family style weight underline face encoding)
   where
     cfamily
       = case family of
-          FontDefault     -> wxDEFAULT
-          FontDecorative  -> wxDECORATIVE
-          FontRoman       -> wxROMAN
-          FontScript      -> wxSCRIPT
-          FontSwiss       -> wxSWISS
-          FontModern      -> wxMODERN
-
+          FontDefault     -> wxFONTFAMILY_DEFAULT
+          FontDecorative  -> wxFONTFAMILY_DECORATIVE
+          FontRoman       -> wxFONTFAMILY_ROMAN
+          FontScript      -> wxFONTFAMILY_SCRIPT
+          FontSwiss       -> wxFONTFAMILY_SWISS
+          FontModern      -> wxFONTFAMILY_MODERN
+          FontTeletype    -> wxFONTFAMILY_TELETYPE
+ 
     cstyle
       = case style of
-          ShapeNormal     -> wxNORMAL
-          ShapeItalic     -> wxITALIC
-          ShapeSlant      -> wxSLANT
+          ShapeNormal     -> wxFONTSTYLE_NORMAL
+          ShapeItalic     -> wxFONTSTYLE_ITALIC
+          ShapeSlant      -> wxFONTSTYLE_SLANT
 
     cweight
       = case weight of
-          WeightNormal    -> wxNORMAL
-          WeightBold      -> wxBOLD
-          WeightLight     -> wxLIGHT
+          WeightNormal    -> wxFONTWEIGHT_NORMAL
+          WeightBold      -> wxFONTWEIGHT_BOLD
+          WeightLight     -> wxFONTWEIGHT_LIGHT
 
 
 -- | Get the 'FontStyle' from a 'Font' object.
@@ -296,22 +298,23 @@ fontGetFontStyle font
                                 (cunderl /= 0) face enc)
    where
     toFamily f
-      | f == wxDECORATIVE   = FontDecorative
-      | f == wxROMAN        = FontRoman
-      | f == wxSCRIPT       = FontScript
-      | f == wxSWISS        = FontSwiss
-      | f == wxMODERN       = FontModern
-      | otherwise           = FontDefault
+      | f == wxFONTFAMILY_DECORATIVE   = FontDecorative
+      | f == wxFONTFAMILY_ROMAN        = FontRoman
+      | f == wxFONTFAMILY_SCRIPT       = FontScript
+      | f == wxFONTFAMILY_SWISS        = FontSwiss
+      | f == wxFONTFAMILY_MODERN       = FontModern
+      | f == wxFONTFAMILY_TELETYPE     = FontTeletype
+      | otherwise                      = FontDefault
 
     toStyle s
-      | s == wxITALIC       = ShapeItalic
-      | s == wxSLANT        = ShapeSlant
-      | otherwise           = ShapeNormal
+      | s == wxFONTSTYLE_ITALIC        = ShapeItalic
+      | s == wxFONTSTYLE_SLANT         = ShapeSlant
+      | otherwise                      = ShapeNormal
 
     toWeight w
-      | w == wxBOLD         = WeightBold
-      | w == wxLIGHT        = WeightLight
-      | otherwise           = WeightNormal
+      | w == wxFONTWEIGHT_BOLD         = WeightBold
+      | w == wxFONTWEIGHT_LIGHT        = WeightLight
+      | otherwise                      = WeightNormal
 
 
 {--------------------------------------------------------------------------------
@@ -449,15 +452,15 @@ penCreateFromStyle penStyle
         -> case lookup color stockPens of
              Just idx -> do pen <- penCreateFromStock idx
                             return (pen,return ())
-             Nothing  -> colorPen color 1 wxSOLID
+             Nothing  -> colorPen color 1 wxPENSTYLE_SOLID
       PenStyle PenSolid color width cap join
-        -> colorPen color width wxSOLID
+        -> colorPen color width wxPENSTYLE_SOLID
       PenStyle (PenDash dash) color width cap join
         -> case dash of
-             DashDot  -> colorPen color width wxDOT
-             DashLong -> colorPen color width wxLONG_DASH
-             DashShort-> colorPen color width wxSHORT_DASH
-             DashDotShort -> colorPen color width wxDOT_DASH
+             DashDot  -> colorPen color width wxPENSTYLE_DOT
+             DashLong -> colorPen color width wxPENSTYLE_LONG_DASH
+             DashShort-> colorPen color width wxPENSTYLE_SHORT_DASH
+             DashDotShort -> colorPen color width wxPENSTYLE_DOT_DASH
       PenStyle (PenStipple bitmap) color width cap join
         -> do pen <- penCreateFromBitmap bitmap width
               setCap pen
@@ -501,21 +504,21 @@ penGetPenStyle pen
                       toPenStyle stl
   where
     toPenStyle stl
-      | stl == wxTRANSPARENT      = return penTransparent
-      | stl == wxSOLID            = toPenStyleWithKind PenSolid
-      | stl == wxDOT              = toPenStyleWithKind (PenDash DashDot)
-      | stl == wxLONG_DASH        = toPenStyleWithKind (PenDash DashLong)
-      | stl == wxSHORT_DASH       = toPenStyleWithKind (PenDash DashShort)
-      | stl == wxDOT_DASH         = toPenStyleWithKind (PenDash DashDotShort)
-      | stl == wxSTIPPLE          = do stipple <- penGetStipple pen
-                                       toPenStyleWithKind (PenStipple stipple)
-      | stl == wxBDIAGONAL_HATCH  = toPenStyleWithKind (PenHatch HatchBDiagonal)
-      | stl == wxCROSSDIAG_HATCH  = toPenStyleWithKind (PenHatch HatchCrossDiag)
-      | stl == wxFDIAGONAL_HATCH  = toPenStyleWithKind (PenHatch HatchFDiagonal)
-      | stl == wxCROSS_HATCH      = toPenStyleWithKind (PenHatch HatchCross)
-      | stl == wxHORIZONTAL_HATCH = toPenStyleWithKind (PenHatch HatchHorizontal)
-      | stl == wxVERTICAL_HATCH   = toPenStyleWithKind (PenHatch HatchVertical)
-      | otherwise                 = toPenStyleWithKind PenSolid
+      | stl == wxPENSTYLE_TRANSPARENT      = return penTransparent
+      | stl == wxPENSTYLE_SOLID            = toPenStyleWithKind PenSolid
+      | stl == wxPENSTYLE_DOT              = toPenStyleWithKind (PenDash DashDot)
+      | stl == wxPENSTYLE_LONG_DASH        = toPenStyleWithKind (PenDash DashLong)
+      | stl == wxPENSTYLE_SHORT_DASH       = toPenStyleWithKind (PenDash DashShort)
+      | stl == wxPENSTYLE_DOT_DASH         = toPenStyleWithKind (PenDash DashDotShort)
+      | stl == wxPENSTYLE_STIPPLE          = do stipple <- penGetStipple pen
+                                                toPenStyleWithKind (PenStipple stipple)
+      | stl == wxPENSTYLE_BDIAGONAL_HATCH  = toPenStyleWithKind (PenHatch HatchBDiagonal)
+      | stl == wxPENSTYLE_CROSSDIAG_HATCH  = toPenStyleWithKind (PenHatch HatchCrossDiag)
+      | stl == wxPENSTYLE_FDIAGONAL_HATCH  = toPenStyleWithKind (PenHatch HatchFDiagonal)
+      | stl == wxPENSTYLE_CROSS_HATCH      = toPenStyleWithKind (PenHatch HatchCross)
+      | stl == wxPENSTYLE_HORIZONTAL_HATCH = toPenStyleWithKind (PenHatch HatchHorizontal)
+      | stl == wxPENSTYLE_VERTICAL_HATCH   = toPenStyleWithKind (PenHatch HatchVertical)
+      | otherwise                          = toPenStyleWithKind PenSolid
       
     toPenStyleWithKind kind
       = do width  <- penGetWidth pen
@@ -596,21 +599,21 @@ brushCreateFromStyle brushStyle
   = case brushStyle of
       BrushStyle BrushTransparent color
         -> do brush <- if (wxToolkit == WxMac)
-	                then brushCreateFromColour color wxTRANSPARENT
+	                then brushCreateFromColour color wxBRUSHSTYLE_TRANSPARENT
 			else brushCreateFromStock 7   {- transparent brush -}
               return (brush,return ())
       BrushStyle BrushSolid color
         -> case lookup color stockBrushes of
              Just idx  -> do brush <- brushCreateFromStock idx
                              return (brush,return ())
-             Nothing   -> colorBrush color wxSOLID
+             Nothing   -> colorBrush color wxBRUSHSTYLE_SOLID
 
-      BrushStyle (BrushHatch HatchBDiagonal) color   -> colorBrush color wxBDIAGONAL_HATCH
-      BrushStyle (BrushHatch HatchCrossDiag) color   -> colorBrush color wxCROSSDIAG_HATCH
-      BrushStyle (BrushHatch HatchFDiagonal) color   -> colorBrush color wxFDIAGONAL_HATCH
-      BrushStyle (BrushHatch HatchCross) color       -> colorBrush color wxCROSS_HATCH
-      BrushStyle (BrushHatch HatchHorizontal) color  -> colorBrush color wxHORIZONTAL_HATCH
-      BrushStyle (BrushHatch HatchVertical) color    -> colorBrush color wxVERTICAL_HATCH
+      BrushStyle (BrushHatch HatchBDiagonal) color   -> colorBrush color wxBRUSHSTYLE_BDIAGONAL_HATCH
+      BrushStyle (BrushHatch HatchCrossDiag) color   -> colorBrush color wxBRUSHSTYLE_CROSSDIAG_HATCH
+      BrushStyle (BrushHatch HatchFDiagonal) color   -> colorBrush color wxBRUSHSTYLE_FDIAGONAL_HATCH
+      BrushStyle (BrushHatch HatchCross) color       -> colorBrush color wxBRUSHSTYLE_CROSS_HATCH
+      BrushStyle (BrushHatch HatchHorizontal) color  -> colorBrush color wxBRUSHSTYLE_HORIZONTAL_HATCH
+      BrushStyle (BrushHatch HatchVertical) color    -> colorBrush color wxBRUSHSTYLE_VERTICAL_HATCH
       BrushStyle (BrushStipple bitmap) color         -> do brush <- brushCreateFromBitmap bitmap
                                                            return (brush, brushDelete brush)
   where
@@ -639,17 +642,17 @@ brushGetBrushStyle brush
                       return (BrushStyle kind color)
   where
     toBrushKind stl
-      | stl == wxTRANSPARENT      = return BrushTransparent
-      | stl == wxSOLID            = return BrushSolid
-      | stl == wxSTIPPLE          = do stipple <- brushGetStipple brush
-                                       return (BrushStipple stipple)
-      | stl == wxBDIAGONAL_HATCH  = return (BrushHatch HatchBDiagonal)
-      | stl == wxCROSSDIAG_HATCH  = return (BrushHatch HatchCrossDiag)
-      | stl == wxFDIAGONAL_HATCH  = return (BrushHatch HatchFDiagonal)
-      | stl == wxCROSS_HATCH      = return (BrushHatch HatchCross)
-      | stl == wxHORIZONTAL_HATCH = return (BrushHatch HatchHorizontal)
-      | stl == wxVERTICAL_HATCH   = return (BrushHatch HatchVertical)
-      | otherwise                 = return BrushTransparent
+      | stl == wxBRUSHSTYLE_TRANSPARENT      = return BrushTransparent
+      | stl == wxBRUSHSTYLE_SOLID            = return BrushSolid
+      | stl == wxBRUSHSTYLE_STIPPLE          = do stipple <- brushGetStipple brush
+                                                  return (BrushStipple stipple)
+      | stl == wxBRUSHSTYLE_BDIAGONAL_HATCH  = return (BrushHatch HatchBDiagonal)
+      | stl == wxBRUSHSTYLE_CROSSDIAG_HATCH  = return (BrushHatch HatchCrossDiag)
+      | stl == wxBRUSHSTYLE_FDIAGONAL_HATCH  = return (BrushHatch HatchFDiagonal)
+      | stl == wxBRUSHSTYLE_CROSS_HATCH      = return (BrushHatch HatchCross)
+      | stl == wxBRUSHSTYLE_HORIZONTAL_HATCH = return (BrushHatch HatchHorizontal)
+      | stl == wxBRUSHSTYLE_VERTICAL_HATCH   = return (BrushHatch HatchVertical)
+      | otherwise                            = return BrushTransparent
 
 
 

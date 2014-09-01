@@ -9,7 +9,7 @@
 	Stability   :  provisional
 	Portability :  portable
 
-Combinators to specify layout. (These combinators use wxWindows 'Sizer' objects).
+Combinators to specify layout. (These combinators use wxWidgets 'Sizer' objects).
 
 Layout can be specified using 'windowSetLayout'. For example:
 
@@ -118,7 +118,7 @@ title of the pages is determined from the label of the container widget.
 Note: /At the moment, extra space is divided evenly among stretchable layouts. We plan to add
 a (/@proportion :: Int -> Layout -> Layout@/) combinator in the future to stretch layouts
 according to a relative weight, but unfortunately, that entails implementing a better
-/'FlexGrid'/ sizer for wxWindows./
+/'FlexGrid'/ sizer for wxWidgets./
 -}
 -----------------------------------------------------------------------------------------
 module Graphics.UI.WXCore.Layout( -- * Types
@@ -710,7 +710,6 @@ vsplit :: SplitterWindow a -> Int -> Int -> Layout -> Layout -> Layout
 vsplit
   = split False
 
-
 split :: Bool -> SplitterWindow a -> Int -> Int -> Layout -> Layout -> Layout
 split splitHorizontal splitter sashWidth paneWidth pane1 pane2
   = Splitter optionsDefault (downcastSplitterWindow splitter) pane1 pane2 splitHorizontal sashWidth paneWidth
@@ -857,7 +856,8 @@ sizerFromLayout parent layout
 
     insert container (Splitter options splitter pane1 pane2 splitHorizontal sashWidth paneWidth)
       = do splitterWindowSetMinimumPaneSize splitter 20
-           splitterWindowSetSashSize splitter sashWidth
+           -- splitterWindowSetSashSize is obsolete
+           -- splitterWindowSetSashSize splitter sashWidth
            sizerAddWindowWithOptions container splitter options
            if splitHorizontal
             then splitterWindowSplitHorizontally splitter win1 win2 paneWidth
@@ -883,7 +883,8 @@ sizerFromLayout parent layout
               WidgetContainer options win layout -> windowSetLayout win layout
               Splitter options splitter pane1 pane2 splitHorizontal sashWidth paneWidth 
                                       ->  do splitterWindowSetMinimumPaneSize splitter 20
-                                             splitterWindowSetSashSize splitter sashWidth
+                                             -- splitterWindowSetSashSize is obsolete
+                                             -- splitterWindowSetSashSize splitter sashWidth
                                              -- sizerAddWindowWithOptions container splitter options
                                              let win1 = getWinFromLayout pane1
                                                  win2 = getWinFromLayout pane2
@@ -995,11 +996,15 @@ sizerFromLayout parent layout
           MarginLeft   -> wxLEFT
           MarginBottom -> wxBOTTOM
           MarginRight  -> wxRIGHT
-    
-    flagsAdjustMinSize window options
+ 
+--  wxADJUST_MINSIZE is deprecated 
+    flagsAdjustMinSize window options = 0
+{-
       = if (adjustMinSize options) 
          then wxADJUST_MINSIZE
          else 0
+-}
+
 {-      
         case minSize options of
           Nothing | -- dleijen: unfortunately, wxADJUST_MINSIZE has bugs for certain controls:

@@ -15,11 +15,11 @@ EWXWEXPORT(wxPreviewFrame*, wxPreviewFrame_Create)( wxPrintPreview* preview
                                                   , wxString* title
                                                   , int x, int y
                                                   , int w, int h
-                                                  , int style
+                                                  , int _stl
                                                   , wxString* name
                                                   )
 {
-  return new wxPreviewFrame( preview, parent, *title, wxPoint(x,y), wxSize(w,h), style, *name );
+  return new wxPreviewFrame( preview, parent, *title, wxPoint(x,y), wxSize(w,h), _stl, *name );
 }
 
 EWXWEXPORT(void, wxPreviewFrame_Delete)( wxPreviewFrame* self )

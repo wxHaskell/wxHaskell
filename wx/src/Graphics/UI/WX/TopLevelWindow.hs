@@ -14,7 +14,7 @@ for wxFrame and wxDialog.
 In the wxHaskell implementation, TopLevel has been added to encapsulate 
 some of the common functionality between the 'Dialog' and 'Frame' modules.
          
-* Instances: 'HasDefault'
+* Instances: 'HasDefault', 'Pictured', 'Framed', 'Form', 'Closeable'
 * Instances inherited from 'Window': 'Textual', 'Literate', 'Dimensions', 
              'Colored', 'Visible', 'Child', 'Able', 'Tipped', 'Identity', 
              'Styled', 'Reactive', 'Paint'.   

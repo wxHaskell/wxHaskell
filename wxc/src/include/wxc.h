@@ -59,7 +59,7 @@ void               wxEvtHandler_SetClientClosure( TSelf(wxEvtHandler) _obj, TCla
 
 /** Get the reference data of an object as a closure: only works if properly initialized. Use 'closureGetData' to get to the actual data. */
 TClass(wxClosure)  wxObject_GetClientClosure( TSelf(wxObject) _obj );
-/** Set the reference data of an object as a closure. The closure data contains the data while the function is called on deletion. Returns 'True' on success. Only works if the reference data is unused by wxWindows! */
+/** Set the reference data of an object as a closure. The closure data contains the data while the function is called on deletion. Returns 'True' on success. Only works if the reference data is unused by wxWidgets! */
 void               wxObject_SetClientClosure( TSelf(wxObject) _obj, TClass(wxClosure) closure );
 
 
@@ -284,7 +284,7 @@ TBool wxProgressDialog_Update(TSelf(wxProgressDialog) obj, int value );
 TBool wxProgressDialog_UpdateWithMessage( TSelf(wxProgressDialog) obj, int value, TClass(wxString) message );
 void wxProgressDialog_Resume( TSelf(wxProgressDialog) obj );
 
-/** Get the version number of wxWindows as a number composed of the major version times 1000, minor version times 100, and the release number. For example, release 2.1.15 becomes 2115. */
+/** Get the version number of wxWidgets as a number composed of the major version times 1000, minor version times 100, and the release number. For example, release 2.1.15 becomes 2115. */
 int wxVersionNumber();
 /** Check if a preprocessor macro is defined. For example, @wxIsDefined("__WXGTK__")@ or @wxIsDefined("wxUSE_GIF")@. */
 TBoolInt wxIsDefined( TString s );
@@ -392,7 +392,8 @@ void       wxLog_RemoveTraceMask( TSelf(wxLog) _obj, TClass(wxString) str );
 void       wxLog_Resume( TSelf(wxLog) _obj );
 TClass(wxLog)  wxLog_SetActiveTarget( TSelf(wxLog) pLogger );
 void       wxLog_SetTimestamp( TSelf(wxLog) _obj, TStringVoid ts );
-void       wxLog_SetTraceMask( TSelf(wxLog) _obj, int ulMask );
+// Obsolete
+// void       wxLog_SetTraceMask( TSelf(wxLog) _obj, int ulMask );
 void       wxLog_SetVerbose( TSelf(wxLog) _obj, TBoolInt bVerbose );
 void       wxLog_Suspend( TSelf(wxLog) _obj );
 

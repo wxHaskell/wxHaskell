@@ -13,19 +13,17 @@ EWXWEXPORT(wxImage*,wxImage_CreateSized)(int width,int height)
 	return new wxImage(width, height);
 }
 
-EWXWEXPORT(wxImage*,wxImage_CreateFromByteString)(char* data,size_t length,int type)
+EWXWEXPORT(wxImage*, wxImage_CreateFromByteString)(const wxSize &sz, unsigned char *data)
 {
-	wxMemoryInputStream in(data,length);
-	return new wxImage(in, type);
+	return new wxImage(sz, data);
 }
 
-EWXWEXPORT(wxImage*,wxImage_CreateFromLazyByteString)(char* data,size_t length,int type)
+EWXWEXPORT(wxImage*, wxImage_CreateFromLazyByteString)(const wxSize &sz, unsigned char *data)
 {
-	wxMemoryInputStream in(data,length);
-	return new wxImage(in, type);
+	return new wxImage(sz, data);
 }
 
-EWXWEXPORT(size_t,wxImage_ConvertToByteString)(wxImage* self,int type,char* data)
+EWXWEXPORT(size_t, wxImage_ConvertToByteString)(wxImage *self, wxBitmapType type, char *data)
 {
 	wxMemoryOutputStream out;
 	self->SaveFile(out, type);
@@ -34,7 +32,7 @@ EWXWEXPORT(size_t,wxImage_ConvertToByteString)(wxImage* self,int type,char* data
         return out.CopyTo(data, len);
 }
 
-EWXWEXPORT(size_t,wxImage_ConvertToLazyByteString)(wxImage* self,int type,char* data)
+EWXWEXPORT(size_t, wxImage_ConvertToLazyByteString)(wxImage *self, wxBitmapType type, char *data)
 {
 	wxMemoryOutputStream out;
 	self->SaveFile(out, type);
@@ -144,14 +142,14 @@ EWXWEXPORT(bool,wxImage_CanRead)(wxString* name)
 	return wxImage::CanRead(*name);
 }
 	
-EWXWEXPORT(bool,wxImage_LoadFile)(wxImage* self,wxString* name,int type)
+EWXWEXPORT(bool, wxImage_LoadFile)(wxImage *self, wxString *name, wxBitmapType type)
 {
-	return self->LoadFile(*name, (long)type);
+	return self->LoadFile(*name, type);
 }
 	
-EWXWEXPORT(bool,wxImage_SaveFile)(wxImage* self,wxString* name,int type)
+EWXWEXPORT(bool, wxImage_SaveFile)(wxImage *self, wxString *name, wxBitmapType type)
 {
-	return self->SaveFile(*name, (long)type);
+	return self->SaveFile(*name, type);
 }
 	
 EWXWEXPORT(bool,wxImage_IsOk)(wxImage* self)

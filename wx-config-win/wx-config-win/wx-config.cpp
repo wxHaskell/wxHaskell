@@ -125,7 +125,7 @@ std::vector<std::string> replace(std::vector<std::string> vec, std::string old_v
       std::vector<std::string>::iterator jt;
       for (jt = new_vals.begin(); jt != new_vals.end() ; ++jt)
       {
-	result.push_back(*jt);
+        result.push_back(*jt);
       }
     }
     else
@@ -206,21 +206,21 @@ public:
     {
       while (!file.eof() )
       {
-	std::getline(file, line);
+        std::getline(file, line);
 
-	// it's a comment line
-	if (line.find_first_of('#') != std::string::npos)
-	  continue;
+        // it's a comment line
+        if (line.find_first_of('#') != std::string::npos)
+          continue;
 
-	// strip spaces
-	line.erase( std::remove(line.begin(), line.end(), ' '), line.end() );
-	
-	split(line);
+        // strip spaces
+        line.erase( std::remove(line.begin(), line.end(), ' '), line.end() );
+        
+        split(line);
       }
       file.close();
 
       if (!m_vars.empty())
-	return true;
+        return true;
     }
     else
       std::cout << g_tokError << "Unable to open file '" << filepath.c_str() << "'." << std::endl;
@@ -286,15 +286,15 @@ public:
     {
       while (!file.eof())
       {
-	std::getline(file, line);
+        std::getline(file, line);
         
-	// does the splitting/parsing
-	split(line);
+        // does the splitting/parsing
+        split(line);
       }
       file.close();
       
       if (!m_vars.empty())
-	return true;
+        return true;
     }
     else
       std::cout << g_tokError << "Unable to open file '" << filepath.c_str() << "'." << std::endl;
@@ -333,11 +333,11 @@ protected:
       // resolves val, checking if last char is 0 or 1
       char lastChar = line.at(line.length()-1);       // TODO: I don't like this line :P
       if (lastChar == '0')
-	val = false;
+        val = false;
       else if (lastChar == '1')
-	val = true;
+        val = true;
       else
-	return; // skips the line
+        return; // skips the line
       
       // resolves key
       size_t startPos = posDefine + tokDefine.length();
@@ -390,7 +390,7 @@ public:
     if (!valid)
     {
       if (m_vars.size() > 1 && !keyExists("--help"))
-	std::cout << g_tokError << "Unrecognised option: '" << m_vars.begin()->first << "'\n" << std::endl;
+        std::cout << g_tokError << "Unrecognised option: '" << m_vars.begin()->first << "'\n" << std::endl;
       
       usage();
     }
@@ -453,17 +453,17 @@ protected:
       // saves in the vector, comma separated text like "text1,text2,text3,text4"
       while(true)
       {
-	size_t comma = param.find(",");
-	if (comma != std::string::npos)
-	{
-	  m_libs.push_back(param.substr(0, comma));
-	  param = param.substr(comma+1, param.size()-comma-1);
-	}
-	else
-	{
-	  m_libs.push_back(param);
-	  break;
-	}
+        size_t comma = param.find(",");
+        if (comma != std::string::npos)
+        {
+          m_libs.push_back(param.substr(0, comma));
+          param = param.substr(comma+1, param.size()-comma-1);
+        }
+        else
+        {
+          m_libs.push_back(param);
+          break;
+        }
       }
     }
     
@@ -476,7 +476,7 @@ protected:
     {
       for (int l = 0; l < ARRAY_LENGTH(stdLibs); ++l)
       {
-	addLib(stdLibs[l]);
+        addLib(stdLibs[l]);
       }
     }
   }
@@ -557,8 +557,8 @@ std::vector<std::string> getInstalledLibs(Options& po)
     {
       if (!(ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
       {
-	std::string fn(ffd.cFileName);
-	pLibsList->push_back(fn);
+        std::string fn(ffd.cFileName);
+        pLibsList->push_back(fn);
       }
     } while (FindNextFile(hDir, &ffd) != 0);
   }
@@ -823,23 +823,23 @@ public:
       size_t sep = strDef.find("=");
       if (sep != std::string::npos)
       {
-	std::string key = strDef.substr(0, sep);
-	std::string val = strDef.substr(sep+1, strDef.size()-sep-1);
+        std::string key = strDef.substr(0, sep);
+        std::string val = strDef.substr(sep+1, strDef.size()-sep-1);
         
-	po[key] = val;
-	cfg[key] = val;
+        po[key] = val;
+        cfg[key] = val;
         
-	if (val == "1" || val == "true")
-	  sho[key] = true;
-	else if (val == "0" || val == "false")
-	  sho[key] = false;
+        if (val == "1" || val == "true")
+          sho[key] = true;
+        else if (val == "0" || val == "false")
+          sho[key] = false;
       }
       else
       {
-	std::cout << g_tokError << "Failed to define a variable as '" 
+        std::cout << g_tokError << "Failed to define a variable as '" 
                   << cl.keyValue("--define-variable") << "'." << std::endl;
-	std::cout << "The syntax is --define-variable=VARIABLENAME=VARIABLEVALUE" << std::endl;
-	exit(1);
+        std::cout << "The syntax is --define-variable=VARIABLENAME=VARIABLEVALUE" << std::endl;
+        exit(1);
       }
     }
         
@@ -902,39 +902,39 @@ public:
       std::string lib = *i;
       
       if (lib == "base")
-	process_base(po, cfg);
+        process_base(po, cfg);
       else if (lib == "net")
-	process_net(po, cfg);
+        process_net(po, cfg);
       else if (lib == "xml")
-	process_xml(po, cfg);
+        process_xml(po, cfg);
       else if (lib == "core")
-	process_core(po,cfg);
+        process_core(po,cfg);
       else if (lib == "adv")
-	process_adv(po, cfg);
+        process_adv(po, cfg);
       else if (lib == "qa")
-	process_qa(po, cfg);
+        process_qa(po, cfg);
       else if (lib == "html")
-	process_html(po, cfg);
+        process_html(po, cfg);
       else if (lib == "media")
-	process_media(po, cfg);
+        process_media(po, cfg);
       else if (lib == "gl")
-	process_opengl(po, cfg);
+        process_opengl(po, cfg);
       else if (lib == "aui")
-	process_aui(po, cfg, sho);
+        process_aui(po, cfg, sho);
       else if (lib == "propgrid")
-	process_propgrid(po, cfg, sho);
+        process_propgrid(po, cfg, sho);
       else if (lib == "ribbon")
-	process_ribbon(po, cfg, sho);
+        process_ribbon(po, cfg, sho);
       else if (lib == "richtext")
-	process_richtext(po, cfg, sho);
+        process_richtext(po, cfg, sho);
       else if (lib == "webview")
-	process_webview(po, cfg);
+        process_webview(po, cfg);
       else if (lib == "stc")
-	process_stc(po, cfg, sho);
+        process_stc(po, cfg, sho);
       else if (lib == "xrc")
-	process_xrc(po, cfg, sho);
+        process_xrc(po, cfg, sho);
       else
-	po["__WXLIB_ARGS_p"] += addLib(po["LIB_BASENAME_MSW"] + "_" + lib);
+        po["__WXLIB_ARGS_p"] += addLib(po["LIB_BASENAME_MSW"] + "_" + lib);
     }
     
     if (cfg["MONOLITHIC"] == "1")
@@ -994,9 +994,9 @@ public:
     
     
     /*  TODO: From BAKEFILE
-	<!-- link-in system libs that wx depends on: -->
-	<!-- If on borland, we don't need to do much            -->
-	<if cond="FORMAT=='borland'">
+        <!-- link-in system libs that wx depends on: -->
+        <!-- If on borland, we don't need to do much            -->
+        <if cond="FORMAT=='borland'">
             <sys-lib>ole2w32</sys-lib>
             <sys-lib>odbc32</sys-lib>
         </if>
@@ -1061,14 +1061,14 @@ public:
       std::string var = cl.keyValue("--variable");
       
       if (po.keyExists(var))
-	po["variable"] += "PO: " + var + "=" + po[var] + "\n";
+        po["variable"] += "PO: " + var + "=" + po[var] + "\n";
       else
-	po["variable"] += "PO: " + var + " does not exist.\n";
+        po["variable"] += "PO: " + var + " does not exist.\n";
       
       if (cfg.keyExists(var))
-	po["variable"] += "CFG: " + var + "=" + cfg[var] + "\n";
+        po["variable"] += "CFG: " + var + "=" + cfg[var] + "\n";
       else
-	po["variable"] += "CFG: " + var + " does not exist.\n";
+        po["variable"] += "CFG: " + var + " does not exist.\n";
     }
   }
   
@@ -1151,8 +1151,8 @@ public:
     
     if (cfg["SHARED"] == "1")
       {
-	po["WXDLLFLAG"] = "dll";
-	po["LIBTYPE_SUFFIX"] = "dll";
+        po["WXDLLFLAG"] = "dll";
+        po["LIBTYPE_SUFFIX"] = "dll";
       }
     
     if (cfg["SHARED"] == "0")
@@ -2272,13 +2272,13 @@ bool replaceUniv(std::string& wxcfg, bool enable)
       const std::string mswStr("msw");
       size_t mswPos = wxcfg.rfind(mswStr);
       if (mswPos != std::string::npos)
-	wxcfg.insert(mswPos + mswStr.length(), univStr);
+        wxcfg.insert(mswPos + mswStr.length(), univStr);
       else
       {
-	const std::string baseStr("base");
-	size_t basePos = wxcfg.rfind(baseStr);
-	if (basePos != std::string::npos)
-	  wxcfg.insert(basePos + baseStr.length(), univStr);
+        const std::string baseStr("base");
+        size_t basePos = wxcfg.rfind(baseStr);
+        if (basePos != std::string::npos)
+          wxcfg.insert(basePos + baseStr.length(), univStr);
       }
       return true;
     }
@@ -2420,10 +2420,10 @@ void autodetectConfiguration(Options& po, const CmdLineOptions& cl)
     {
       cfg = *curCfg;
       if (replaceUnicode(cfg, true))
-	newCfgs.push_back(cfg);
+        newCfgs.push_back(cfg);
       cfg = *curCfg;
       if (replaceUnicode(cfg, false))
-	newCfgs.push_back(cfg);
+        newCfgs.push_back(cfg);
     }
     for (curCfg = newCfgs.begin(); curCfg != newCfgs.end(); ++curCfg)
       cfgs.push_back(*curCfg);
@@ -2435,10 +2435,10 @@ void autodetectConfiguration(Options& po, const CmdLineOptions& cl)
     {
       cfg = *curCfg;
       if (replaceDebug(cfg, true))
-	newCfgs.push_back(cfg);
+        newCfgs.push_back(cfg);
       cfg = *curCfg;
       if (replaceDebug(cfg, false))
-	newCfgs.push_back(cfg);
+        newCfgs.push_back(cfg);
     }
     for (curCfg = newCfgs.begin(); curCfg != newCfgs.end(); ++curCfg)
       cfgs.push_back(*curCfg);
@@ -2450,10 +2450,10 @@ void autodetectConfiguration(Options& po, const CmdLineOptions& cl)
     {
       cfg = *curCfg;
       if (replaceStatic(cfg, true))
-	newCfgs.push_back(cfg);
+        newCfgs.push_back(cfg);
       cfg = *curCfg;
       if (replaceStatic(cfg, false))
-	newCfgs.push_back(cfg);
+        newCfgs.push_back(cfg);
     }
     for (curCfg = newCfgs.begin(); curCfg != newCfgs.end(); ++curCfg)
       cfgs.push_back(*curCfg);
@@ -2465,19 +2465,19 @@ void autodetectConfiguration(Options& po, const CmdLineOptions& cl)
     {
       cfg = *curCfg;
       if (replaceCompilerIfFound(cfg, "gcc"))
-	newCfgs.push_back(cfg);
+        newCfgs.push_back(cfg);
       cfg = *curCfg;
       if (replaceCompilerIfFound(cfg, "dmc"))
-	newCfgs.push_back(cfg);
+        newCfgs.push_back(cfg);
       cfg = *curCfg;
       if (replaceCompilerIfFound(cfg, "vc"))
-	newCfgs.push_back(cfg);
+        newCfgs.push_back(cfg);
       cfg = *curCfg;
       if (replaceCompilerIfFound(cfg, "wat"))
-	newCfgs.push_back(cfg);
+        newCfgs.push_back(cfg);
       cfg = *curCfg;
       if (replaceCompilerIfFound(cfg, "bcc"))
-	newCfgs.push_back(cfg);
+        newCfgs.push_back(cfg);
     }
     for (curCfg = newCfgs.begin(); curCfg != newCfgs.end(); ++curCfg)
       cfgs.push_back(*curCfg);
@@ -2494,18 +2494,18 @@ void autodetectConfiguration(Options& po, const CmdLineOptions& cl)
     {
       if (!found)
       {
-	po["wxcfg"] = *it;
-	found = true;
+        po["wxcfg"] = *it;
+        found = true;
       }
       else
       {
-	std::cerr << g_tokWarning << "Multiple compiled configurations of wxWidgets have been detected." << std::endl;
-	std::cerr << "Using first detected version by default." << std::endl;
-	std::cerr << std::endl;
-	std::cerr << "Please use the --wxcfg flag (as in wx-config --wxcfg=gcc_dll\\mswud)" << std::endl;
-	std::cerr << "or set the environment variable WXCFG (as in WXCFG=gcc_dll\\mswud)" << std::endl;
-	std::cerr << "to specify which configuration exactly you want to use." << std::endl;
-	return;
+        std::cerr << g_tokWarning << "Multiple compiled configurations of wxWidgets have been detected." << std::endl;
+        std::cerr << "Using first detected version by default." << std::endl;
+        std::cerr << std::endl;
+        std::cerr << "Please use the --wxcfg flag (as in wx-config --wxcfg=gcc_dll\\mswud)" << std::endl;
+        std::cerr << "or set the environment variable WXCFG (as in WXCFG=gcc_dll\\mswud)" << std::endl;
+        std::cerr << "to specify which configuration exactly you want to use." << std::endl;
+        return;
       }
     }
   }

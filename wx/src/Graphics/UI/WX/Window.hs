@@ -10,7 +10,8 @@
 
 Exports default instances for generic windows.
 
-* Instances: 'Textual', 'Literate', 'Dimensions', 'Colored', 'Visible', 'Child', 
+* Instances: 'Textual', 'Literate', 'Dimensions', 'Colored', 'Visible',
+             'Child', 'Sized', 'Parent', 'Help', 'Bordered',
              'Able', 'Tipped', 'Identity', 'Styled', 'Reactive', 'Paint'.             
 -}
 --------------------------------------------------------------------------------

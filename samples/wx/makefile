@@ -13,25 +13,28 @@ APPS= BouncingBalls\
       ByeDemo\
       Controls\
       CustomControl\
-      DbBrowse\
-      DbConsole\
       FileBrowse\
       Grid\
       HelloWorld\
       ImageViewer\
       Layout\
       ListCtrl\
+      ListView\
       Minimal\
       Paint\
       Print\
       Process\
+      PropertyGrid    \
       TestTaskBarIcon \
       TimeFlows\
       TimeFlowsEx\
 
-.PHONY: clean
+
+.PHONY: all
 
 all: $(APPS)
+
+.PHONY: clean
 
 clean:
 	rm -rf $(APPS) *.o *.hi *.app *exe *.manifest

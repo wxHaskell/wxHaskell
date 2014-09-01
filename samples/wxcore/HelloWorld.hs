@@ -1,5 +1,5 @@
 {--------------------------------------------------------------------------------
-  The 'hello world' demo from the wxWindows site.
+  The 'hello world' demo from the wxWidgets site.
 --------------------------------------------------------------------------------}
 module Main where
 

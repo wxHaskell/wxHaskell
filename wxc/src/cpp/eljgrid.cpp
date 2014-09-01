@@ -754,9 +754,9 @@ EWXWEXPORT(void,wxGrid_DisableDragRowSize)(wxGrid* self)
 	self->DisableDragRowSize();
 }
 	
-EWXWEXPORT(bool,wxGrid_CanDragRowSize)(wxGrid* self)
+EWXWEXPORT(bool, wxGrid_CanDragRowSize)(wxGrid* self, int row)
 {
-	return self->CanDragRowSize();
+	return self->CanDragRowSize(row);
 }
 	
 EWXWEXPORT(void,wxGrid_EnableDragColSize)(wxGrid* self,bool enable)
@@ -769,9 +769,9 @@ EWXWEXPORT(void,wxGrid_DisableDragColSize)(wxGrid* self)
 	self->DisableDragColSize();
 }
 	
-EWXWEXPORT(bool,wxGrid_CanDragColSize)(wxGrid* self)
+EWXWEXPORT(bool, wxGrid_CanDragColSize)(wxGrid* self, int col)
 {
-	return self->CanDragColSize();
+	return self->CanDragColSize(col);
 }
 	
 EWXWEXPORT(void,wxGrid_EnableDragGridSize)(wxGrid* self,bool enable)

@@ -33,3 +33,7 @@ Thumbs.db
 
 # Backups created by editors
 *.bak
+
+# Cabal sandbox directory and config file
+.cabal-sandbox/
+cabal.sandbox.config

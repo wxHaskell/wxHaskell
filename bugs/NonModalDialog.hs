@@ -1,6 +1,5 @@
--- Compile with ghc -fglasgow-exts
--- --make NonModalDialogTest.hs -o
--- NonModalDialogTest
+-- Compile with
+--   ghc -optl-s --make NonModalDialog.hs
 
 module Main where
 import Graphics.UI.WX

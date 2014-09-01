@@ -1,6 +1,6 @@
 -- Bug 2810904
 
-module Main () where
+-- module Main () where
 
 import Graphics.UI.WX
 import Graphics.UI.WXCore

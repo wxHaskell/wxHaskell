@@ -223,10 +223,8 @@ EWXWEXPORT(void,wxWindow_SetExtraStyle)(wxWindow* self,long exStyle)
 	self->SetExtraStyle(exStyle);
 }
 	
-EWXWEXPORT(void,wxWindow_MakeModal)(wxWindow* self,bool modal)
-{
-	self->MakeModal(modal);
-}
+// Obsolete
+// EWXWEXPORT(void,wxWindow_MakeModal)(wxWindow* self,bool modal)
 	
 EWXWEXPORT(void,wxWindow_SetFocus)(wxWindow* self)
 {

@@ -138,7 +138,7 @@ fileSaveDialog parent rememberCurrentDir overwritePrompt message wildcards direc
 -- >         else do fname <- fileDialogGetPath fd
 -- >                 return (Just fname)
 
-fileDialog :: Window a -> (FileDialog () -> Int -> IO b) -> Int -> String -> [(String,[String])] -> FilePath -> FilePath -> IO b
+fileDialog :: Window a -> (FileDialog () -> Style -> IO b) -> Style -> String -> [(String,[String])] -> FilePath -> FilePath -> IO b
 fileDialog parent processResult flags message wildcards directory filename
   = bracket
      (fileDialogCreate parent message directory filename (formatWildCards wildcards) pointNull flags)

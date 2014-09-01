@@ -1,21 +1,32 @@
+
+{-# LANGUAGE CPP #-}
+
 import Control.Monad (mapM_, when)
-import Data.List (foldl', intersperse, intercalate, nub, lookup, isPrefixOf)
-import Data.Maybe (fromJust)
+import Data.Functor  ( (<$>) )
+import Data.List (foldl', intersperse, intercalate, nub, lookup, isPrefixOf, isInfixOf)
+import Data.Maybe (fromJust, isNothing, isJust, listToMaybe)
 import Distribution.PackageDescription
 import Distribution.Simple
 import Distribution.Simple.InstallDirs (InstallDirs(..))
 import Distribution.Simple.LocalBuildInfo (LocalBuildInfo, localPkgDescr, installedPkgs, withPrograms, buildDir, absoluteInstallDirs)
 import Distribution.Simple.PackageIndex(SearchResult (..), searchByName )
 import Distribution.Simple.Program (ConfiguredProgram (..), lookupProgram, runProgram, simpleProgram, locationPath)
-import Distribution.Simple.Setup (ConfigFlags, BuildFlags, InstallFlags, CopyDest(..), fromFlag, installVerbosity)
+import Distribution.Simple.Setup ( BuildFlags, ConfigFlags
+                                 , CopyDest(..), CopyFlags, copyVerbosity
+                                 , InstallFlags, installVerbosity
+                                 , fromFlag
+                                 )
 import Distribution.Simple.Utils (installOrdinaryFile)
 import Distribution.System (OS (..), Arch (..), buildOS, buildArch)
-import Distribution.Verbosity (normal, verbose)
-import System.Cmd (system)
-import System.Directory (createDirectoryIfMissing, doesFileExist, getCurrentDirectory, getModificationTime)
-import System.Environment (getEnv)
-import System.Exit (ExitCode (..))
-import System.FilePath.Posix ((</>), (<.>), replaceExtension, takeFileName, dropFileName, addExtension)
+import Distribution.Verbosity (Verbosity, normal, verbose)
+import System.Process (system)
+import System.Directory ( createDirectoryIfMissing, doesFileExist
+                        , findExecutable,           getCurrentDirectory
+                        , getDirectoryContents,     getModificationTime
+                        )
+import System.Environment (lookupEnv)
+import System.Exit (ExitCode (..), exitFailure)
+import System.FilePath ((</>), (<.>), replaceExtension, takeFileName, dropFileName, addExtension)
 import System.IO (hPutStrLn, stderr)
 import System.IO.Unsafe (unsafePerformIO)
 import qualified System.Process as Process
@@ -30,8 +41,18 @@ readProcess cmd args stdin =
     hPutStrLn stderr $ "readProcess failed: " ++ show err
     E.throwIO err
 
+
+whenM :: Monad m => m Bool -> m () -> m ()
+whenM mp e = mp >>= \p -> when p e
+
+
 main :: IO ()
-main = defaultMainWithHooks simpleUserHooks { confHook = myConfHook, buildHook = myBuildHook, instHook = myInstHook }
+main = defaultMainWithHooks simpleUserHooks
+     { confHook = myConfHook
+     , buildHook = myBuildHook
+     , copyHook = myCopyHook
+     , instHook = myInstHook
+     }
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
@@ -45,6 +66,14 @@ includeDirectory = "include"
 
 -- Comment out type signature because of a Cabal API change from 1.6 to 1.7
 myConfHook (pkg0, pbi) flags = do
+
+    whenM (isNothing <$> findExecutable "wx-config") $
+      do
+        putStrLn "Error: wx-config not found, please install wx-config before installing wxc"
+        exitFailure
+
+    whenM bitnessMismatch
+      exitFailure
 
     lbi <- confHook simpleUserHooks (pkg0, pbi) flags
     let lpd       = localPkgDescr lbi
@@ -70,28 +99,180 @@ myConfHook (pkg0, pbi) flags = do
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
--- Make sure the right version of wx widgets is installed and return the 
+data Bitness
+  = Bits32
+  | Bits64
+  | Universal
+  | Unknown
+  deriving Eq
+
+
+instance Show Bitness where
+  show Bits32    = "32"
+  show Bits64    = "64"
+  show Universal = "Universal"
+  show Unknown   = "Unknown"
+
+
+data CheckResult
+  = OK
+  | NotOK Bitness Bitness
+  | NotChecked
+  deriving Eq
+
+{-
+   Extract bitness info from a dynamic library and compare to the
+   bitness of this program.
+   Preconditions (when buildArch == I386 || buildArch == X86_64):
+    - Command "file" must exist
+    - The specified file must exist
+-}
+checkBitness :: FilePath -> IO CheckResult
+checkBitness file =
+  if thisBitness == Unknown
+    then return NotChecked
+    else compareBitness . readBitness <$> readProcess "file" [file] ""
+  where
+    compareBitness :: Bitness -> CheckResult
+    compareBitness thatBitness =
+      if thatBitness == Unknown
+        then NotChecked
+        else
+          if thisBitness == thatBitness ||
+             thatBitness == Universal
+            then OK
+            else NotOK thisBitness thatBitness
+
+    thisBitness =
+      case buildArch of
+        I386   -> Bits32
+        X86_64 -> Bits64
+        _      -> Unknown
+
+    readBitness :: String -> Bitness
+    readBitness string
+      | anyInString [ " i386",   " 80386"
+                    , " 32-bit", "AMD386"  ] = Bits32
+      | anyInString [ " x86_64", " 64-bit" ] = Bits64
+      | anyInString [ "universal binary"   ] = Universal
+      | otherwise                            = Unknown
+      where
+        anyInString :: [String] -> Bool
+        anyInString strings = any (`isInfixOf` string) strings
+
+{-
+   Return True if this program is 32 bit and the wxWidgets dynamic
+   libraries are 64 bits or vice versa. Also, print a result message.
+
+   If there is insufficient data, or the OS is not handled, return
+   False, to prevent unnecessary abortion of the install procedure
+   N.B. If the installation procedure is simplified, we cannot
+   use the file-command on Windows anymore, as it is part of MSYS
+   N.B. This does not work if we are cross-compiling
+-}
+bitnessMismatch :: IO Bool
+bitnessMismatch =
+  case buildOS of
+    Windows ->
+      do
+        fileCommandPresent <- isJust <$> findExecutable "file"
+        if fileCommandPresent
+          then check
+          else
+            do
+              putStrLn "No file command present, bitness not checked"
+              return False -- No check on bitness, just continue installing
+
+    Linux   -> check
+    OSX     -> check
+    _       -> return False -- Other OSes are not checked
+  where
+    check =
+      do
+        maybeWxwin <- lookupEnv "WXWIN"
+        maybeWxcfg <- lookupEnv "WXCFG"
+        if isNothing maybeWxwin || isNothing maybeWxcfg
+          then return False -- Insufficient data, just continue installing
+          else check2 (fromJust maybeWxwin) (fromJust maybeWxcfg)
+
+    check2 wxwin wxcfg =
+      do
+        let path = normalisePath $ wxwin </> "lib" </> wxcfg </> ".."
+        maybeDynamicLibraryName <- getDynamicLibraryName path
+        case maybeDynamicLibraryName of
+          Nothing                 ->
+            putStrLn "Could not find a dynamic library to check bitness, continuing installation" >>
+            return False
+          Just dynamicLibraryName ->
+            check3 path dynamicLibraryName
+
+    check3 path dynamicLibraryName =
+      do
+        bitnessCheckResult <- checkBitness $ path </> dynamicLibraryName
+        case bitnessCheckResult of
+          NotOK thisBitness thatBitness ->
+            do
+              putStrLn $ "Error: The bitness does not match,"
+                         ++ " wxHaskell is being compiled as "
+                         ++ show thisBitness   ++ " bit, the file "
+                         ++ dynamicLibraryName ++ " is "
+                         ++ show thatBitness   ++ " bit."
+              return True
+          OK         ->
+            do
+              putStrLn $ "The bitness is correct"
+              return False
+          NotChecked ->
+            do
+              putStrLn $ "The bitness is not checked"
+              return False
+
+    getDynamicLibraryName :: FilePath -> IO (Maybe String)
+    getDynamicLibraryName path =
+      listToMaybe . filter isLibrary <$> getDirectoryContents path
+        `E.onException` return Nothing
+        where
+          isLibrary x = any (`isPrefixOf` x) ["libwx_base", "wxbase"] &&
+                        any (`isInfixOf`  x) [".dll", ".dylib", ".so."]
+
+
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+
+-- Find the most recent version of wxWidgets;
+-- abort the setup procedure when no proper version of wxWidgets is found
 readWxConfig :: IO String
 readWxConfig = do
-    -- Try to force version and see if we have it
-    let wxRequiredVersion = "2.9"
+    -- Try to find an acceptable version of wxWidgets
+    -- (a version that can be handled by this version of wxHaskell)
+    let wxAcceptableVersions = ["3.0", "2.9"] -- Preferred version first
 
     -- The Windows port of wx-config doesn't let you specify a version, nor query the full version,
     -- accordingly we just check what version is installed (which is returned with --release)
-    wxVersion <- case buildOS of
-      Windows -> readProcess "wx-config" ["--release"] ""
-      _       -> readProcess "wx-config" ["--version=" ++ wxRequiredVersion, "--version-full"] ""
+    wxVersions <- case buildOS of
+      Windows -> sequence [readProcess "wx-config" ["--release"] ""]
+      _       -> mapM readVersion wxAcceptableVersions
+                 where readVersion x = E.catch (readProcess "wx-config" ["--version=" ++ x, "--version-full"] "") handleError
+                       handleError :: IOError -> IO String
+                       handleError _ = return ""
 
-    if wxRequiredVersion `isPrefixOf` wxVersion 
-      then putStrLn ("Configuring wxc to build against wxWidgets " ++ wxVersion)
-      else error ("This version of wxc requires wxWidgets " ++ wxRequiredVersion ++ " to be available")
+    case [(x, y) | x <- wxAcceptableVersions, 
+                   y <- wxVersions, 
+                   x `isPrefixOf` y
+         ] of
+      [] ->
+        error ("This version of wxc requires one of the following wxWidgets versions to be available: " 
+               ++ show wxAcceptableVersions
+              )
+      ((wxVersion, wxFullVersion) : _) ->
+        do
+          putStrLn ("Configuring wxc to build against wxWidgets " ++ wxFullVersion)
 
-    -- The Windows port of wx-config doesn't let you specify a version (yet)
-    output <- case buildOS of
-      -- TODO: Nasty Windows hack: wx-config-win barfs if --cppflags comes after --libs :-(
-      Windows -> readProcess "wx-config" ["--cppflags", "--libs", "all"] ""
-      _       -> readProcess "wx-config" ["--version=" ++ wxRequiredVersion, "--libs", "all", "--cppflags"] ""
-    return output
+          -- The Windows port of wx-config doesn't let you specify a version (yet)
+          case buildOS of
+            -- TODO: Nasty Windows hack: wx-config-win barfs if --cppflags comes after --libs :-(
+            Windows -> readProcess "wx-config" ["--cppflags", "--libs", "all"] ""
+            _       -> readProcess "wx-config" ["--version=" ++ wxVersion, "--libs", "all", "--cppflags"] ""
+
 
 parseWxConfig :: String -> BuildInfo
 parseWxConfig s =
@@ -118,28 +299,27 @@ parseWxConfig s =
 myBuildHook :: PackageDescription -> LocalBuildInfo -> UserHooks -> BuildFlags -> IO ()
 myBuildHook pkg_descr local_bld_info user_hooks bld_flags =
     do
-    -- Extract the custom fields customFieldsPD where field name is x-cpp-dll-sources
-    let lib = fromJust (library pkg_descr)
-        lib_bi = libBuildInfo lib
+    -- Extract the custom fields customFieldsPD where field name is x-dll-sources
+    let lib       = fromJust (library pkg_descr)
+        lib_bi    = libBuildInfo lib
         custom_bi = customFieldsBI lib_bi
-        dll_name = fromJust (lookup "x-dll-name" custom_bi)
-        dll_srcs = (lines . fromJust) (lookup "x-dll-sources" custom_bi)
-        dll_libs = (lines . fromJust) (lookup "x-dll-extra-libraries" custom_bi)
-        cc_opts = ccOptions lib_bi
-        ld_opts = ldOptions lib_bi
-        inc_dirs = includeDirs lib_bi
-        lib_dirs = extraLibDirs lib_bi
-        libs = extraLibs lib_bi
-        bld_dir = buildDir local_bld_info
-        progs = withPrograms local_bld_info
-        gcc = fromJust (lookupProgram (simpleProgram "gcc") progs)
-        ver = (pkgVersion . package) pkg_descr
+        dll_name  = fromJust (lookup "x-dll-name" custom_bi)
+        dll_srcs  = (lines . fromJust) (lookup "x-dll-sources" custom_bi)
+        dll_libs  = (lines . fromJust) (lookup "x-dll-extra-libraries" custom_bi)
+        cc_opts   = ccOptions lib_bi
+        ld_opts   = ldOptions lib_bi
+        inc_dirs  = includeDirs lib_bi
+        lib_dirs  = extraLibDirs lib_bi
+        libs      = extraLibs lib_bi
+        bld_dir   = buildDir local_bld_info
+        progs     = withPrograms local_bld_info
+        gcc       = fromJust (lookupProgram (simpleProgram "gcc") progs)
+        ver       = (pkgVersion . package) pkg_descr
         inst_lib_dir = libdir $ absoluteInstallDirs pkg_descr local_bld_info NoCopyDest
     -- Compile C/C++ sources - output directory is dist/build/src/cpp
     putStrLn "Building wxc"
     objs <- mapM (compileCxx gcc cc_opts inc_dirs bld_dir) dll_srcs
     -- Link C/C++ sources as a DLL - output directory is dist/build
-    putStrLn "Linking wxc"
     linkSharedLib gcc ld_opts lib_dirs (libs ++ dll_libs) objs ver bld_dir dll_name inst_lib_dir
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
@@ -170,10 +350,10 @@ linkCxxOpts :: Version -- ^ Version information to be used for Unix shared libra
             -> String -- ^ Absolute path of the shared library
             -> [String] -- ^ List of options which can be applied to 'runProgram'
 linkCxxOpts ver out_dir basename basepath =
-    let dll_pathname = normalisePath (out_dir </> addExtension basename ".dll")
-        implib_pathname = normalisePath (out_dir </> "lib" ++ addExtension basename ".a") in
+    -- let dll_pathname = normalisePath (out_dir </> addExtension basename ".dll")
+    --     implib_ pathname = normalisePath (out_dir </> "lib" ++ addExtension basename ".a") in
     case buildOS of
-      Windows -> ["--dll", "-shared", 
+      Windows -> ["-Wl,--dll", "-shared", 
                   "-o", out_dir </> sharedLibName ver basename,
                   "-Wl,--out-implib," ++ "lib" ++ addExtension basename ".a",
                   "-Wl,--export-all-symbols", "-Wl,--enable-auto-import"]
@@ -225,25 +405,44 @@ needsCompiling src obj =
 
 -- | Create a dynamically linked library using the configured ld.
 linkSharedLib :: ConfiguredProgram -- ^ Program used to perform linking
-              -> [String] -- ^ Linker options supplied by Cabal
-              -> [FilePath] -- ^ Library directories
-              -> [String] -- ^ Libraries
-              -> [String] -- ^ Objects
-              -> Version -- ^ wxCore version (wxC has same version number)
-              -> FilePath -- ^ Directory in which library will be generated
-              -> String -- ^ Name of the shared library
-              -> String -- ^ Absolute path of the shared library
+              -> [String]          -- ^ Linker options supplied by Cabal
+              -> [FilePath]        -- ^ Library directories
+              -> [String]          -- ^ Libraries
+              -> [String]          -- ^ Objects
+              -> Version           -- ^ wxCore version (wxC has same version number)
+              -> FilePath          -- ^ Directory in which library will be generated
+              -> String            -- ^ Name of the shared library
+              -> String            -- ^ Absolute path of the shared library
               -> IO ()
 linkSharedLib gcc opts lib_dirs libs objs ver out_dir dll_name dll_path =
     do
     let lib_dirs' = map (\d -> "-L" ++ normalisePath d) lib_dirs
-        out_dir' = normalisePath out_dir
-        opts' = opts ++ linkCxxOpts ver (out_dir') dll_name dll_path
-        objs' = map normalisePath objs
-        libs' = ["-lstdc++"] ++ map ("-l" ++) libs
-    runProgram verbose gcc (opts' ++ objs' ++ lib_dirs' ++ libs')
-    --system $ (unwords ([show . locationPath . programLocation $ gcc] ++ opts' ++ objs' ++ lib_dirs' ++ libs'))
-    return ()
+        out_dir'  = normalisePath out_dir
+        opts'     = opts ++ linkCxxOpts ver out_dir' dll_name dll_path
+        objs'     = map normalisePath objs
+        libs'     = ["-lstdc++"] ++ map ("-l" ++) libs
+        target    = out_dir' </> sharedLibName ver dll_name
+    link <- linkingNeeded target objs' 
+    when link $
+      do
+        putStrLn "Linking wxc"
+        runProgram verbose gcc (opts' ++ objs' ++ lib_dirs' ++ libs')
+      --system $ (unwords ([show . locationPath . programLocation $ gcc] ++ opts' ++ objs' ++ lib_dirs' ++ libs'))
+
+
+-- | Check if one of the input files is more recent then the output file 
+linkingNeeded :: FilePath -> [FilePath] -> IO Bool
+linkingNeeded output input = 
+  do
+    fileExists <- doesFileExist output
+    if not fileExists 
+      then return True
+      else 
+        do
+          mostRecentModificationTime <- maximum <$> mapM getModificationTime input
+          outputModificationTime     <- getModificationTime output
+          return $ mostRecentModificationTime > outputModificationTime
+
 
 -- | The 'normalise' implementation in System.FilePath does not meet the requirements of
 -- calling and/or running external programs on Windows particularly well as it does not
@@ -280,11 +479,20 @@ ldconfig path = case buildOS of
                 ExitSuccess -> return ()
                 otherwise -> error "Couldn't execute ldconfig, ensure it is on your path"
 
+myCopyHook :: PackageDescription -> LocalBuildInfo -> UserHooks -> CopyFlags -> IO ()
+myCopyHook = hookHelper (fromFlag . copyVerbosity) (copyHook simpleUserHooks)
+
 myInstHook :: PackageDescription -> LocalBuildInfo -> UserHooks -> InstallFlags -> IO ()
-myInstHook pkg_descr local_bld_info user_hooks inst_flags = 
+myInstHook = hookHelper (fromFlag . installVerbosity) (instHook simpleUserHooks)
+
+hookHelper ::
+    (a -> Verbosity) ->
+    (PackageDescription -> LocalBuildInfo -> UserHooks -> a -> IO ()) ->
+    PackageDescription -> LocalBuildInfo -> UserHooks -> a -> IO ()
+hookHelper verbosity origHook pkg_descr local_bld_info user_hooks flags =
     do
-    -- Perform simpleUserHooks instHook (to copy installIncludes)
-    instHook simpleUserHooks pkg_descr local_bld_info user_hooks inst_flags
+    -- Perform simpleUserHooks (copyHook/instHook => to copy installIncludes)
+    origHook pkg_descr local_bld_info user_hooks flags
 
     -- Copy shared library
     let bld_dir = buildDir local_bld_info
@@ -298,6 +506,6 @@ myInstHook pkg_descr local_bld_info user_hooks inst_flags =
 
         inst_lib_dir = libdir $ absoluteInstallDirs pkg_descr local_bld_info NoCopyDest
 
-    installOrdinaryFile (fromFlag (installVerbosity inst_flags)) (bld_dir </> lib_name) (inst_lib_dir </> lib_name)
+    installOrdinaryFile (verbosity flags) (bld_dir </> lib_name) (inst_lib_dir </> lib_name)
     ldconfig inst_lib_dir
 

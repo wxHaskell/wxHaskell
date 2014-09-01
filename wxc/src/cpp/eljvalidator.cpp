@@ -45,9 +45,11 @@ EWXWEXPORT(bool,wxValidator_IsSilent)()
 }
 #endif
 	
-EWXWEXPORT(void,wxValidator_SetBellOnError)(bool doIt)
+// EWXWEXPORT(void,wxValidator_SetBellOnError)(bool doIt)
+EWXWEXPORT(void,wxValidator_SuppressBellOnError)(bool doIt)
 {
-	wxValidator::SetBellOnError(doIt);
+//	wxValidator::SetBellOnError(doIt);
+	wxValidator::SuppressBellOnError(doIt);
 }
 	
 EWXWEXPORT(void*,wxTextValidator_Create)(int style,void* val)

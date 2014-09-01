@@ -3,29 +3,25 @@ wxHaskell
 
 wxWidgets wrapper for Haskell
 
-This is
-=======
-
-This is a fork of jodonoghue/wxHaskell intended to combine/hold the various patches required to keep wxHaskell working.
-
 Status
 ======
 
 This fork builds & compiles
-- against: wxWidgets (http://www.wxwidgets.org/) 2.9.3, 2.9.4 and 2.9.5
-- with: Haskell platform (http://www.haskell.org/platform/) 2013.2.0.0
-- on: MacOSX 10.8.4, 64 bits Haskell platform
+- against: wxWidgets (http://www.wxwidgets.org/) 2.9.3, 2.9.4, 2.9.5, 3.0.0 and 3.0.1
+- with: Haskell platform (http://www.haskell.org/platform/) 2013.2.0.0 and 2014.2.0.0
+- on: MacOSX 10.8.4, 64 bits Haskell platform; Windows XP; Windows 8.1
 
-Patches up and until 20130725 have been merged into this fork.
+Patches up and until 2014-08-11 have been merged into this fork.
 
-All packages have cabal version 0.90.1.0, intending this to lead to a maintenance release.
+All packages have cabal version 0.91.0.0
+
 
 Build & installation
 ====================
 
-As of 20130725:
+As of 2014-08-11:
 - Prerequisites:
-  - install wxWidgets 2.9.3, 2.9.4 or 2.9.5 directly from a source release or use a platform specific installer.
+  - install wxWidgets 2.9.3, 2.9.4, 2.9.5, 3.0.0 or 3.0.1 directly from a source release or use a platform specific installer.
     - if installed from source release configure with
         ./configure --disable-debug_flag	# to avoid debugging popups
 
@@ -54,4 +50,4 @@ Platform specifics
 ==================
 
 MacOSX:
-- 20130725: homebrew (http://brew.sh/) does not yet install 2.9.5 (by means of 'brew install wxmac').
+- 20130725: homebrew (http://brew.sh/) does not yet install wxWidgets 2.9.5 (by means of 'brew install wxmac').

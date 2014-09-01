@@ -148,10 +148,10 @@ EWXWEXPORT(void,wxMenu_SetLabel)(wxMenu* self,int id,wxString* label)
 	self->SetLabel(id,*label);
 }
 	
-EWXWEXPORT(wxString*,wxMenu_GetLabel)(wxMenu* self,int id)
+EWXWEXPORT(wxString*, wxMenu_GetLabelText)(wxMenu* self, int id)
 {
 	wxString *result = new wxString();
-	*result = self->GetLabel(id);
+	*result = self->GetLabelText(id);
 	return result;
 }
 	
@@ -260,29 +260,29 @@ EWXWEXPORT(bool,wxMenuItem_IsSeparator)(wxMenuItem* self)
 	return self->IsSeparator();
 }
 	
-EWXWEXPORT(void,wxMenuItem_SetText)(wxMenuItem* self,wxString* str)
+EWXWEXPORT(void, wxMenuItem_SetItemLabel)(wxMenuItem* self, wxString* str)
 {
-	self->SetText(*str);
+	self->SetItemLabel(*str);
 }
 	
-EWXWEXPORT(wxString*,wxMenuItem_GetLabel)(wxMenuItem* self)
+EWXWEXPORT(wxString*, wxMenuItem_GetItemLabelText)(wxMenuItem* self)
 {
 	wxString *result = new wxString();
-	*result = self->GetLabel();
+	*result = self->GetItemLabelText();
 	return result;
 }
 	
-EWXWEXPORT(wxString*,wxMenuItem_GetText)(wxMenuItem* self)
+EWXWEXPORT(wxString*, wxMenuItem_GetItemLabel)(wxMenuItem* self)
 {
 	wxString *result = new wxString();
-	*result = self->GetText();
+	*result = self->GetItemLabel();
 	return result;
 }
 
-EWXWEXPORT(wxString*,wxMenuItem_GetLabelFromText)(wxString* text)
+EWXWEXPORT(wxString*, wxMenuItem_GetLabelText)(wxString* text)
 {
 	wxString *result = new wxString();
-	*result = wxMenuItem::GetLabelFromText(* text);
+	*result = wxMenuItem::GetLabelText(* text);
 	return result;
 }
 

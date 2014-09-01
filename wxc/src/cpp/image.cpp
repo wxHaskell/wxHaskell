@@ -60,9 +60,9 @@ EWXWEXPORT(int,wxcGetPixelRGB)(wxUint8* buffer,int width,int x,int y)
 
 EWXWEXPORT(void,wxcSetPixelRowRGB)(wxUint8* buffer,int width,int x,int y,int rgb0,int rgb1,int count)
 {
-  int r0  = ((rgb0 >> 16) && 0xFF);
-  int g0  = ((rgb0 >>  8) && 0xFF);
-  int b0  = (rgb0 && 0xFF);
+  int r0  = ((rgb0 >> 16) & 0xFF);
+  int g0  = ((rgb0 >>  8) & 0xFF);
+  int b0  = (rgb0 & 0xFF);
   int start = 3*(width*y+x);
   int i;
 
@@ -76,9 +76,9 @@ EWXWEXPORT(void,wxcSetPixelRowRGB)(wxUint8* buffer,int width,int x,int y,int rgb
   }
   else {
     /* do linear interpolation of the color */
-    int r1  = ((rgb1 >> 16) && 0xFF);
-    int g1  = ((rgb1 >>  8) && 0xFF);
-    int b1  = (rgb1 && 0xFF);
+    int r1  = ((rgb1 >> 16) & 0xFF);
+    int g1  = ((rgb1 >>  8) & 0xFF);
+    int b1  = (rgb1 & 0xFF);
 
     int rd  = ((r1 - r0) << 16) / (count-1);
     int gd  = ((g1 - g0) << 16) / (count-1);
@@ -102,9 +102,9 @@ EWXWEXPORT(void,wxcSetPixelRowRGB)(wxUint8* buffer,int width,int x,int y,int rgb
 EWXWEXPORT(void,wxcInitPixelsRGB)(wxUint8* buffer,int width,int height,int rgb)
 {
   int count        = width*height*3;
-  wxUint8 r  = ((rgb >> 16) && 0xFF);
-  wxUint8 g  = ((rgb >>  8) && 0xFF);
-  wxUint8 b  = rgb && 0xFF;
+  wxUint8 r  = ((rgb >> 16) & 0xFF);
+  wxUint8 g  = ((rgb >>  8) & 0xFF);
+  wxUint8 b  = rgb & 0xFF;
   int i;
 
   if (r==g && g==b) {
@@ -158,10 +158,10 @@ EWXWEXPORT(int,wxcGetPixelRGBA)(wxUint8* buffer,int width,int x,int y)
 
 EWXWEXPORT(void,wxcSetPixelRowRGBA)(wxUint8* buffer,int width,int x,int y,unsigned int rgba0,unsigned int rgba1,unsigned int count)
 {
-  int r0  = ((rgba0 >> 24) && 0xFF);
-  int g0  = ((rgba0 >> 16) && 0xFF);
-  int b0  = ((rgba0 >>  8) && 0xFF);
-  int a0  = (rgba0 && 0xFF);
+  int r0  = ((rgba0 >> 24) & 0xFF);
+  int g0  = ((rgba0 >> 16) & 0xFF);
+  int b0  = ((rgba0 >>  8) & 0xFF);
+  int a0  = (rgba0 & 0xFF);
   unsigned int start = 4*(width*y+x);
   unsigned int i;
 
@@ -176,10 +176,10 @@ EWXWEXPORT(void,wxcSetPixelRowRGBA)(wxUint8* buffer,int width,int x,int y,unsign
   }
   else {
     /* do linear interpolation of the color */
-    int r1  = ((rgba1 >> 24) && 0xFF);
-    int g1  = ((rgba1 >> 16) && 0xFF);
-    int b1  = ((rgba1 >>  8) && 0xFF);
-    int a1  = (rgba1 && 0xFF);
+    int r1  = ((rgba1 >> 24) & 0xFF);
+    int g1  = ((rgba1 >> 16) & 0xFF);
+    int b1  = ((rgba1 >>  8) & 0xFF);
+    int a1  = (rgba1 & 0xFF);
 
     int rd  = ((r1 - r0) << 24) / (count-1);
     int gd  = ((g1 - g0) << 24) / (count-1);
@@ -207,10 +207,10 @@ EWXWEXPORT(void,wxcSetPixelRowRGBA)(wxUint8* buffer,int width,int x,int y,unsign
 EWXWEXPORT(void,wxcInitPixelsRGBA)(wxUint8* buffer,int width,int height,int rgba)
 {
   unsigned int count        = width*height*4;
-  wxUint8 r  = ((rgba >> 24) && 0xFF);
-  wxUint8 g  = ((rgba >> 16) && 0xFF);
-  wxUint8 b  = ((rgba >>  8) && 0xFF);
-  wxUint8 a  = rgba && 0xFF;
+  wxUint8 r  = ((rgba >> 24) & 0xFF);
+  wxUint8 g  = ((rgba >> 16) & 0xFF);
+  wxUint8 b  = ((rgba >>  8) & 0xFF);
+  wxUint8 a  = rgba & 0xFF;
   unsigned int i;
 
   if (r==g && g==b && b==a) {

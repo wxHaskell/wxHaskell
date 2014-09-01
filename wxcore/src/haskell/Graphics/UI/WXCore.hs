@@ -7,10 +7,10 @@
 	Stability   :  provisional
 	Portability :  portable
 
-The "WXCore" module is the interface to the core wxWindows functionality.
+The "WXCore" module is the interface to the core wxWidgets functionality.
     
 The library contains the automatically generated interface to the raw
-wxWindows API in "Graphics.UI.WXCore.WxcClasses", "Graphics.UI.WXCore.WxcClassTypes",
+wxWidgets API in "Graphics.UI.WXCore.WxcClasses", "Graphics.UI.WXCore.WxcClassTypes",
 and "Graphics.UI.WXCore.WxcDefs". 
 
 The other helper modules contain convenient wrappers but only use functional
@@ -65,8 +65,8 @@ import Graphics.UI.WXCore.OpenGL
 import Graphics.UI.WXCore.GHCiSupport
 
 -- | Start the event loop. Takes an initialisation action as argument.
--- Except for 'run', the functions in the WXH library can only be called
--- from this intialisation action or from event handlers, or otherwise bad
+-- Except for 'run', the functions in the WX library can only be called
+-- from this initialisation action or from event handlers, otherwise bad
 -- things will happen :-)
 run :: IO a -> IO ()
 run init

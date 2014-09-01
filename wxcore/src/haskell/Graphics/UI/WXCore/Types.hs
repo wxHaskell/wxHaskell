@@ -88,6 +88,7 @@ import System.IO.Unsafe( unsafePerformIO )
 -- utility
 import Data.Array
 import Data.Bits
+import Data.Word
 import Control.Concurrent.STM
 import qualified Control.Exception as CE
 import qualified Control.Monad as M
@@ -110,22 +111,22 @@ object # method   = method object
   Bitmasks
 --------------------------------------------------------------------------------}
 -- | Bitwise /or/ of two bit masks.
-(.+.) :: Int -> Int -> Int
+(.+.) :: Bits a => a -> a -> a
 (.+.) i j
   = i .|. j
 
 -- | Unset certain bits in a bitmask.
-(.-.) :: Int -> BitFlag -> Int
+(.-.) :: Bits a => a -> a -> a
 (.-.) i j
   = i .&. complement j
 
 -- | Bitwise /or/ of a list of bit masks.
-bits :: [Int] -> Int
+bits :: (Num a, Bits a) => [a] -> a
 bits xs
   = foldr (.+.) 0 xs
 
 -- | (@bitsSet mask i@) tests if all bits in @mask@ are also set in @i@.
-bitsSet :: Int -> Int -> Bool
+bitsSet :: Bits a => a -> a -> Bool
 bitsSet mask i
   = (i .&. mask == mask)
 
@@ -138,7 +139,7 @@ varTopId :: Var Id
 varTopId
   = unsafePerformIO (varCreate (wxID_HIGHEST+1))
 
--- | When creating a new window you may specify 'idAny' to let wxWindows
+-- | When creating a new window you may specify 'idAny' to let wxWidgets
 -- assign an unused identifier to it automatically. Furthermore, it can be
 -- used in an event connection to handle events for any identifier.
 idAny :: Id
@@ -478,7 +479,8 @@ instance Enum SystemColor where
     = error "Graphics.UI.WXCore.Types.SytemColor.toEnum: can not convert integers to system colors."
 
   fromEnum systemColor
-    = case systemColor of
+    = fromIntegral $ 
+       case systemColor of
         ColorScrollBar        -> wxSYS_COLOUR_SCROLLBAR
         ColorBackground       -> wxSYS_COLOUR_BACKGROUND
         ColorActiveCaption    -> wxSYS_COLOUR_ACTIVECAPTION
