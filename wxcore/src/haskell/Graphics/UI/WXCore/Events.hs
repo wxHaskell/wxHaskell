@@ -16,9 +16,11 @@ event.
 -----------------------------------------------------------------------------------------
 module Graphics.UI.WXCore.Events
         (
+        -- Veto command for veto-able events
+          Veto
         -- * Set event handlers
         -- ** Controls
-          buttonOnCommand
+        , buttonOnCommand
         , checkBoxOnCommand
         , choiceOnCommand
         , comboBoxOnCommand
@@ -34,6 +36,7 @@ module Graphics.UI.WXCore.Events
         , toggleButtonOnCommand
         , treeCtrlOnTreeEvent
         , gridOnGridEvent
+        , wizardOnWizEvent
         , propertyGridOnPropertyGridEvent
 
         -- ** Windows
@@ -92,6 +95,7 @@ module Graphics.UI.WXCore.Events
         , toggleButtonGetOnCommand
         , treeCtrlGetOnTreeEvent
         , gridGetOnGridEvent
+        , wizardGetOnWizEvent
         , propertyGridGetOnPropertyGridEvent
 
         -- ** Windows
@@ -194,6 +198,9 @@ module Graphics.UI.WXCore.Events
         -- * TaskBar icon events
         , EventTaskBarIcon(..)
 
+        -- ** Wizard events
+        , EventWizard(..), Direction(..)
+
         -- ** PropertyGrid events
         , EventPropertyGrid(..)
 
@@ -262,6 +269,9 @@ import Graphics.UI.WXCore.WxcClassInfo
 import Graphics.UI.WXCore.Types
 import Graphics.UI.WXCore.Draw
 import Graphics.UI.WXCore.Defines
+
+-- | IO action to cancel events.
+type Veto = IO ()
 
 ------------------------------------------------------------------------------------------
 -- Controls  (COMMAND events)
@@ -2388,6 +2398,67 @@ evtHandlerGetOnTaskBarIconEvent window id evt
       (fromMaybe wxEVT_TASKBAR_MOVE
           $ lookup evt $ uncurry (flip zip) . unzip $ taskBarIconEvents)
       skipCurrentEvent
+
+{-----------------------------------------------------------------------------------------
+  Wizard events
+-----------------------------------------------------------------------------------------}
+data Direction = Backward | Forward
+
+data EventWizard
+    = WizardPageChanged     Direction
+    | WizardPageChanging    Direction Veto
+--    | WizardBeforePageChanged Veto   -- Missing from ClassesMZ
+    | WizardPageShown
+    | WizardCancel          Veto
+    | WizardHelp
+    | WizardFinished
+    | WizardUnknown
+
+fromWizardEvent :: WizardEvent a -> IO EventWizard
+fromWizardEvent wizEvent
+    = do tp <- eventGetEventType wizEvent
+         case lookup tp wizEvents of
+           Just f  -> f wizEvent
+           Nothing -> return WizardUnknown
+
+wizEvents :: [(Int, WizardEvent a -> IO EventWizard)]
+wizEvents
+    = [(wxEVT_WIZARD_PAGE_CHANGED     ,withDir (withPage WizardPageChanged))
+      ,(wxEVT_WIZARD_PAGE_CHANGING    ,withVeto $ withDir (withPage WizardPageChanging))
+--      ,(wxEVT_WIZARD_BEFORE_PAGE_CHANGED, withVeto WizardBeforePageChanged) -- missing from ClassesMZ
+      ,(wxEVT_WIZARD_PAGE_SHOWN       ,withPage WizardPageShown)
+      ,(wxEVT_WIZARD_CANCEL           ,withVeto (withPage WizardCancel))
+      ,(wxEVT_WIZARD_HELP             ,withPage  WizardHelp)
+      ,(wxEVT_WIZARD_FINISHED         ,withPage WizardFinished)]
+    where -- page getter is missing from ClassesMZ, omitting page for the time being
+          withPage :: c -> WizardEvent a -> IO c
+          withPage = const . return
+          withDir :: (WizardEvent a -> IO (Direction -> c)) -> WizardEvent a -> IO c
+          withDir make wizEvent
+            = do
+              dir <- wizardEventGetDirection wizEvent
+              f <- make wizEvent
+              return $ f (if dir /= 0 then Forward else Backward)
+          withVeto :: (WizardEvent a -> IO (Veto -> c)) -> WizardEvent a -> IO c 
+          withVeto make wizEvent
+            = do
+              f <- make wizEvent
+              return $ f (notifyEventVeto wizEvent)
+
+-- | Set a calendar event handler.
+wizardOnWizEvent :: Wizard a -> (EventWizard -> IO ()) -> IO ()
+wizardOnWizEvent wiz eventHandler
+  = windowOnEvent wiz (map fst wizEvents) eventHandler wizHandler
+  where
+    wizHandler event
+      = do eventWizard <- fromWizardEvent (objectCast event)
+           eventHandler eventWizard
+
+-- | Get the current calendar event handler of a window.
+wizardGetOnWizEvent :: Wizard a -> IO (EventWizard -> IO ())
+wizardGetOnWizEvent wiz
+  -- not sure about the wxEVT_WIZARD_PAGE_CHANGED
+  = unsafeWindowGetHandlerState wiz wxEVT_WIZARD_PAGE_CHANGED (\event -> skipCurrentEvent)
 
 
 {-----------------------------------------------------------------------------------------

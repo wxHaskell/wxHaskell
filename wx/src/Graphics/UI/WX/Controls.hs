@@ -17,6 +17,9 @@ module Graphics.UI.WX.Controls
         Align(..), Aligned, alignment
       , Wrap(..), Wrapped, wrap
       , Sorted, sorted
+      -- * Calendar Ctrl
+      , calendarCtrl, date
+      , IsDate (..)
       -- * Containers
       , Panel, panel, panelEx
       , Notebook, notebook
@@ -37,6 +40,8 @@ module Graphics.UI.WX.Controls
       -- ** ListBox
       , ListBox, SingleListBox, MultiListBox
       , singleListBox, singleListBoxRes, multiListBox, multiListBoxRes
+      , ListBoxView (..), singleListBoxView, multiListBoxView, listBoxViewAddItem, listBoxViewGetItems, listBoxViewSetItems
+      , singleListBoxViewGetSelection, multiListBoxViewGetSelections
       -- ** RadioBox
       , RadioBox, radioBox, radioBoxRes
       -- ** Spin Control
@@ -62,7 +67,8 @@ module Graphics.UI.WX.Controls
       -- ** MediaCtrl
       , MediaCtrlBackend(..), MediaCtrl, mediaCtrl, mediaCtrlWithBackend, mediaCtrlEx
       -- ** Wizard
-      , Wizard, wizard, wizardEx, wizardPageSimple, runWizard, next, prev, chain
+      , Wizard, wizard, wizardEx, wizardPageSimple, runWizard, next, prev, chain, wizardPageSize
+      , wizardEvent, wizardCurrentPage
       -- ** StyledTextCtrl
       , StyledTextCtrl, stcEvent, styledTextCtrl, styledTextCtrlEx
       -- ** PropertyGrid
@@ -81,8 +87,10 @@ import Graphics.UI.WX.Variable (variable)
 import Graphics.UI.WX.Window
 
 import Control.Monad (forM_)
+import Control.Applicative
 import Data.Maybe (fromMaybe, isJust, fromJust)
 import Data.Dynamic  -- for "alignment"
+import Data.Time
 import System.Info (os)
 
 
@@ -460,6 +468,50 @@ staticTextRes parent name props =
        return t
 
 {--------------------------------------------------------------------------------
+  Calendar Control
+--------------------------------------------------------------------------------}
+
+class IsDate a where
+  toWXDate :: a -> IO (DateTime ())
+  fromWXDate :: DateTime () -> IO a
+
+instance IsDate (DateTime ()) where
+  toWXDate = return
+  fromWXDate = return
+
+instance IsDate Day where
+  -- time zone??
+  toWXDate utc = do
+    wxd <- dateTimeCreate
+    dateTimeSet wxd (fromInteger y) (m - 1) d 0 0 0 0
+    return wxd
+    where (y,m,d) = toGregorian utc
+  fromWXDate wxd = fromGregorian
+                      <$> (toInteger <$> dateTimeGetYear wxd 0)
+                      <*> ((+1)      <$> dateTimeGetMonth wxd 0)
+                      <*> dateTimeGetDay wxd 0
+
+
+date :: (Typeable a, IsDate a) => Attr (CalendarCtrl w) a
+date = createAttr "date" getter setter
+  where getter w = do
+          wxd <- dateTimeCreate
+          withObjectPtr wxd (calendarCtrlGetDate w)
+          fromWXDate wxd
+        setter w dt = do
+          wxd <- toWXDate dt
+          withObjectPtr wxd (calendarCtrlSetDate w)
+
+calendarCtrl :: Window a -> [Prop (CalendarCtrl ())] -> IO (CalendarCtrl ())
+calendarCtrl parent props
+  = feed2 props 0 $
+    initialWindow $ \id rect -> \props flags ->
+    do dt <- dateTimeCreate
+       t <- calendarCtrlCreate parent id dt rect flags
+       set t props
+       return t
+
+{--------------------------------------------------------------------------------
   Check box
 --------------------------------------------------------------------------------}
 instance Commanding (CheckBox a) where
@@ -755,6 +807,56 @@ multiListBoxRes parent name props =
        let ml = (objectCast l :: MultiListBox())
        set ml props
        return ml
+
+-- | A small wrapper over WX's ListCtrl, allowing us to keep the data
+--   we're representing as well as its string form (shown to the user as
+--   rows).
+data ListBoxView b a = ListBoxView {
+    listBoxViewCtrl  :: ListBox b,
+    listBoxViewItems :: Var [a],
+    listBoxViewToRow :: a -> String
+  }
+
+listBoxViewLayout :: ListBoxView b a -> Layout
+listBoxViewLayout = fill . widget . listBoxViewCtrl
+
+listBoxViewSetItems :: ListBoxView b a -> [a] -> IO ()
+listBoxViewSetItems list its = do
+  set (listBoxViewItems list) [value := its]
+  set (listBoxViewCtrl list)  [items := map (listBoxViewToRow list) its]
+
+listBoxViewGetItems :: ListBoxView b a -> IO [a]
+listBoxViewGetItems list = get (listBoxViewItems list) value
+
+listBoxViewAddItem :: ListBoxView b a -> a -> IO ()
+listBoxViewAddItem list it = do
+  its <- (it:) `fmap` get (listBoxViewItems list) value
+  listBoxViewSetItems list its
+
+singleListBoxViewGetSelection :: ListBoxView (CSingleListBox ()) a -> IO (Maybe a)
+singleListBoxViewGetSelection view = do
+  sel <- get (listBoxViewCtrl view) selection
+  its <- get (listBoxViewItems view) value 
+  return $ if sel == -1 then Nothing else Just (its !! sel)
+
+multiListBoxViewGetSelections :: ListBoxView (CMultiListBox ()) a -> IO [a]
+multiListBoxViewGetSelections view = do
+  sels <- get (listBoxViewCtrl view) selections
+  its <- get (listBoxViewItems view) value
+  return $ map (its !!) sels
+
+singleListBoxView :: Window b -> [Prop (SingleListBox ())] -> (a -> String) -> IO (ListBoxView (CSingleListBox ()) a)
+singleListBoxView parent props toRow = do
+  ctrl <- singleListBox parent props
+  var <- variable [value := []]
+  return $ ListBoxView ctrl var toRow
+
+multiListBoxView :: Window b -> [Prop (MultiListBox ())] -> (a -> String) -> IO (ListBoxView (CMultiListBox ()) a)
+multiListBoxView parent props toRow = do
+  ctrl <- multiListBox parent props
+  var <- variable [value := []]
+  return $ ListBoxView ctrl var toRow
+
 
 {--------------------------------------------------------------------------------
   RadioBox
@@ -1348,6 +1450,12 @@ prev = writeAttr "prev" setter
   where
     setter w p = wizardPageSimpleSetPrev w (fromMaybe objectNull p)
 
+wizardPageSize :: Attr (Wizard a) Size
+wizardPageSize = newAttr "pageSize" getter setter
+  where
+    getter w = wizardGetPageSize w
+    setter w p = wizardSetPageSize w p
+
 -- | Chain together all given wizard pages.
 chain :: [WizardPageSimple a] -> IO ()
 chain ws = chain1 Nothing ws
@@ -1379,6 +1487,17 @@ wizardPageSimple parent props
     w <- wizardPageSimpleCreate parent
     set w props
     return w
+
+wizardCurrentPage :: ReadAttr (Wizard a) (Maybe (WizardPage ()))
+wizardCurrentPage = readAttr "currentPage" getter
+  where getter w = do
+          x <- wizardGetCurrentPage w
+          return $ if objectIsNull x then Nothing else Just x
+
+
+wizardEvent :: Event (Wizard a) (EventWizard -> IO ())
+wizardEvent
+  = newEvent "wizardEvent" wizardGetOnWizEvent wizardOnWizEvent
  
 -- | Run the wizard.
 -- IMPORTANT: `windowDestroy` needs to be called on the wizard when it is no longer used. After
