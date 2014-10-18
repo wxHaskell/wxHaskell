@@ -11,7 +11,7 @@ typedef struct _EiffelSort
 	EiffelSortFunc fnc;
 }EiffelSort;
 
-int wxCALLBACK ListCmp (long item1, long item2, long sortData)
+int wxCALLBACK ListCmp (wxIntPtr item1, wxIntPtr item2, wxIntPtr sortData)
 {
 	return ((EiffelSort*)sortData)->fnc (((EiffelSort*)sortData)->obj, (int)item1, (int)item2);
 }
@@ -475,7 +475,7 @@ EWXWEXPORT(bool,wxListCtrl_ScrollList)(wxListCtrl* self,int dx,int dy)
 EWXWEXPORT(bool,wxListCtrl_SortItems)(wxListCtrl* self,void* fnc,void* obj)
 {
 	EiffelSort srt = {obj, (EiffelSortFunc)fnc};
-	return self->SortItems(ListCmp, (long)&srt);
+	return self->SortItems(ListCmp, (wxIntPtr)&srt);
 }
 	
 EWXWEXPORT(void,wxListCtrl_UpdateStyle)(wxListCtrl* self)
