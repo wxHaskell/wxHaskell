@@ -16,6 +16,7 @@
 
 #ifndef wxUSE_GLCANVAS
 # define wxGLCanvas      void
+# define wxGLContext     void
 #endif
 
 extern "C" {
