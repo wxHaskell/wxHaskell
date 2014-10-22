@@ -1548,7 +1548,7 @@ struct SortData {
   wxClosure* closure;
 };
 
-int wxCALLBACK sortCallBack( long item1, long item2, long data )
+int wxCALLBACK sortCallBack( wxIntPtr item1, wxIntPtr item2, wxIntPtr data )
 {
   wxClosure* closure = ((SortData*)data)->closure;
   long       id      = ((SortData*)data)->id;
@@ -1563,7 +1563,7 @@ int wxCALLBACK sortCallBack( long item1, long item2, long data )
 EWXWEXPORT(bool,wxListCtrl_SortItems2)(wxListCtrl* self,wxClosure* closure)
 {
   SortData sortData = { self->GetId(), closure };
-  return self->SortItems( sortCallBack, (long)&sortData );
+  return self->SortItems( sortCallBack, (wxIntPtr)&sortData );
 }
 
 
