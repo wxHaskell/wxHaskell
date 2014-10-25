@@ -1,7 +1,7 @@
 
 {-# LANGUAGE CPP #-}
 
-import Control.Monad (filterM, mapM_, when)
+import Control.Monad (filterM, join, mapM_, when)
 import Data.Functor  ( (<$>) )
 import Data.List (foldl', intersperse, intercalate, nub, lookup, isPrefixOf, isInfixOf)
 import Data.Maybe (fromJust, isNothing, isJust, listToMaybe)
@@ -48,10 +48,17 @@ whenM :: Monad m => m Bool -> m () -> m ()
 whenM mp e = mp >>= \p -> when p e
 
 
-findM :: (Functor m, Monad m) => (a -> m Bool) -> [a] -> m (Maybe a)
-findM p xs = listToMaybe <$> filterM p xs
+-- Find the first element in a list that matches a condition
+findM :: Monad m => (a -> m Bool) -> [a] -> m (Maybe a)
+findM _  []       = return Nothing
+findM mp (x : xs) =
+  do
+    r <- mp x
+    if r 
+      then return $ Just x
+      else findM mp xs
 
-
+    
 main :: IO ()
 main = defaultMainWithHooks simpleUserHooks
      { confHook = myConfHook
@@ -290,11 +297,11 @@ findWxVersion =
       where
         readVersionWindows :: IO String
         readVersionWindows =
-          wx_config ["--release"]
+          wx_config ["--version"]                          -- Sample output: 3.0.1
 
         readVersion :: String -> IO String
         readVersion x =
-          wx_config ["--version=" ++ x, "--version-full"]
+          wx_config ["--version=" ++ x, "--version-full"]  -- Sample output: 3.0.1.0
 
         isCompatible :: String -> Bool
         isCompatible xs =
