@@ -396,7 +396,8 @@ linkCxxOpts ver out_dir basename basepath =
       Windows -> ["-Wl,--dll", "-shared", 
                   "-o", out_dir </> sharedLibName ver basename,
                   "-Wl,--out-implib," ++ "lib" ++ addExtension basename ".a",
-                  "-Wl,--export-all-symbols", "-Wl,--enable-auto-import"]
+                  "-Wl,--export-all-symbols", "-Wl,--enable-auto-import",
+                  "-Wl,-no-undefined,--enable-runtime-pseudo-reloc"]
       OSX -> ["-dynamiclib",
                   "-o", out_dir </> sharedLibName ver basename,
                   "-install_name", basepath </> sharedLibName ver basename,
