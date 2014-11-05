@@ -17,6 +17,17 @@ int copyStrToBuf(void* dst, wxString& src) {
   return src.Length();
 }
 
+void initImageHandlers()
+{
+  static int InitImageHandlers_done = 0;
+
+  if (!InitImageHandlers_done)
+  {
+    InitImageHandlers_done = 1;
+    wxInitAllImageHandlers();
+  }
+}
+
 /*-----------------------------------------------------------------------------
     The global idle timer
 -----------------------------------------------------------------------------*/
@@ -56,7 +67,10 @@ IMPLEMENT_APP_NO_MAIN(ELJApp);
 
 bool ELJApp::OnInit (void)
 {
-  wxInitAllImageHandlers();
+  if (!wxApp::OnInit())
+    return false;
+
+  initImageHandlers();
   initIdleTimer();
   if (initClosure) {
     delete initClosure; /* special: init is only called once with a NULL event */
@@ -84,13 +98,7 @@ void ELJApp::InitZipFileSystem()
 
 void ELJApp::InitImageHandlers()
 {
-        static int InitImageHandlers_done = 0;
-
-        if (!InitImageHandlers_done)
-        {
-                InitImageHandlers_done = 1;
-                wxInitAllImageHandlers();
-        }
+  initImageHandlers();
 }
 
 
@@ -451,7 +459,7 @@ EWXWEXPORT(void,ELJApp_SetTooltipDelay)(int _ms)
 
 EWXWEXPORT(void,ELJApp_InitAllImageHandlers)()
 {
-        wxInitAllImageHandlers();
+  initImageHandlers();
 }
 
 EWXWEXPORT(void,ELJApp_Bell)()
