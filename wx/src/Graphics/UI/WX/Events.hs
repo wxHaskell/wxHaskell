@@ -100,6 +100,14 @@ module Graphics.UI.WX.Events
             , EventCalendar(..)
             , calendarEvent
 
+            -- ** AuiNotebook event
+            , EventAuiNotebook(..)
+            , auiNotebookOnPageCloseEvent
+            , auiNotebookOnPageClosedEvent
+            , auiNotebookOnPageChangingEvent
+            , auiNotebookOnPageChangedEvent
+
+
             -- ** Keyboard events
             , EventKey (..), Key(..)
             , keyKey, keyModifiers, keyPos
@@ -323,6 +331,31 @@ keyboardFilter1 name filter
 calendarEvent :: Event (CalendarCtrl a) (EventCalendar -> IO ())
 calendarEvent
   = newEvent "calendarEvent" calendarCtrlGetOnCalEvent calendarCtrlOnCalEvent
+
+{--------------------------------------------------------------------
+   AuiNotebook event filters
+--------------------------------------------------------------------}
+
+newAuiEvent ::  String -> EventId -> Event (AuiNotebook a) (EventAuiNotebook -> IO ())
+newAuiEvent s evId = newEvent s (auiNotebookGetOnAuiNotebookEvent evId) (auiNotebookOnAuiNotebookEvent s evId)
+
+-- AUI Notebook PageClose
+auiNotebookOnPageCloseEvent ::  Event (AuiNotebook a) (EventAuiNotebook -> IO ())
+auiNotebookOnPageCloseEvent = newAuiEvent "auiNotebookOnPageClose" wxEVT_AUINOTEBOOK_PAGE_CLOSE
+
+-- AUINotebook PageClosed
+auiNotebookOnPageClosedEvent ::  Event (AuiNotebook a) (EventAuiNotebook -> IO ())
+auiNotebookOnPageClosedEvent = newAuiEvent "auiNotebookOnPageClosed" wxEVT_AUINOTEBOOK_PAGE_CLOSED
+
+-- AUINotebook PageChange
+auiNotebookOnPageChangingEvent ::  Event (AuiNotebook a) (EventAuiNotebook -> IO ())
+auiNotebookOnPageChangingEvent = newAuiEvent "auiNotebookOnPageChanging" wxEVT_AUINOTEBOOK_PAGE_CHANGING
+
+-- AUINotebook PageChanged
+auiNotebookOnPageChangedEvent ::  Event (AuiNotebook a) (EventAuiNotebook -> IO ())
+auiNotebookOnPageChangedEvent = newAuiEvent "auiNotebookOnPageChanged" wxEVT_AUINOTEBOOK_PAGE_CHANGED
+
+
 
 
 {--------------------------------------------------------------------

@@ -18,26 +18,26 @@ TClass(wxPalette) Null_Palette(  );
 TClass(wxPen) Null_Pen(  );
 
 /* Events */
-int expEVT_COMMAND_AUITOOLBAR_TOOL_DROPDOWN();
-int expEVT_COMMAND_AUITOOLBAR_OVERFLOW_CLICK();
-int expEVT_COMMAND_AUITOOLBAR_RIGHT_CLICK();
-int expEVT_COMMAND_AUITOOLBAR_MIDDLE_CLICK();
-int expEVT_COMMAND_AUITOOLBAR_BEGIN_DRAG();
-int expEVT_COMMAND_AUINOTEBOOK_PAGE_CLOSE();
-int expEVT_COMMAND_AUINOTEBOOK_PAGE_CHANGED();
-int expEVT_COMMAND_AUINOTEBOOK_PAGE_CHANGING();
-int expEVT_COMMAND_AUINOTEBOOK_PAGE_CLOSED();
-int expEVT_COMMAND_AUINOTEBOOK_BUTTON();
-int expEVT_COMMAND_AUINOTEBOOK_BEGIN_DRAG();
-int expEVT_COMMAND_AUINOTEBOOK_END_DRAG();
-int expEVT_COMMAND_AUINOTEBOOK_DRAG_MOTION();
-int expEVT_COMMAND_AUINOTEBOOK_ALLOW_DND();
-int expEVT_COMMAND_AUINOTEBOOK_TAB_MIDDLE_DOWN();
-int expEVT_COMMAND_AUINOTEBOOK_TAB_MIDDLE_UP();
-int expEVT_COMMAND_AUINOTEBOOK_TAB_RIGHT_DOWN();
-int expEVT_COMMAND_AUINOTEBOOK_TAB_RIGHT_UP();
-int expEVT_COMMAND_AUINOTEBOOK_DRAG_DONE();
-int expEVT_COMMAND_AUINOTEBOOK_BG_DCLICK();
+int expEVT_AUITOOLBAR_TOOL_DROPDOWN();
+int expEVT_AUITOOLBAR_OVERFLOW_CLICK();
+int expEVT_AUITOOLBAR_RIGHT_CLICK();
+int expEVT_AUITOOLBAR_MIDDLE_CLICK();
+int expEVT_AUITOOLBAR_BEGIN_DRAG();
+int expEVT_AUINOTEBOOK_PAGE_CLOSE();
+int expEVT_AUINOTEBOOK_PAGE_CHANGED();
+int expEVT_AUINOTEBOOK_PAGE_CHANGING();
+int expEVT_AUINOTEBOOK_PAGE_CLOSED();
+int expEVT_AUINOTEBOOK_BUTTON();
+int expEVT_AUINOTEBOOK_BEGIN_DRAG();
+int expEVT_AUINOTEBOOK_END_DRAG();
+int expEVT_AUINOTEBOOK_DRAG_MOTION();
+int expEVT_AUINOTEBOOK_ALLOW_DND();
+int expEVT_AUINOTEBOOK_TAB_MIDDLE_DOWN();
+int expEVT_AUINOTEBOOK_TAB_MIDDLE_UP();
+int expEVT_AUINOTEBOOK_TAB_RIGHT_DOWN();
+int expEVT_AUINOTEBOOK_TAB_RIGHT_UP();
+int expEVT_AUINOTEBOOK_DRAG_DONE();
+int expEVT_AUINOTEBOOK_BG_DCLICK();
 int expEVT_AUI_PANE_BUTTON();
 int expEVT_AUI_PANE_CLOSE();
 int expEVT_AUI_PANE_MAXIMIZE();
@@ -1049,7 +1049,7 @@ TClassDef(wxAcceleratorTable)
 TClass(wxAcceleratorTable) wxAcceleratorTable_Create( int n, void* entries );
 void       wxAcceleratorTable_Delete( TSelf(wxAcceleratorTable) _obj );
 
-/* wxctivateEvent */
+/* wxActivateEvent */
 TClassDefExtend(wxActivateEvent,wxEvent)
 void       wxActivateEvent_CopyObject( TSelf(wxActivateEvent) _obj, void* obj );
 TBool      wxActivateEvent_GetActive( TSelf(wxActivateEvent) _obj );
@@ -1068,6 +1068,578 @@ TClassDefExtend(wxArtProvider,wxObject)
 TBool      PopProvider(  );
 void       PushProvider( TClass(wxArtProvider) provider );
 TBool      RemoveProvider( TClass(wxArtProvider) provider );
+
+/* wxAuiDefaultTabArt */
+TClassDefExtend(wxAuiDefaultTabArt, wxAuiTabArt)
+TClass(wxAuiDefaultTabArt)    wxAuiDefaultTabArt_Create();
+TClass(wxAuiTabArt) 	wxAuiDefaultTabArt_Clone (TSelf(wxAuiDefaultTabArt) _obj );
+void 	wxAuiDefaultTabArt_SetFlags (TSelf(wxAuiDefaultTabArt) _obj, int _flags );
+void 	wxAuiDefaultTabArt_SetSizingInfo (TSelf(wxAuiDefaultTabArt) _obj, TSize(_width,_height), size_t tabCount );
+void 	wxAuiDefaultTabArt_SetNormalFont (TSelf(wxAuiDefaultTabArt) _obj, TClass(wxFont) _font );
+void 	wxAuiDefaultTabArt_SetSelectedFont (TSelf(wxAuiDefaultTabArt) _obj, TClass(wxFont) _font );
+void 	wxAuiDefaultTabArt_SetMeasuringFont (TSelf(wxAuiDefaultTabArt) _obj, TClass(wxFont) _font );
+void 	wxAuiDefaultTabArt_SetColour (TSelf(wxAuiDefaultTabArt) _obj, TClass(wxColour) _colour );
+void 	wxAuiDefaultTabArt_SetActiveColour (TSelf(wxAuiDefaultTabArt) _obj, TClass(wxColour) _colour );
+void 	wxAuiDefaultTabArt_DrawBackground (TSelf(wxAuiDefaultTabArt) _obj, TClass(wxDC) _dc, TClass(wxWindow) _wnd, TClass(wxRect) _rect );
+void 	wxAuiDefaultTabArt_DrawTab (TSelf(wxAuiDefaultTabArt) _obj, TClass(wxDC) _dc, TClass(wxWindow) _wnd, TClass(wxAuiNotebookPage) _pane, TClass(wxRect) _inRect, int closeButtonState, TClass(wxRect) _outTabRect, TClass(wxRect) _outButtonRect, int *xExtent );
+void 	wxAuiDefaultTabArt_DrawButton (TSelf(wxAuiDefaultTabArt) _obj, TClass(wxDC) _dc, TClass(wxWindow) _wnd, TClass(wxRect) _inRect, int bitmapId, int buttonState, int orientation, TClass(wxRect) _outRect );
+int 	wxAuiDefaultTabArt_GetIndentSize (TSelf(wxAuiDefaultTabArt) _obj );
+TClass(wxSize) 	wxAuiDefaultTabArt_GetTabSize (TSelf(wxAuiDefaultTabArt) _obj, TClass(wxDC) _dc, TClass(wxWindow) _wnd, TClass(wxString) _caption, TClass(wxBitmap) _bitmap, TBool active, int closeButtonState, int *xExtent );
+int 	wxAuiDefaultTabArt_ShowDropDown (TSelf(wxAuiDefaultTabArt) _obj, TClass(wxWindow) _wnd, TClass(wxAuiNotebookPageArray) _items, int activeIdx );
+int 	wxAuiDefaultTabArt_GetBestTabCtrlSize (TSelf(wxAuiDefaultTabArt) _obj, TClass(wxWindow) _wnd, TClass(wxAuiNotebookPageArray) _pages, TSize(_width,_height));
+
+/* wxAuiToolBarEvent */
+TClassDefExtend(wxAuiToolBarEvent, wxNotifyEvent)
+TBool 	wxAuiToolBarEvent_IsDropDownClicked (TSelf(wxAuiToolBarEvent) _obj );
+TClass(wxPoint) 	wxAuiToolBarEvent_GetClickPoint (TSelf(wxAuiToolBarEvent) _obj );
+TClass(wxRect) 	wxAuiToolBarEvent_GetItemRect (TSelf(wxAuiToolBarEvent) _obj );
+int 	wxAuiToolBarEvent_GetToolId (TSelf(wxAuiToolBarEvent) _obj );
+
+/* wxAuiToolBarItem */
+TClassDef(wxAuiToolBarItem)
+TClass(wxAuiToolBarItem)  wxAuiToolBarItem_CreateDefault();
+TClass(wxAuiToolBarItem)  wxAuiToolBarItem_Create(TClass(wxAuiToolBarItem) _c );
+TClass(wxAuiToolBarItem) wxAuiToolBarItem_Copy (TSelf(wxAuiToolBarItem) _obj, TClass(wxAuiToolBarItem) _c);
+void 	wxAuiToolBarItem_Assign (TSelf(wxAuiToolBarItem) _obj, TClass(wxAuiToolBarItem) _c );
+void 	wxAuiToolBarItem_SetWindow (TSelf(wxAuiToolBarItem) _obj, TClass(wxWindow) _w );
+TClass(wxWindow) 	wxAuiToolBarItem_GetWindow (TSelf(wxAuiToolBarItem) _obj );
+void 	wxAuiToolBarItem_SetId (TSelf(wxAuiToolBarItem) _obj, int new_id );
+int 	wxAuiToolBarItem_GetId (TSelf(wxAuiToolBarItem) _obj );
+void 	wxAuiToolBarItem_SetKind (TSelf(wxAuiToolBarItem) _obj, int new_kind );
+int 	wxAuiToolBarItem_GetKind (TSelf(wxAuiToolBarItem) _obj );
+void 	wxAuiToolBarItem_SetState (TSelf(wxAuiToolBarItem) _obj, int new_state );
+int 	wxAuiToolBarItem_GetState (TSelf(wxAuiToolBarItem) _obj );
+void 	wxAuiToolBarItem_SetSizerItem (TSelf(wxAuiToolBarItem) _obj, TClass(wxSizerItem) _s );
+TClass(wxSizerItem) 	wxAuiToolBarItem_GetSizerItem (TSelf(wxAuiToolBarItem) _obj );
+void 	wxAuiToolBarItem_SetLabel (TSelf(wxAuiToolBarItem) _obj, TClass(wxString) _s );
+TClass(wxString) 	wxAuiToolBarItem_GetLabel (TSelf(wxAuiToolBarItem) _obj );
+void 	wxAuiToolBarItem_SetBitmap (TSelf(wxAuiToolBarItem) _obj, TClass(wxBitmap) _bmp );
+void 	wxAuiToolBarItem_GetBitmap (TSelf(wxAuiToolBarItem) _obj, TClassRef(wxBitmap) _ref );
+void 	wxAuiToolBarItem_SetDisabledBitmap (TSelf(wxAuiToolBarItem) _obj, TClass(wxBitmap) _bmp );
+void 	wxAuiToolBarItem_GetDisabledBitmap (TSelf(wxAuiToolBarItem) _obj, TClassRef(wxBitmap) _ref );
+void 	wxAuiToolBarItem_SetHoverBitmap (TSelf(wxAuiToolBarItem) _obj, TClass(wxBitmap) _bmp );
+void 	wxAuiToolBarItem_GetHoverBitmap (TSelf(wxAuiToolBarItem) _obj, TClassRef(wxBitmap) _ref );
+void 	wxAuiToolBarItem_SetShortHelp (TSelf(wxAuiToolBarItem) _obj, TClass(wxString) _s );
+TClass(wxString) 	wxAuiToolBarItem_GetShortHelp (TSelf(wxAuiToolBarItem) _obj );
+void 	wxAuiToolBarItem_SetLongHelp (TSelf(wxAuiToolBarItem) _obj, TClass(wxString) _s );
+TClass(wxString) 	wxAuiToolBarItem_GetLongHelp (TSelf(wxAuiToolBarItem) _obj );
+void 	wxAuiToolBarItem_SetMinSize (TSelf(wxAuiToolBarItem) _obj, TSize(_width,_height));
+TClass(wxSize) 	wxAuiToolBarItem_GetMinSize (TSelf(wxAuiToolBarItem) _obj );
+void 	wxAuiToolBarItem_SetSpacerPixels (TSelf(wxAuiToolBarItem) _obj, int s );
+int 	wxAuiToolBarItem_GetSpacerPixels (TSelf(wxAuiToolBarItem) _obj );
+void 	wxAuiToolBarItem_SetProportion (TSelf(wxAuiToolBarItem) _obj, int p );
+int 	wxAuiToolBarItem_GetProportion (TSelf(wxAuiToolBarItem) _obj );
+void 	wxAuiToolBarItem_SetActive (TSelf(wxAuiToolBarItem) _obj, TBool b );
+TBool 	wxAuiToolBarItem_IsActive (TSelf(wxAuiToolBarItem) _obj );
+void 	wxAuiToolBarItem_SetHasDropDown (TSelf(wxAuiToolBarItem) _obj, TBool b );
+TBool 	wxAuiToolBarItem_HasDropDown (TSelf(wxAuiToolBarItem) _obj );
+void 	wxAuiToolBarItem_SetSticky (TSelf(wxAuiToolBarItem) _obj, TBool b );
+TBool 	wxAuiToolBarItem_IsSticky (TSelf(wxAuiToolBarItem) _obj );
+void 	wxAuiToolBarItem_SetUserData (TSelf(wxAuiToolBarItem) _obj, long l );
+long 	wxAuiToolBarItem_GetUserData (TSelf(wxAuiToolBarItem) _obj );
+void 	wxAuiToolBarItem_SetAlignment (TSelf(wxAuiToolBarItem) _obj, int l );
+int 	wxAuiToolBarItem_GetAlignment (TSelf(wxAuiToolBarItem) _obj );
+
+/* wxAuiToolBarArt */
+TClassDef(wxAuiToolBarArt)
+TClass(wxAuiToolBarArt) 	 wxAuiToolBarArt_Clone (TSelf(wxAuiToolBarArt) _obj );
+void 	 wxAuiToolBarArt_SetFlags (TSelf(wxAuiToolBarArt) _obj, int _flags );
+int 	 wxAuiToolBarArt_GetFlags (TSelf(wxAuiToolBarArt) _obj );
+void 	 wxAuiToolBarArt_SetFont (TSelf(wxAuiToolBarArt) _obj, TClass(wxFont) _font );
+TClass(wxFont) 	 wxAuiToolBarArt_GetFont (TSelf(wxAuiToolBarArt) _obj );
+void 	 wxAuiToolBarArt_SetTextOrientation (TSelf(wxAuiToolBarArt) _obj, int orientation );
+int 	 wxAuiToolBarArt_GetTextOrientation (TSelf(wxAuiToolBarArt) _obj );
+void 	 wxAuiToolBarArt_DrawBackground (TSelf(wxAuiToolBarArt) _obj, TClass(wxDC) _dc, TClass(wxWindow) _wnd, TClass(wxRect) _rect );
+void 	 wxAuiToolBarArt_DrawPlainBackground (TSelf(wxAuiToolBarArt) _obj, TClass(wxDC) _dc, TClass(wxWindow) _wnd, TClass(wxRect) _rect );
+void 	 wxAuiToolBarArt_DrawLabel (TSelf(wxAuiToolBarArt) _obj, TClass(wxDC) _dc, TClass(wxWindow) _wnd, TClass(wxAuiToolBarItem) _item, TClass(wxRect) _rect );
+void 	 wxAuiToolBarArt_DrawButton (TSelf(wxAuiToolBarArt) _obj, TClass(wxDC) _dc, TClass(wxWindow) _wnd, TClass(wxAuiToolBarItem) _item, TClass(wxRect) _rect );
+void 	 wxAuiToolBarArt_DrawDropDownButton (TSelf(wxAuiToolBarArt) _obj, TClass(wxDC) _dc, TClass(wxWindow) _wnd, TClass(wxAuiToolBarItem) _item, TClass(wxRect) _rect );
+void 	 wxAuiToolBarArt_DrawControlLabel (TSelf(wxAuiToolBarArt) _obj, TClass(wxDC) _dc, TClass(wxWindow) _wnd, TClass(wxAuiToolBarItem) _item, TClass(wxRect) _rect );
+void 	 wxAuiToolBarArt_DrawSeparator (TSelf(wxAuiToolBarArt) _obj, TClass(wxDC) _dc, TClass(wxWindow) _wnd, TClass(wxRect) _rect );
+void 	 wxAuiToolBarArt_DrawGripper (TSelf(wxAuiToolBarArt) _obj, TClass(wxDC) _dc, TClass(wxWindow) _wnd, TClass(wxRect) _rect );
+void 	 wxAuiToolBarArt_DrawOverflowButton (TSelf(wxAuiToolBarArt) _obj, TClass(wxDC) _dc, TClass(wxWindow) _wnd, TClass(wxRect) _rect, int state );
+TClass(wxSize) 	 wxAuiToolBarArt_GetLabelSize (TSelf(wxAuiToolBarArt) _obj, TClass(wxDC) _dc, TClass(wxWindow) _wnd, TClass(wxAuiToolBarItem) _item );
+TClass(wxSize) 	 wxAuiToolBarArt_GetToolSize (TSelf(wxAuiToolBarArt) _obj, TClass(wxDC) _dc, TClass(wxWindow) _wnd, TClass(wxAuiToolBarItem) _item );
+int 	 wxAuiToolBarArt_GetElementSize (TSelf(wxAuiToolBarArt) _obj, int element_id );
+void 	 wxAuiToolBarArt_SetElementSize (TSelf(wxAuiToolBarArt) _obj, int element_id, int size );
+int 	 wxAuiToolBarArt_ShowDropDown (TSelf(wxAuiToolBarArt) _obj, TClass(wxWindow) _wnd, TClass(wxAuiToolBarItemArray) _items );
+
+/* wxAuiDefaultToolBarArt */
+TClassDefExtend(wxAuiDefaultToolBarArt, wxAuiToolBarArt)
+TClass(wxAuiDefaultToolBarArt)  wxAuiDefaultToolBarArt_Create();
+TClass(wxAuiToolBarArt) 	 wxAuiDefaultToolBarArt_Clone (TSelf(wxAuiDefaultToolBarArt) _obj );
+void 	 wxAuiDefaultToolBarArt_SetFlags (TSelf(wxAuiDefaultToolBarArt) _obj, int _flags );
+int 	 wxAuiDefaultToolBarArt_GetFlags (TSelf(wxAuiDefaultToolBarArt) _obj );
+void 	 wxAuiDefaultToolBarArt_SetFont (TSelf(wxAuiDefaultToolBarArt) _obj, TClass(wxFont) _font );
+TClass(wxFont) 	 wxAuiDefaultToolBarArt_GetFont (TSelf(wxAuiDefaultToolBarArt) _obj );
+void 	 wxAuiDefaultToolBarArt_SetTextOrientation (TSelf(wxAuiDefaultToolBarArt) _obj, int orientation );
+int 	 wxAuiDefaultToolBarArt_GetTextOrientation (TSelf(wxAuiDefaultToolBarArt) _obj );
+void 	 wxAuiDefaultToolBarArt_DrawBackground (TSelf(wxAuiDefaultToolBarArt) _obj, TClass(wxDC) _dc, TClass(wxWindow) _wnd, TClass(wxRect) _rect );
+void 	 wxAuiDefaultToolBarArt_DrawPlainBackground (TSelf(wxAuiDefaultToolBarArt) _obj, TClass(wxDC) _dc, TClass(wxWindow) _wnd, TClass(wxRect) _rect );
+void 	 wxAuiDefaultToolBarArt_DrawLabel (TSelf(wxAuiDefaultToolBarArt) _obj, TClass(wxDC) _dc, TClass(wxWindow) _wnd, TClass(wxAuiToolBarItem) _item, TClass(wxRect) _rect );
+void 	 wxAuiDefaultToolBarArt_DrawButton (TSelf(wxAuiDefaultToolBarArt) _obj, TClass(wxDC) _dc, TClass(wxWindow) _wnd, TClass(wxAuiToolBarItem) _item, TClass(wxRect) _rect );
+void 	 wxAuiDefaultToolBarArt_DrawDropDownButton (TSelf(wxAuiDefaultToolBarArt) _obj, TClass(wxDC) _dc, TClass(wxWindow) _wnd, TClass(wxAuiToolBarItem) _item, TClass(wxRect) _rect );
+void 	 wxAuiDefaultToolBarArt_DrawControlLabel (TSelf(wxAuiDefaultToolBarArt) _obj, TClass(wxDC) _dc, TClass(wxWindow) _wnd, TClass(wxAuiToolBarItem) _item, TClass(wxRect) _rect );
+void 	 wxAuiDefaultToolBarArt_DrawSeparator (TSelf(wxAuiDefaultToolBarArt) _obj, TClass(wxDC) _dc, TClass(wxWindow) _wnd, TClass(wxRect) _rect );
+void 	 wxAuiDefaultToolBarArt_DrawGripper (TSelf(wxAuiDefaultToolBarArt) _obj, TClass(wxDC) _dc, TClass(wxWindow) _wnd, TClass(wxRect) _rect );
+void 	 wxAuiDefaultToolBarArt_DrawOverflowButton (TSelf(wxAuiDefaultToolBarArt) _obj, TClass(wxDC) _dc, TClass(wxWindow) _wnd, TClass(wxRect) _rect, int state );
+TClass(wxSize) 	 wxAuiDefaultToolBarArt_GetLabelSize (TSelf(wxAuiDefaultToolBarArt) _obj, TClass(wxDC) _dc, TClass(wxWindow) _wnd, TClass(wxAuiToolBarItem) _item );
+TClass(wxSize) 	 wxAuiDefaultToolBarArt_GetToolSize (TSelf(wxAuiDefaultToolBarArt) _obj, TClass(wxDC) _dc, TClass(wxWindow) _wnd, TClass(wxAuiToolBarItem) _item );
+int 	 wxAuiDefaultToolBarArt_GetElementSize (TSelf(wxAuiDefaultToolBarArt) _obj, int element );
+void 	 wxAuiDefaultToolBarArt_SetElementSize (TSelf(wxAuiDefaultToolBarArt) _obj, int element_id, int size );
+int 	 wxAuiDefaultToolBarArt_ShowDropDown (TSelf(wxAuiDefaultToolBarArt) _obj, TClass(wxWindow) _wnd, TClass(wxAuiToolBarItemArray) _items );
+
+/* wxAuiToolBar */
+TClassDefExtend(wxAuiToolBar, wxControl)
+TClass(wxAuiToolBar)  wxAuiToolBar_CreateDefault();
+TClass(wxAuiToolBar)  wxAuiToolBar_Create(TClass(wxWindow) _parent, int id, TPoint(x,y), TSize(_width,_height), long style );
+TBool 	 wxAuiToolBar_CreateFromDefault (TSelf(wxAuiToolBar) _obj, TClass(wxWindow) _parent, int id, TPoint(x,y), TSize(_width,_height), long style);
+void     wxAuiToolBar_Delete(TSelf(wxAuiToolBar) _obj );
+void 	 wxAuiToolBar_SetWindowStyleFlag (TSelf(wxAuiToolBar) _obj, long style );
+long 	 wxAuiToolBar_GetWindowStyleFlag (TSelf(wxAuiToolBar) _obj );
+void 	 wxAuiToolBar_SetArtProvider (TSelf(wxAuiToolBar) _obj, TClass(wxAuiToolBarArt) _art );
+TClass(wxAuiToolBarArt) 	 wxAuiToolBar_GetArtProvider (TSelf(wxAuiToolBar) _obj );
+TBool 	 wxAuiToolBar_SetFont (TSelf(wxAuiToolBar) _obj, TClass(wxFont) _font );
+TClass(wxAuiToolBarItem) 	 wxAuiToolBar_AddToolByLabel (TSelf(wxAuiToolBar) _obj, int tool_id, TClass(wxString) _label, TClass(wxBitmap) _bitmap, TClass(wxString) _short_help_string, int kind );
+TClass(wxAuiToolBarItem) 	 wxAuiToolBar_AddTool (TSelf(wxAuiToolBar) _obj, int tool_id, TClass(wxString) _label, TClass(wxBitmap) _bitmap, TClass(wxBitmap) _disabled_bitmap, int kind, TClass(wxString) _short_help_string, TClass(wxString) _long_help_string, TClass(wxObject) _client_data );
+TClass(wxAuiToolBarItem) 	 wxAuiToolBar_AddToolByBitmap (TSelf(wxAuiToolBar) _obj, int tool_id, TClass(wxBitmap) _bitmap, TClass(wxBitmap) _disabled_bitmap, TBool toggle, TClass(wxObject) _client_data, TClass(wxString) _short_help_string, TClass(wxString) _long_help_string );
+TClass(wxAuiToolBarItem) 	 wxAuiToolBar_AddLabel (TSelf(wxAuiToolBar) _obj, int tool_id, TClass(wxString) _label, int width );
+TClass(wxAuiToolBarItem) 	 wxAuiToolBar_AddControl (TSelf(wxAuiToolBar) _obj, TClass(wxControl) _control, TClass(wxString) _label );
+TClass(wxAuiToolBarItem) 	 wxAuiToolBar_AddSeparator (TSelf(wxAuiToolBar) _obj );
+TClass(wxAuiToolBarItem) 	 wxAuiToolBar_AddSpacer (TSelf(wxAuiToolBar) _obj, int pixels );
+TClass(wxAuiToolBarItem) 	 wxAuiToolBar_AddStretchSpacer (TSelf(wxAuiToolBar) _obj, int proportion );
+TBool 	 wxAuiToolBar_Realize (TSelf(wxAuiToolBar) _obj );
+TClass(wxControl) 	 wxAuiToolBar_FindControl (TSelf(wxAuiToolBar) _obj, int window_id );
+TClass(wxAuiToolBarItem) 	 wxAuiToolBar_FindToolByPosition (TSelf(wxAuiToolBar) _obj, int x, int y );
+TClass(wxAuiToolBarItem) 	 wxAuiToolBar_FindToolByIndex (TSelf(wxAuiToolBar) _obj, int idx );
+TClass(wxAuiToolBarItem) 	 wxAuiToolBar_FindTool (TSelf(wxAuiToolBar) _obj, int tool_id );
+void 	 wxAuiToolBar_ClearTools (TSelf(wxAuiToolBar) _obj );
+void 	 wxAuiToolBar_Clear (TSelf(wxAuiToolBar) _obj );
+TBool 	 wxAuiToolBar_DeleteTool (TSelf(wxAuiToolBar) _obj, int tool_id );
+TBool 	 wxAuiToolBar_DeleteByIndex (TSelf(wxAuiToolBar) _obj, int tool_id );
+size_t 	 wxAuiToolBar_GetToolCount (TSelf(wxAuiToolBar) _obj );
+int 	 wxAuiToolBar_GetToolPos (TSelf(wxAuiToolBar) _obj, int tool_id );
+int 	 wxAuiToolBar_GetToolIndex (TSelf(wxAuiToolBar) _obj, int tool_id );
+TBool 	 wxAuiToolBar_GetToolFits (TSelf(wxAuiToolBar) _obj, int tool_id );
+TClass(wxRect) 	 wxAuiToolBar_GetToolRect (TSelf(wxAuiToolBar) _obj, int tool_id );
+TBool 	 wxAuiToolBar_GetToolFitsByIndex (TSelf(wxAuiToolBar) _obj, int tool_id );
+TBool 	 wxAuiToolBar_GetToolBarFits (TSelf(wxAuiToolBar) _obj );
+void 	 wxAuiToolBar_SetMargins (TSelf(wxAuiToolBar) _obj, TSize(_width,_height));
+void 	 wxAuiToolBar_SetMarginsXY (TSelf(wxAuiToolBar) _obj, int x, int y );
+void 	 wxAuiToolBar_SetMarginsDetailed (TSelf(wxAuiToolBar) _obj, int left, int right, int top, int bottom );
+void 	 wxAuiToolBar_SetToolBitmapSize (TSelf(wxAuiToolBar) _obj, TSize(_width,_height));
+TClass(wxSize) 	 wxAuiToolBar_GetToolBitmapSize (TSelf(wxAuiToolBar) _obj );
+TBool 	 wxAuiToolBar_GetOverflowVisible (TSelf(wxAuiToolBar) _obj );
+void 	 wxAuiToolBar_SetOverflowVisible (TSelf(wxAuiToolBar) _obj, TBool visible );
+TBool 	 wxAuiToolBar_GetGripperVisible (TSelf(wxAuiToolBar) _obj );
+void 	 wxAuiToolBar_SetGripperVisible (TSelf(wxAuiToolBar) _obj, TBool visible );
+void 	 wxAuiToolBar_ToggleTool (TSelf(wxAuiToolBar) _obj, int tool_id, TBool state );
+TBool 	 wxAuiToolBar_GetToolToggled (TSelf(wxAuiToolBar) _obj, int tool_id );
+void 	 wxAuiToolBar_EnableTool (TSelf(wxAuiToolBar) _obj, int tool_id, TBool state );
+TBool 	 wxAuiToolBar_GetToolEnabled (TSelf(wxAuiToolBar) _obj, int tool_id );
+void 	 wxAuiToolBar_SetToolDropDown (TSelf(wxAuiToolBar) _obj, int tool_id, TBool dropdown );
+TBool 	 wxAuiToolBar_GetToolDropDown (TSelf(wxAuiToolBar) _obj, int tool_id );
+void 	 wxAuiToolBar_SetToolBorderPadding (TSelf(wxAuiToolBar) _obj, int padding );
+int 	 wxAuiToolBar_GetToolBorderPadding (TSelf(wxAuiToolBar) _obj );
+void 	 wxAuiToolBar_SetToolTextOrientation (TSelf(wxAuiToolBar) _obj, int orientation );
+int 	 wxAuiToolBar_GetToolTextOrientation (TSelf(wxAuiToolBar) _obj );
+void 	 wxAuiToolBar_SetToolPacking (TSelf(wxAuiToolBar) _obj, int packing );
+int 	 wxAuiToolBar_GetToolPacking (TSelf(wxAuiToolBar) _obj );
+void 	 wxAuiToolBar_SetToolProportion (TSelf(wxAuiToolBar) _obj, int tool_id, int proportion );
+int 	 wxAuiToolBar_GetToolProportion (TSelf(wxAuiToolBar) _obj, int tool_id );
+void 	 wxAuiToolBar_SetToolSeparation (TSelf(wxAuiToolBar) _obj, int separation );
+int 	 wxAuiToolBar_GetToolSeparation (TSelf(wxAuiToolBar) _obj );
+void 	 wxAuiToolBar_SetToolSticky (TSelf(wxAuiToolBar) _obj, int tool_id, TBool sticky );
+TBool 	 wxAuiToolBar_GetToolSticky (TSelf(wxAuiToolBar) _obj, int tool_id );
+TClass(wxString) 	 wxAuiToolBar_GetToolLabel (TSelf(wxAuiToolBar) _obj, int tool_id );
+void 	 wxAuiToolBar_SetToolLabel (TSelf(wxAuiToolBar) _obj, int tool_id, TClass(wxString) _label );
+void 	 wxAuiToolBar_GetToolBitmap (TSelf(wxAuiToolBar) _obj, int tool_id, TClassRef(wxBitmap) _bmp );
+void 	 wxAuiToolBar_SetToolBitmap (TSelf(wxAuiToolBar) _obj, int tool_id, TClass(wxBitmap) _bitmap );
+TClass(wxString) 	 wxAuiToolBar_GetToolShortHelp (TSelf(wxAuiToolBar) _obj, int tool_id );
+void 	 wxAuiToolBar_SetToolShortHelp (TSelf(wxAuiToolBar) _obj, int tool_id, TClass(wxString) _help_string );
+TClass(wxString) 	 wxAuiToolBar_GetToolLongHelp (TSelf(wxAuiToolBar) _obj, int tool_id );
+void 	 wxAuiToolBar_SetToolLongHelp (TSelf(wxAuiToolBar) _obj, int tool_id, TClass(wxString) _help_string );
+void 	 wxAuiToolBar_SetCustomOverflowItems (TSelf(wxAuiToolBar) _obj, TClass(wxAuiToolBarItemArray) _prepend, TClass(wxAuiToolBarItemArray) _append );
+TClass(wxSize) 	 wxAuiToolBar_GetHintSize (TSelf(wxAuiToolBar) _obj, int dock_direction);
+TBool 	 wxAuiToolBar_IsPaneValid (TSelf(wxAuiToolBar) _obj, TClass(wxAuiPaneInfo) _pane );
+
+/* wxAuiNotebook */
+TClassDefExtend(wxAuiNotebook, wxBookCtrlBase)
+TClass(wxAuiNotebook)   wxAuiNotebook_CreateDefault();
+TClass(wxAuiNotebook)   wxAuiNotebook_Create(TClass(wxWindow) _parent, int id, TPoint(x,y), TSize(_width,_height), long style );
+TBool 	 wxAuiNotebook_CreateFromDefault (TSelf(wxAuiNotebook) _obj, TClass(wxWindow) _parent, int id, TPoint(x,y), TSize(_width,_height), long style);
+TBool 	 wxAuiNotebook_AddPageWithBitmap (TSelf(wxAuiNotebook) _obj, TClass(wxWindow) _page, TClass(wxString) _caption, TBool select, TClass(wxBitmap) _bitmap);
+TBool 	 wxAuiNotebook_AddPage (TSelf(wxAuiNotebook) _obj, TClass(wxWindow) _page, TClass(wxString) _text, TBool select, int imageId);
+void 	 wxAuiNotebook_AdvanceSelection (TSelf(wxAuiNotebook) _obj, TBool forward);
+int 	 wxAuiNotebook_ChangeSelection (TSelf(wxAuiNotebook) _obj, size_t n);
+TBool 	 wxAuiNotebook_DeleteAllPages (TSelf(wxAuiNotebook) _obj );
+TBool 	 wxAuiNotebook_DeletePage (TSelf(wxAuiNotebook) _obj, size_t page );
+TClass(wxAuiTabArt) 	 wxAuiNotebook_GetArtProvider (TSelf(wxAuiNotebook) _obj );
+TClass(wxWindow) 	 wxAuiNotebook_GetCurrentPage (TSelf(wxAuiNotebook) _obj );
+int 	 wxAuiNotebook_GetHeightForPageHeight (TSelf(wxAuiNotebook) _obj, int pageHeight );
+TClass(wxWindow) 	 wxAuiNotebook_GetPage (TSelf(wxAuiNotebook) _obj, size_t page_idx );
+void                 wxAuiNotebook_GetPageBitmap (TSelf(wxAuiNotebook) _obj, size_t page, TClassRef(wxBitmap) bmp );
+size_t 	 wxAuiNotebook_GetPageCount (TSelf(wxAuiNotebook) _obj );
+int 	 wxAuiNotebook_GetPageIndex (TSelf(wxAuiNotebook) _obj, TClass(wxWindow) _page_wnd );
+TClass(wxString) 	 wxAuiNotebook_GetPageText (TSelf(wxAuiNotebook) _obj, size_t page );
+TClass(wxString) 	 wxAuiNotebook_GetPageToolTip (TSelf(wxAuiNotebook) _obj, size_t pageIdx );
+int 	 wxAuiNotebook_GetSelection (TSelf(wxAuiNotebook) _obj );
+int 	 wxAuiNotebook_GetTabCtrlHeight (TSelf(wxAuiNotebook) _obj );
+TBool 	 wxAuiNotebook_InsertPageWithBitmap (TSelf(wxAuiNotebook) _obj, size_t page_idx, TClass(wxWindow) _page, TClass(wxString) _caption, TBool select, TClass(wxBitmap) _bitmap );
+TBool 	 wxAuiNotebook_InsertPage (TSelf(wxAuiNotebook) _obj, size_t index, TClass(wxWindow) _page, TClass(wxString) _text, TBool select, int imageId );
+TBool 	 wxAuiNotebook_RemovePage (TSelf(wxAuiNotebook) _obj, size_t page );
+void 	 wxAuiNotebook_SetArtProvider (TSelf(wxAuiNotebook) _obj, TClass(wxAuiTabArt) _art );
+TBool 	 wxAuiNotebook_SetFont (TSelf(wxAuiNotebook) _obj, TClass(wxFont) _font );
+void 	 wxAuiNotebook_SetMeasuringFont (TSelf(wxAuiNotebook) _obj, TClass(wxFont) _font );
+void 	 wxAuiNotebook_SetNormalFont (TSelf(wxAuiNotebook) _obj, TClass(wxFont) _font );
+TBool 	 wxAuiNotebook_SetPageBitmap (TSelf(wxAuiNotebook) _obj, size_t page, TClass(wxBitmap) _bitmap );
+TBool 	 wxAuiNotebook_SetPageImage (TSelf(wxAuiNotebook) _obj, size_t n, int imageId );
+TBool 	 wxAuiNotebook_SetPageText (TSelf(wxAuiNotebook) _obj, size_t page, TClass(wxString) _text );
+TBool 	 wxAuiNotebook_SetPageToolTip (TSelf(wxAuiNotebook) _obj, size_t page, TClass(wxString) _text );
+void 	 wxAuiNotebook_SetSelectedFont (TSelf(wxAuiNotebook) _obj, TClass(wxFont) _font );
+size_t 	 wxAuiNotebook_SetSelection (TSelf(wxAuiNotebook) _obj, size_t new_page );
+void 	 wxAuiNotebook_SetTabCtrlHeight (TSelf(wxAuiNotebook) _obj, int height );
+TBool 	 wxAuiNotebook_ShowWindowMenu (TSelf(wxAuiNotebook) _obj );
+void 	 wxAuiNotebook_SetUniformBitmapSize (TSelf(wxAuiNotebook) _obj, TSize(_width,_height));
+void 	 wxAuiNotebook_Split (TSelf(wxAuiNotebook) _obj, size_t page, int direction );
+
+/* wxAuiTabContainerButton */
+TClassDef(wxAuiTabContainerButton)
+int 	wxAuiTabContainerButton_Id(TSelf(wxAuiTabContainerButton) _obj );
+int 	wxAuiTabContainerButton_CurState(TSelf(wxAuiTabContainerButton) _obj );
+int 	wxAuiTabContainerButton_Location(TSelf(wxAuiTabContainerButton) _obj );
+void 	wxAuiTabContainerButton_Bitmap(TSelf(wxAuiTabContainerButton) _obj, TClassRef(wxBitmap) _bmp );
+void 	wxAuiTabContainerButton_DisBitmap(TSelf(wxAuiTabContainerButton) _obj, TClassRef(wxBitmap) _bmp );
+TClass(wxRect) 	wxAuiTabContainerButton_Rect(TSelf(wxAuiTabContainerButton) _obj );
+
+
+/* wxAuiTabContainer */
+TClassDef(wxAuiTabContainer)
+TClass(wxAuiTabContainer)  wxAuiTabContainer_Create();
+void 	 wxAuiTabContainer_SetArtProvider (TSelf(wxAuiTabContainer) _obj, TClass(wxAuiTabArt) _art );
+TClass(wxAuiTabArt) 	 wxAuiTabContainer_GetArtProvider (TSelf(wxAuiTabContainer) _obj );
+void 	 wxAuiTabContainer_SetFlags (TSelf(wxAuiTabContainer) _obj, int _flags );
+int 	 wxAuiTabContainer_GetFlags (TSelf(wxAuiTabContainer) _obj );
+TBool 	 wxAuiTabContainer_AddPage (TSelf(wxAuiTabContainer) _obj, TClass(wxWindow) _page, TClass(wxAuiNotebookPage) _info );
+TBool 	 wxAuiTabContainer_InsertPage (TSelf(wxAuiTabContainer) _obj, TClass(wxWindow) _page, TClass(wxAuiNotebookPage) _info, size_t idx );
+TBool 	 wxAuiTabContainer_MovePage (TSelf(wxAuiTabContainer) _obj, TClass(wxWindow) _page, size_t newIdx );
+TBool 	 wxAuiTabContainer_RemovePage (TSelf(wxAuiTabContainer) _obj, TClass(wxWindow) _page );
+TBool 	 wxAuiTabContainer_SetActivePageByWindow (TSelf(wxAuiTabContainer) _obj, TClass(wxWindow) _page );
+TBool 	 wxAuiTabContainer_SetActivePage (TSelf(wxAuiTabContainer) _obj, size_t page );
+void 	 wxAuiTabContainer_SetNoneActive (TSelf(wxAuiTabContainer) _obj );
+int 	 wxAuiTabContainer_GetActivePage (TSelf(wxAuiTabContainer) _obj );
+//TBool 	 wxAuiTabContainer_TabHitTest (TSelf(wxAuiTabContainer) _obj, int x, int y, TClassRef(wxWindow) _hit );
+//TBool 	 wxAuiTabContainer_ButtonHitTest (TSelf(wxAuiTabContainer) _obj, int x, int y, TClassRef(wxAuiTabContainerButton) _hit );
+TClass(wxWindow) 	 wxAuiTabContainer_GetWindowFromIdx (TSelf(wxAuiTabContainer) _obj, size_t idx );
+int 	 wxAuiTabContainer_GetIdxFromWindow (TSelf(wxAuiTabContainer) _obj, TClass(wxWindow) _page );
+size_t 	 wxAuiTabContainer_GetPageCount (TSelf(wxAuiTabContainer) _obj );
+TClass(wxAuiNotebookPage) 	 wxAuiTabContainer_GetPage (TSelf(wxAuiTabContainer) _obj, size_t idx );
+TClass(wxAuiNotebookPageArray) 	 wxAuiTabContainer_GetPages (TSelf(wxAuiTabContainer) _obj);
+void 	 wxAuiTabContainer_SetNormalFont (TSelf(wxAuiTabContainer) _obj, TClass(wxFont) _normalFont );
+void 	 wxAuiTabContainer_SetSelectedFont (TSelf(wxAuiTabContainer) _obj, TClass(wxFont) _selectedFont );
+void 	 wxAuiTabContainer_SetMeasuringFont (TSelf(wxAuiTabContainer) _obj, TClass(wxFont) _measuringFont );
+void 	 wxAuiTabContainer_SetColour (TSelf(wxAuiTabContainer) _obj, TClass(wxColour) _colour );
+void 	 wxAuiTabContainer_SetActiveColour (TSelf(wxAuiTabContainer) _obj, TClass(wxColour) _colour );
+void 	 wxAuiTabContainer_DoShowHide (TSelf(wxAuiTabContainer) _obj );
+void 	 wxAuiTabContainer_SetRect (TSelf(wxAuiTabContainer) _obj, TClass(wxRect) _rect );
+void 	 wxAuiTabContainer_RemoveButton (TSelf(wxAuiTabContainer) _obj, int id );
+void 	 wxAuiTabContainer_AddButton (TSelf(wxAuiTabContainer) _obj, int id, int location, TClass(wxBitmap) _normalBitmap, TClass(wxBitmap) _disabledBitmap );
+size_t 	 wxAuiTabContainer_GetTabOffset (TSelf(wxAuiTabContainer) _obj );
+void 	 wxAuiTabContainer_SetTabOffset (TSelf(wxAuiTabContainer) _obj, size_t offset );
+TBool 	 wxAuiTabContainer_IsTabVisible (TSelf(wxAuiTabContainer) _obj, int tabPage, int tabOffset, TClass(wxDC) _dc, TClass(wxWindow) _wnd );
+void 	 wxAuiTabContainer_MakeTabVisible (TSelf(wxAuiTabContainer) _obj, int tabPage, TClass(wxWindow) _win );
+
+/* wxAuiTabCtrl */
+TClassDefExtend(wxAuiTabCtrl, wxControl)
+void 	 wxAuiTabCtrl_SetArtProvider (TSelf(wxAuiTabCtrl) _obj, TClass(wxAuiTabArt) _art );
+TClass(wxAuiTabArt) 	 wxAuiTabCtrl_GetArtProvider (TSelf(wxAuiTabCtrl) _obj );
+void 	 wxAuiTabCtrl_SetFlags (TSelf(wxAuiTabCtrl) _obj, int _flags );
+int 	 wxAuiTabCtrl_GetFlags (TSelf(wxAuiTabCtrl) _obj );
+TBool 	 wxAuiTabCtrl_AddPage (TSelf(wxAuiTabCtrl) _obj, TClass(wxWindow) _page, TClass(wxAuiNotebookPage) _info );
+TBool 	 wxAuiTabCtrl_InsertPage (TSelf(wxAuiTabCtrl) _obj, TClass(wxWindow) _page, TClass(wxAuiNotebookPage) _info, size_t idx );
+TBool 	 wxAuiTabCtrl_MovePage (TSelf(wxAuiTabCtrl) _obj, TClass(wxWindow) _page, size_t newIdx );
+TBool 	 wxAuiTabCtrl_RemovePage (TSelf(wxAuiTabCtrl) _obj, TClass(wxWindow) _page );
+TBool 	 wxAuiTabCtrl_SetActivePageByWindow (TSelf(wxAuiTabCtrl) _obj, TClass(wxWindow) _page );
+TBool 	 wxAuiTabCtrl_SetActivePage (TSelf(wxAuiTabCtrl) _obj, size_t page );
+void 	 wxAuiTabCtrl_SetNoneActive (TSelf(wxAuiTabCtrl) _obj );
+int 	 wxAuiTabCtrl_GetActivePage (TSelf(wxAuiTabCtrl) _obj );
+//TBool 	 wxAuiTabCtrl_TabHitTest (TSelf(wxAuiTabCtrl) _obj, int x, int y, TClassRef(wxWindow) _hit );
+//TBool 	 wxAuiTabCtrl_ButtonHitTest (TSelf(wxAuiTabCtrl) _obj, int x, int y, TClassRef(wxAuiTabCtrlButton) _hit );
+TClass(wxWindow) 	 wxAuiTabCtrl_GetWindowFromIdx (TSelf(wxAuiTabCtrl) _obj, size_t idx );
+int 	 wxAuiTabCtrl_GetIdxFromWindow (TSelf(wxAuiTabCtrl) _obj, TClass(wxWindow) _page );
+size_t 	 wxAuiTabCtrl_GetPageCount (TSelf(wxAuiTabCtrl) _obj );
+TClass(wxAuiNotebookPage) 	 wxAuiTabCtrl_GetPage (TSelf(wxAuiTabCtrl) _obj, size_t idx );
+TClass(wxAuiNotebookPageArray) 	 wxAuiTabCtrl_GetPages (TSelf(wxAuiTabCtrl) _obj);
+void 	 wxAuiTabCtrl_SetNormalFont (TSelf(wxAuiTabCtrl) _obj, TClass(wxFont) _normalFont );
+void 	 wxAuiTabCtrl_SetSelectedFont (TSelf(wxAuiTabCtrl) _obj, TClass(wxFont) _selectedFont );
+void 	 wxAuiTabCtrl_SetMeasuringFont (TSelf(wxAuiTabCtrl) _obj, TClass(wxFont) _measuringFont );
+void 	 wxAuiTabCtrl_SetColour (TSelf(wxAuiTabCtrl) _obj, TClass(wxColour) _colour );
+void 	 wxAuiTabCtrl_SetActiveColour (TSelf(wxAuiTabCtrl) _obj, TClass(wxColour) _colour );
+void 	 wxAuiTabCtrl_DoShowHide (TSelf(wxAuiTabCtrl) _obj );
+void 	 wxAuiTabCtrl_SetRect (TSelf(wxAuiTabCtrl) _obj, TClass(wxRect) _rect );
+void 	 wxAuiTabCtrl_RemoveButton (TSelf(wxAuiTabCtrl) _obj, int id );
+void 	 wxAuiTabCtrl_AddButton (TSelf(wxAuiTabCtrl) _obj, int id, int location, TClass(wxBitmap) _normalBitmap, TClass(wxBitmap) _disabledBitmap );
+size_t 	 wxAuiTabCtrl_GetTabOffset (TSelf(wxAuiTabCtrl) _obj );
+void 	 wxAuiTabCtrl_SetTabOffset (TSelf(wxAuiTabCtrl) _obj, size_t offset );
+TBool 	 wxAuiTabCtrl_IsTabVisible (TSelf(wxAuiTabCtrl) _obj, int tabPage, int tabOffset, TClass(wxDC) _dc, TClass(wxWindow) _wnd );
+void 	 wxAuiTabCtrl_MakeTabVisible (TSelf(wxAuiTabCtrl) _obj, int tabPage, TClass(wxWindow) _win );
+
+
+/* wxAuiTabArt */
+TClassDef(wxAuiTabArt)
+TClass(wxAuiTabArt) 	 wxAuiTabArt_Clone (TSelf(wxAuiTabArt) _obj );
+void 	 wxAuiTabArt_DrawBackground (TSelf(wxAuiTabArt) _obj, TClass(wxDC) _dc, TClass(wxWindow) _wnd, TClass(wxRect) _rect );
+void 	 wxAuiTabArt_DrawButton (TSelf(wxAuiTabArt) _obj, TClass(wxDC) _dc, TClass(wxWindow) _wnd, TClass(wxRect) _in_rect, int bitmap_id, int button_state, int orientation, TClass(wxRect) _out_rect );
+void 	 wxAuiTabArt_DrawTab (TSelf(wxAuiTabArt) _obj, TClass(wxDC) _dc, TClass(wxWindow) _wnd, TClass(wxAuiNotebookPage) _page, TClass(wxRect) _rect, int close_button_state, TClass(wxRect) _out_tab_rect, TClass(wxRect) _out_button_rect, int *x_extent );
+int 	 wxAuiTabArt_GetBestTabCtrlSize (TSelf(wxAuiTabArt) _obj, TClass(wxWindow) _wnd, TClass(wxAuiNotebookPageArray) _pages, TSize(_width,_height));
+int 	 wxAuiTabArt_GetIndentSize (TSelf(wxAuiTabArt) _obj );
+TClass(wxSize) 	 wxAuiTabArt_GetTabSize (TSelf(wxAuiTabArt) _obj, TClass(wxDC) _dc, TClass(wxWindow) _wnd, TClass(wxString) _caption, TClass(wxBitmap) _bitmap, TBool active, int close_button_state, int *x_extent );
+void 	 wxAuiTabArt_SetFlags (TSelf(wxAuiTabArt) _obj, int _flags );
+void 	 wxAuiTabArt_SetMeasuringFont (TSelf(wxAuiTabArt) _obj, TClass(wxFont) _font );
+void 	 wxAuiTabArt_SetNormalFont (TSelf(wxAuiTabArt) _obj, TClass(wxFont) _font );
+void 	 wxAuiTabArt_SetSelectedFont (TSelf(wxAuiTabArt) _obj, TClass(wxFont) _font );
+void 	 wxAuiTabArt_SetColour (TSelf(wxAuiTabArt) _obj, TClass(wxColour) _colour );
+void 	 wxAuiTabArt_SetActiveColour (TSelf(wxAuiTabArt) _obj, TClass(wxColour) _colour );
+void 	 wxAuiTabArt_SetSizingInfo (TSelf(wxAuiTabArt) _obj, TSize(_width,_height), size_t tab_count );
+
+/* wxAuiSimpleTabArt */
+TClassDefExtend(wxAuiSimpleTabArt, wxAuiTabArt)
+TClass(wxAuiSimpleTabArt)  wxAuiSimpleTabArt_Create();
+TClass(wxAuiTabArt) 	 wxAuiSimpleTabArt_Clone (TSelf(wxAuiSimpleTabArt) _obj );
+void 	 wxAuiSimpleTabArt_SetFlags (TSelf(wxAuiSimpleTabArt) _obj, int _flags );
+void 	 wxAuiSimpleTabArt_SetSizingInfo (TSelf(wxAuiSimpleTabArt) _obj, TSize(_width,_height), size_t tabCount );
+void 	 wxAuiSimpleTabArt_SetNormalFont (TSelf(wxAuiSimpleTabArt) _obj, TClass(wxFont) _font );
+void 	 wxAuiSimpleTabArt_SetSelectedFont (TSelf(wxAuiSimpleTabArt) _obj, TClass(wxFont) _font );
+void 	 wxAuiSimpleTabArt_SetMeasuringFont (TSelf(wxAuiSimpleTabArt) _obj, TClass(wxFont) _font );
+void 	 wxAuiSimpleTabArt_SetColour (TSelf(wxAuiSimpleTabArt) _obj, TClass(wxColour) _colour );
+void 	 wxAuiSimpleTabArt_SetActiveColour (TSelf(wxAuiSimpleTabArt) _obj, TClass(wxColour) _colour );
+void 	 wxAuiSimpleTabArt_DrawBackground (TSelf(wxAuiSimpleTabArt) _obj, TClass(wxDC) _dc, TClass(wxWindow) _wnd, TClass(wxRect) _rect );
+void 	 wxAuiSimpleTabArt_DrawTab (TSelf(wxAuiSimpleTabArt) _obj, TClass(wxDC) _dc, TClass(wxWindow) _wnd, TClass(wxAuiNotebookPage) _pane, TClass(wxRect) _inRect, int closeButtonState, TClass(wxRect) _outTabRect, TClass(wxRect) _outButtonRect, int *xExtent );
+void 	 wxAuiSimpleTabArt_DrawButton (TSelf(wxAuiSimpleTabArt) _obj, TClass(wxDC) _dc, TClass(wxWindow) _wnd, TClass(wxRect) _inRect, int bitmapId, int buttonState, int orientation, TClass(wxRect) _outRect );
+int 	 wxAuiSimpleTabArt_GetIndentSize (TSelf(wxAuiSimpleTabArt) _obj );
+TClass(wxSize) 	 wxAuiSimpleTabArt_GetTabSize (TSelf(wxAuiSimpleTabArt) _obj, TClass(wxDC) _dc, TClass(wxWindow) _wnd, TClass(wxString) _caption, TClass(wxBitmap) _bitmap, TBool active, int closeButtonState, int *xExtent );
+int 	 wxAuiSimpleTabArt_ShowDropDown (TSelf(wxAuiSimpleTabArt) _obj, TClass(wxWindow) _wnd, TClass(wxAuiNotebookPageArray) _items, int activeIdx );
+int 	 wxAuiSimpleTabArt_GetBestTabCtrlSize (TSelf(wxAuiSimpleTabArt) _obj, TClass(wxWindow) _wnd, TClass(wxAuiNotebookPageArray) _pages, TSize(_width,_height));
+
+
+/* wxAuiManager - public member */
+TClassDefExtend(wxAuiManager,wxEvtHandler)
+TClass(wxAuiManager) wxAuiManager_Create(TClass(wxWindow) _managed_wnd, int _flags);
+void       wxAuiManager_Delete( TSelf(wxAuiManager) _obj );
+TBool      wxAuiManager_DetachPane(TSelf(wxAuiManager) _obj, TClass(wxWindow) _window);
+TClass(wxAuiPaneInfoArray)  wxAuiManager_GetAllPanes(TSelf(wxAuiManager) _obj);
+TClass(wxAuiDockArt) wxAuiManager_GetArtProvider(TSelf(wxAuiManager) _obj);
+void       wxAuiManager_GetDockSizeConstraint(TSelf(wxAuiManager) _obj, double* _widthpct, double* _heightpct);
+int    wxAuiManager_GetFlags(TSelf(wxAuiManager) _obj);
+TClass(wxWindow) wxAuiManager_GetManagedWindow(TSelf(wxAuiManager) _obj);
+void       wxAuiManager_HideHint(TSelf(wxAuiManager) _obj);
+TBool      wxAuiManager_InsertPane(TSelf(wxAuiManager) _obj, TClass(wxWindow) _window, TClass(wxAuiPaneInfo) _insert_location, int _insert_level);
+void       wxAuiManager_LoadPaneInfo(TSelf(wxAuiManager) _obj, TClass(wxString) _pane_part, TClass(wxAuiPaneInfo) _pane);
+TBool      wxAuiManager_LoadPerspective(TSelf(wxAuiManager) _obj, TClass(wxString) _perspective, TBool update);
+TClass(wxString) wxAuiManager_SavePaneInfo(TSelf(wxAuiManager) _obj, TClass(wxAuiPaneInfo) _pane);
+TClass(wxString) wxAuiManager_SavePerspective(TSelf(wxAuiManager) _obj);
+void       wxAuiManager_SetArtProvider(TSelf(wxAuiManager) _obj, TClass(wxAuiDockArt) _art_provider);
+void       wxAuiManager_SetDockSizeConstraint(TSelf(wxAuiManager) _obj, double widthpct, double heightpct);
+void       wxAuiManager_SetFlags(TSelf(wxAuiManager) _obj, int flags);
+void       wxAuiManager_SetManagedWindow(TSelf(wxAuiManager) _obj, TClass(wxWindow) _managed_wnd);
+void       wxAuiManager_ShowHint(TSelf(wxAuiManager) _obj, TClass(wxRect) _rect);
+void       wxAuiManager_UnInit(TSelf(wxAuiManager) _obj);
+void       wxAuiManager_Update(TSelf(wxAuiManager) _obj);
+TBool     wxAuiManager_AddPane(TSelf(wxAuiManager) _obj, TClass(wxWindow) _window, int _direction, TClass(wxString) _caption);
+TBool     wxAuiManager_AddPaneByPaneInfo(TSelf(wxAuiManager) _obj, TClass(wxWindow) _window, TClass(wxAuiPaneInfo) _pane_info);
+TBool     wxAuiManager_AddPaneByPaneInfoAndDropPosition(TSelf(wxAuiManager) _obj, TClass(wxWindow) _window, TClass(wxAuiPaneInfo) _pane_info, TPoint(x,y));
+TClass(wxAuiPaneInfo)      wxAuiManager_GetPaneByWindow(TSelf(wxAuiManager) _obj, TClass(wxWindow) _window);
+TClass(wxAuiPaneInfo)      wxAuiManager_GetPaneByName(TSelf(wxAuiManager) _obj, TClass(wxString) _name);
+TClass(wxAuiManager)  wxAuiManager_GetManager(TClass(wxWindow) _window);
+
+/* wxAuiDockArt */
+TClassDef(wxAuiDockArt)
+void wxAuiDockArt_DrawBackground(TSelf(wxAuiDockArt) _obj, TClass(wxDC) _dc, TClass(wxWindow) _window, int orientation, TClass(wxRect) _rect);
+void wxAuiDockArt_DrawBorder(TSelf(wxAuiDockArt) _obj, TClass(wxDC) _dc, TClass(wxWindow) _window, TClass(wxRect) _rect, TClass(wxAuiPaneInfo) _pane);
+void wxAuiDockArt_DrawCaption(TSelf(wxAuiDockArt) _obj, TClass(wxDC) _dc, TClass(wxWindow) _window, TClass(wxString) _text, TClass(wxRect) _rect, TClass(wxAuiPaneInfo) _pane);
+void wxAuiDockArt_DrawGripper(TSelf(wxAuiDockArt) _obj, TClass(wxDC) _dc, TClass(wxWindow) _window, TClass(wxRect) _rect, TClass(wxAuiPaneInfo) _pane);
+void wxAuiDockArt_DrawPaneButton(TSelf(wxAuiDockArt) _obj, TClass(wxDC) _dc, TClass(wxWindow) _window, int button, int button_state, TClass(wxRect) _rect, TClass(wxAuiPaneInfo) _pane);
+void wxAuiDockArt_DrawSash(TSelf(wxAuiDockArt) _obj, TClass(wxDC) _dc, TClass(wxWindow) _window, int orientation, TClass(wxRect) _rect);
+TClass(wxColour) wxAuiDockArt_GetColour(TSelf(wxAuiDockArt) _obj, int id);
+TClass(wxFont) wxAuiDockArt_GetFont(TSelf(wxAuiDockArt) _obj, int id);
+int wxAuiDockArt_GetMetric(TSelf(wxAuiDockArt) _obj, int id);
+void wxAuiDockArt_SetColour(TSelf(wxAuiDockArt) _obj, int id, TClass(wxColour) _colour);
+void wxAuiDockArt_SetFont(TSelf(wxAuiDockArt) _obj, int id, TClass(wxFont) _font);
+void wxAuiDockArt_SetMetric(TSelf(wxAuiDockArt) _obj, int id, int new_val);
+
+/* wxAuiPaneInfo */
+TClassDef(wxAuiPaneInfo)
+TClass(wxAuiPaneInfo)    wxAuiPaneInfo_CreateDefault();
+TClass(wxAuiPaneInfo)    wxAuiPaneInfo_Create(TClass(wxAuiPaneInfo) _c );
+TClass(wxAuiPaneInfo) 	 wxAuiPaneInfo_Bottom (TSelf(wxAuiPaneInfo) _obj);
+TClass(wxAuiPaneInfo) 	 wxAuiPaneInfo_BottomDockable (TSelf(wxAuiPaneInfo) _obj, TBool b);
+TClass(wxAuiPaneInfo) 	 wxAuiPaneInfo_Caption (TSelf(wxAuiPaneInfo) _obj, TClass(wxString) _c);
+TClass(wxAuiPaneInfo) 	 wxAuiPaneInfo_CaptionVisible (TSelf(wxAuiPaneInfo) _obj, TBool visible);
+TClass(wxAuiPaneInfo) 	 wxAuiPaneInfo_CloseButton (TSelf(wxAuiPaneInfo) _obj, TBool visible);
+TClass(wxAuiPaneInfo) 	 wxAuiPaneInfo_DefaultPane (TSelf(wxAuiPaneInfo) _obj);
+TClass(wxAuiPaneInfo) 	 wxAuiPaneInfo_DestroyOnClose (TSelf(wxAuiPaneInfo) _obj, TBool b);
+TClass(wxAuiPaneInfo) 	 wxAuiPaneInfo_Direction (TSelf(wxAuiPaneInfo) _obj, int direction);
+TClass(wxAuiPaneInfo) 	 wxAuiPaneInfo_Dock (TSelf(wxAuiPaneInfo) _obj);
+TClass(wxAuiPaneInfo) 	 wxAuiPaneInfo_DockFixed (TSelf(wxAuiPaneInfo) _obj, TBool b);
+TClass(wxAuiPaneInfo) 	 wxAuiPaneInfo_Dockable (TSelf(wxAuiPaneInfo) _obj, TBool b);
+TClass(wxAuiPaneInfo) 	 wxAuiPaneInfo_Fixed (TSelf(wxAuiPaneInfo) _obj);
+TClass(wxAuiPaneInfo) 	 wxAuiPaneInfo_Float (TSelf(wxAuiPaneInfo) _obj);
+TClass(wxAuiPaneInfo) 	 wxAuiPaneInfo_Floatable (TSelf(wxAuiPaneInfo) _obj, TBool b);
+TClass(wxAuiPaneInfo) 	 wxAuiPaneInfo_Gripper (TSelf(wxAuiPaneInfo) _obj, TBool visible);
+TClass(wxAuiPaneInfo) 	 wxAuiPaneInfo_GripperTop (TSelf(wxAuiPaneInfo) _obj, TBool attop);
+TBool 	 wxAuiPaneInfo_HasBorder (TSelf(wxAuiPaneInfo) _obj );
+TBool 	 wxAuiPaneInfo_HasCaption (TSelf(wxAuiPaneInfo) _obj );
+TBool 	 wxAuiPaneInfo_HasCloseButton (TSelf(wxAuiPaneInfo) _obj );
+TBool 	 wxAuiPaneInfo_HasFlag (TSelf(wxAuiPaneInfo) _obj, int flag );
+TBool 	 wxAuiPaneInfo_HasGripper (TSelf(wxAuiPaneInfo) _obj );
+TBool 	 wxAuiPaneInfo_HasGripperTop (TSelf(wxAuiPaneInfo) _obj );
+TBool 	 wxAuiPaneInfo_HasMaximizeButton (TSelf(wxAuiPaneInfo) _obj );
+TBool 	 wxAuiPaneInfo_HasMinimizeButton (TSelf(wxAuiPaneInfo) _obj );
+TBool 	 wxAuiPaneInfo_HasPinButton (TSelf(wxAuiPaneInfo) _obj );
+TClass(wxAuiPaneInfo) 	 wxAuiPaneInfo_Hide (TSelf(wxAuiPaneInfo) _obj);
+TClass(wxAuiPaneInfo) 	 wxAuiPaneInfo_Icon (TSelf(wxAuiPaneInfo) _obj, TClass(wxBitmap) _b);
+TBool 	 wxAuiPaneInfo_IsBottomDockable (TSelf(wxAuiPaneInfo) _obj );
+TBool 	 wxAuiPaneInfo_IsDockable (TSelf(wxAuiPaneInfo) _obj );
+TBool 	 wxAuiPaneInfo_IsDocked (TSelf(wxAuiPaneInfo) _obj );
+TBool 	 wxAuiPaneInfo_IsFixed (TSelf(wxAuiPaneInfo) _obj );
+TBool 	 wxAuiPaneInfo_IsFloatable (TSelf(wxAuiPaneInfo) _obj );
+TBool 	 wxAuiPaneInfo_IsFloating (TSelf(wxAuiPaneInfo) _obj );
+TBool 	 wxAuiPaneInfo_IsLeftDockable (TSelf(wxAuiPaneInfo) _obj );
+TBool 	 wxAuiPaneInfo_IsMovable (TSelf(wxAuiPaneInfo) _obj );
+TBool 	 wxAuiPaneInfo_IsOk (TSelf(wxAuiPaneInfo) _obj );
+TBool 	 wxAuiPaneInfo_IsResizable (TSelf(wxAuiPaneInfo) _obj );
+TBool 	 wxAuiPaneInfo_IsRightDockable (TSelf(wxAuiPaneInfo) _obj );
+TBool 	 wxAuiPaneInfo_IsShown (TSelf(wxAuiPaneInfo) _obj );
+TBool 	 wxAuiPaneInfo_IsToolbar (TSelf(wxAuiPaneInfo) _obj );
+TBool 	 wxAuiPaneInfo_IsTopDockable (TSelf(wxAuiPaneInfo) _obj );
+TClass(wxAuiPaneInfo) 	 wxAuiPaneInfo_Layer (TSelf(wxAuiPaneInfo) _obj, int layer);
+TClass(wxAuiPaneInfo) 	 wxAuiPaneInfo_Left (TSelf(wxAuiPaneInfo) _obj);
+TClass(wxAuiPaneInfo) 	 wxAuiPaneInfo_LeftDockable (TSelf(wxAuiPaneInfo) _obj, TBool b);
+TClass(wxAuiPaneInfo) 	 wxAuiPaneInfo_MaximizeButton (TSelf(wxAuiPaneInfo) _obj, TBool visible);
+TClass(wxAuiPaneInfo) 	 wxAuiPaneInfo_MinimizeButton (TSelf(wxAuiPaneInfo) _obj, TBool visible);
+TClass(wxAuiPaneInfo) 	 wxAuiPaneInfo_Movable (TSelf(wxAuiPaneInfo) _obj, TBool b);
+TClass(wxAuiPaneInfo) 	 wxAuiPaneInfo_Name (TSelf(wxAuiPaneInfo) _obj, TClass(wxString) _n);
+TClass(wxAuiPaneInfo) 	 wxAuiPaneInfo_PaneBorder (TSelf(wxAuiPaneInfo) _obj, TBool visible);
+TClass(wxAuiPaneInfo) 	 wxAuiPaneInfo_PinButton (TSelf(wxAuiPaneInfo) _obj, TBool visible);
+TClass(wxAuiPaneInfo) 	 wxAuiPaneInfo_Position (TSelf(wxAuiPaneInfo) _obj, int pos);
+TClass(wxAuiPaneInfo) 	 wxAuiPaneInfo_Resizable (TSelf(wxAuiPaneInfo) _obj, TBool resizable);
+TClass(wxAuiPaneInfo) 	 wxAuiPaneInfo_Right (TSelf(wxAuiPaneInfo) _obj);
+TClass(wxAuiPaneInfo) 	 wxAuiPaneInfo_RightDockable (TSelf(wxAuiPaneInfo) _obj, TBool b);
+TClass(wxAuiPaneInfo) 	 wxAuiPaneInfo_Row (TSelf(wxAuiPaneInfo) _obj, int row);
+void 	 wxAuiPaneInfo_SafeSet (TSelf(wxAuiPaneInfo) _obj, TClass(wxAuiPaneInfo) source );
+TClass(wxAuiPaneInfo) 	 wxAuiPaneInfo_SetFlag (TSelf(wxAuiPaneInfo) _obj, int flag, TBool option_state);
+TClass(wxAuiPaneInfo) 	 wxAuiPaneInfo_Show (TSelf(wxAuiPaneInfo) _obj, TBool show);
+TClass(wxAuiPaneInfo) 	 wxAuiPaneInfo_ToolbarPane (TSelf(wxAuiPaneInfo) _obj);
+TClass(wxAuiPaneInfo) 	 wxAuiPaneInfo_Top (TSelf(wxAuiPaneInfo) _obj);
+TClass(wxAuiPaneInfo) 	 wxAuiPaneInfo_TopDockable (TSelf(wxAuiPaneInfo) _obj, TBool b);
+TClass(wxAuiPaneInfo) 	 wxAuiPaneInfo_Window (TSelf(wxAuiPaneInfo) _obj, TClass(wxWindow) _w);
+TClass(wxAuiPaneInfo) 	 wxAuiPaneInfo_Copy (TSelf(wxAuiPaneInfo) _obj, TClass(wxAuiPaneInfo) _c);
+TClass(wxAuiPaneInfo) 	 wxAuiPaneInfo_BestSize (TSelf(wxAuiPaneInfo) _obj, TSize(_width,_height));
+TClass(wxAuiPaneInfo) 	 wxAuiPaneInfo_BestSizeXY (TSelf(wxAuiPaneInfo) _obj, int x, int y);
+TClass(wxAuiPaneInfo) 	 wxAuiPaneInfo_Centre (TSelf(wxAuiPaneInfo) _obj);
+TClass(wxAuiPaneInfo) 	 wxAuiPaneInfo_Center (TSelf(wxAuiPaneInfo) _obj);
+TClass(wxAuiPaneInfo) 	 wxAuiPaneInfo_CentrePane (TSelf(wxAuiPaneInfo) _obj);
+TClass(wxAuiPaneInfo) 	 wxAuiPaneInfo_CenterPane (TSelf(wxAuiPaneInfo) _obj);
+TClass(wxAuiPaneInfo) 	 wxAuiPaneInfo_FloatingPosition (TSelf(wxAuiPaneInfo) _obj, TPoint(x,y));
+TClass(wxAuiPaneInfo) 	 wxAuiPaneInfo_FloatingPositionXY (TSelf(wxAuiPaneInfo) _obj, int x, int y);
+TClass(wxAuiPaneInfo) 	 wxAuiPaneInfo_FloatingSize (TSelf(wxAuiPaneInfo) _obj, TSize(_width,_height));
+TClass(wxAuiPaneInfo) 	 wxAuiPaneInfo_FloatingSizeXY (TSelf(wxAuiPaneInfo) _obj, int x, int y);
+TClass(wxAuiPaneInfo) 	 wxAuiPaneInfo_MaxSize (TSelf(wxAuiPaneInfo) _obj, TSize(_width,_height));
+TClass(wxAuiPaneInfo) 	 wxAuiPaneInfo_MaxSizeXY (TSelf(wxAuiPaneInfo) _obj, int x, int y);
+TClass(wxAuiPaneInfo) 	 wxAuiPaneInfo_MinSize (TSelf(wxAuiPaneInfo) _obj, TSize(_width,_height));
+TClass(wxAuiPaneInfo) 	 wxAuiPaneInfo_MinSizeXY (TSelf(wxAuiPaneInfo) _obj, int x, int y);
+
+/* wxAuiManagerEvent */
+TClassDefExtend(wxAuiManagerEvent, wxEvtHandler)
+TClass(wxAuiManagerEvent)  wxAuiManagerEvent_Create(int type );
+TBool 	 wxAuiManagerEvent_CanVeto (TSelf(wxAuiManagerEvent) _obj );
+int 	 wxAuiManagerEvent_GetButton (TSelf(wxAuiManagerEvent) _obj );
+TClass(wxDC) 	 wxAuiManagerEvent_GetDC (TSelf(wxAuiManagerEvent) _obj );
+TBool 	 wxAuiManagerEvent_GetVeto (TSelf(wxAuiManagerEvent) _obj );
+TClass(wxAuiManager) 	 wxAuiManagerEvent_GetManager (TSelf(wxAuiManagerEvent) _obj );
+TClass(wxAuiPaneInfo) 	 wxAuiManagerEvent_GetPane (TSelf(wxAuiManagerEvent) _obj );
+void 	 wxAuiManagerEvent_SetButton (TSelf(wxAuiManagerEvent) _obj, int button );
+void 	 wxAuiManagerEvent_SetCanVeto (TSelf(wxAuiManagerEvent) _obj, TBool can_veto );
+void 	 wxAuiManagerEvent_SetDC (TSelf(wxAuiManagerEvent) _obj, TClass(wxDC) _pdc);
+void 	 wxAuiManagerEvent_SetManager (TSelf(wxAuiManagerEvent) _obj, TClass(wxAuiManager) _manager );
+void 	 wxAuiManagerEvent_SetPane (TSelf(wxAuiManagerEvent) _obj, TClass(wxAuiPaneInfo) _pane );
+void 	 wxAuiManagerEvent_Veto (TSelf(wxAuiManagerEvent) _obj, TBool veto );
+
+
+/* wxAuiNotebookEvent */
+TClassDefExtend(wxAuiNotebookEvent, wxBookCtrlEvent)
+TClass(wxAuiNotebookEvent)  wxAuiNotebookEvent_Create(int command_type, int win_id);
+TClass(wxAuiNotebook) wxAuiNotebookEvent_GetDragSource(TSelf(wxAuiNotebookEvent) _obj);
+/* void SetDragSource(wxAuiNotebook* s) { m_dragSource = s; } */
+
+
+/* wxBookCtrlEvent */
+TClassDefExtend(wxBookCtrlEvent, wxNotifyEvent)
+TClass(wxBookCtrlEvent)  wxBookCtrlEvent_Create(int commandType, int winid, int nSel, int nOldSel);
+int     wxBookCtrlEvent_GetSelection(TSelf(wxBookCtrlEvent) _obj);
+int     wxBookCtrlEvent_GetOldSelection(TSelf(wxBookCtrlEvent) _obj);
+/* void    wxBookCtrlEvent_SetSelection(int nSel); */
+/* void    wxBookCtrlEvent_SetOldSelection(int nOldSel); */
+
+
+/* wxBookCtrlBase */
+TClassDefExtend(wxBookCtrlBase, wxControl)
+TBool 	wxBookCtrlBase_CreateFromDefault (TSelf(wxBookCtrlBase) _obj, TClass(wxWindow) _parent, int winid, TPoint(x,y), TSize(_width,_height), long style, TClass(wxString) _name );
+void 	wxBookCtrlBase_SetPageSize (TSelf(wxBookCtrlBase) _obj, TSize(_width,_height));
+int 	wxBookCtrlBase_HitTest (TSelf(wxBookCtrlBase) _obj, TPoint(x,y), long *flags );
+int 	wxBookCtrlBase_GetPageImage (TSelf(wxBookCtrlBase) _obj, size_t nPage );
+TBool 	wxBookCtrlBase_SetPageImage (TSelf(wxBookCtrlBase) _obj, size_t page, int image );
+TClass(wxString) 	wxBookCtrlBase_GetPageText (TSelf(wxBookCtrlBase) _obj, size_t nPage );
+TBool 	wxBookCtrlBase_SetPageText (TSelf(wxBookCtrlBase) _obj, size_t page, TClass(wxString) _text );
+int 	wxBookCtrlBase_GetSelection (TSelf(wxBookCtrlBase) _obj );
+TClass(wxWindow) 	wxBookCtrlBase_GetCurrentPage (TSelf(wxBookCtrlBase) _obj );
+int 	wxBookCtrlBase_SetSelection (TSelf(wxBookCtrlBase) _obj, size_t page );
+void 	wxBookCtrlBase_AdvanceSelection (TSelf(wxBookCtrlBase) _obj, TBool forward );
+int 	wxBookCtrlBase_ChangeSelection (TSelf(wxBookCtrlBase) _obj, size_t page );
+int 	wxBookCtrlBase_FindPage (TSelf(wxBookCtrlBase) _obj, TClass(wxWindow) _page );
+TBool 	wxBookCtrlBase_AddPage (TSelf(wxBookCtrlBase) _obj, TClass(wxWindow) _page, TClass(wxString) _text, TBool select, int imageId );
+TBool 	wxBookCtrlBase_DeleteAllPages (TSelf(wxBookCtrlBase) _obj );
+TBool 	wxBookCtrlBase_DeletePage (TSelf(wxBookCtrlBase) _obj, size_t page );
+TBool 	wxBookCtrlBase_InsertPage (TSelf(wxBookCtrlBase) _obj, size_t index, TClass(wxWindow) _page, TClass(wxString) _text, TBool select, int imageId );
+TBool 	wxBookCtrlBase_RemovePage (TSelf(wxBookCtrlBase) _obj, size_t page );
+size_t 	wxBookCtrlBase_GetPageCount (TSelf(wxBookCtrlBase) _obj );
+TClass(wxWindow) 	wxBookCtrlBase_GetPage (TSelf(wxBookCtrlBase) _obj, size_t page );
+void 	wxBookCtrlBase_AssignImageList (TSelf(wxBookCtrlBase) _obj, TClass(wxImageList) imageList );
+void 	wxBookCtrlBase_SetImageList (TSelf(wxBookCtrlBase) _obj, TClass(wxImageList) imageList );
+TClass(wxImageList) wxBookCtrlBase_GetImageList (TSelf(wxBookCtrlBase) _obj );
+
+TClassDef(wxAuiNotebookPage)
+TClass(wxWindow) wxAuiNotebookPage_Window(TSelf(wxAuiNotebookPage) _obj);
+TClass(wxString) wxAuiNotebookPage_Caption(TSelf(wxAuiNotebookPage) _obj);
+TClass(wxString) wxAuiNotebookPage_Tooltip(TSelf(wxAuiNotebookPage) _obj);
+TClass(wxBitmap) wxAuiNotebookPage_Bitmap(TSelf(wxAuiNotebookPage) _obj);
+TClass(wxRect) wxAuiNotebookPage_Rect(TSelf(wxAuiNotebookPage) _obj);
+TBool wxAuiNotebookPage_Active(TSelf(wxAuiNotebookPage) _obj);
+
+/** wxAuiNotebookPageArray **/
+/** see wxWidgets dynarray.h for additional array functions **/
+TClassDef(wxAuiNotebookPageArray)
+TClass(wxAuiNotebookPageArray) wxAuiNotebookPageArray_Create();
+void       wxAuiNotebookPageArray_Delete(TSelf(wxAuiNotebookPageArray) _obj);
+int        wxAuiNotebookPageArray_GetCount(TSelf(wxAuiNotebookPageArray) _obj);
+TClass(wxAuiNotebookPage)       wxAuiNotebookPageArray_Item(TSelf(wxAuiNotebookPageArray) _obj, int _idx);
+
+/** wxAuiToolBarItemArray **/
+/** see wxWidgets dynarray.h for additional array functions **/
+TClassDef(wxAuiToolBarItemArray)
+TClass(wxAuiToolBarItemArray) wxAuiToolBarItemArray_Create();
+void       wxAuiToolBarItemArray_Delete(TSelf(wxAuiToolBarItemArray) _obj);
+int        wxAuiToolBarItemArray_GetCount(TSelf(wxAuiToolBarItemArray) _obj);
+TClass(wxAuiToolBarItem)       wxAuiToolBarItemArray_Item(TSelf(wxAuiToolBarItemArray) _obj, int _idx);
+
+/** wxAuiPaneInfoArray **/
+/** see wxWidgets dynarray.h for additional array functions **/
+TClassDef(wxAuiPaneInfoArray)
+TClass(wxAuiPaneInfoArray) wxAuiPaneInfoArray_Create();
+void       wxAuiPaneInfoArray_Delete(TSelf(wxAuiPaneInfoArray) _obj);
+int        wxAuiPaneInfoArray_GetCount(TSelf(wxAuiPaneInfoArray) _obj);
+TClass(wxAuiPaneInfo)       wxAuiPaneInfoArray_Item(TSelf(wxAuiPaneInfoArray) _obj, int _idx);
+
 
 /* wxAutoBufferedPaintDC */
 TClassDefExtend(wxAutoBufferedPaintDC,wxDC)
@@ -5000,6 +5572,7 @@ TClass(wxValidator) wxWindow_GetValidator( TSelf(wxWindow) _obj );
 TClass(wxSize) wxWindow_GetVirtualSize( TSelf(wxWindow) _obj );
 int        wxWindow_GetWindowStyleFlag( TSelf(wxWindow) _obj );
 TBool      wxWindow_HasFlag( TSelf(wxWindow) _obj, int flag );
+TBool      wxWindow_HasFocus( TSelf(wxWindow) _obj );
 TBool      wxWindow_Hide( TSelf(wxWindow) _obj );
 void       wxWindow_InitDialog( TSelf(wxWindow) _obj );
 TBool      wxWindow_IsBeingDeleted( TSelf(wxWindow) _obj );

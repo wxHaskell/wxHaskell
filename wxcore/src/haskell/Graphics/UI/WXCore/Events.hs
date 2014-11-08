@@ -204,6 +204,14 @@ module Graphics.UI.WXCore.Events
         -- ** PropertyGrid events
         , EventPropertyGrid(..)
 
+        -- ** AuiNotebook events
+        , WindowId(..)
+        , WindowSelection(..)
+        , PageWindow(..)
+        , EventAuiNotebook(..)
+        , noWindowSelection 
+        , auiNotebookOnAuiNotebookEvent
+        , auiNotebookGetOnAuiNotebookEvent
 
         -- * Current event
         , propagateEvent
@@ -2505,7 +2513,129 @@ propertyGridGetOnPropertyGridEvent propertyGrid
   -- I'm not sure what expEVT_PG_HIGHLIGHTED needs to be here for, just followed pattern with `listCtrlGetOnListEvent'
   = unsafeWindowGetHandlerState propertyGrid wxEVT_PG_HIGHLIGHTED (\event -> skipCurrentEvent)
 
+{-----------------------------------------------------------------------------------------
+  AuiNotebook events
+-----------------------------------------------------------------------------------------}
 
+-- | Represents a page in the AuiNotebook for a
+
+newtype WindowId = WindowId Int deriving (Eq,Show)
+data WindowSelection = WindowSelection Int (Maybe PageWindow) deriving (Show, Eq)
+data PageWindow = PageWindow { winId :: WindowId, win :: (Window ()) } deriving (Show, Eq)
+
+noWindowSelection :: WindowSelection
+noWindowSelection = WindowSelection wxNOT_FOUND Nothing
+
+-- | AuiNotebook events.
+data EventAuiNotebook = AuiNotebookAllowDnd { newSel ::  WindowSelection, oldSel ::  WindowSelection }
+                      | AuiNotebookBeginDrag  { newSel ::  WindowSelection, oldSel ::  WindowSelection }
+                      | AuiNotebookBgDclick  { newSel ::  WindowSelection, oldSel ::  WindowSelection }
+                      | AuiNotebookButton  { newSel ::  WindowSelection, oldSel ::  WindowSelection }
+                      | AuiNotebookDragDone  { newSel ::  WindowSelection, oldSel ::  WindowSelection }
+                      | AuiNotebookDragMotion  { newSel ::  WindowSelection, oldSel ::  WindowSelection }
+                      | AuiNotebookEndDrag  { newSel ::  WindowSelection, oldSel ::  WindowSelection }
+                      | AuiNotebookPageChanged  { newSel ::  WindowSelection, oldSel ::  WindowSelection }
+                      | AuiNotebookPageChanging  { newSel ::  WindowSelection, oldSel ::  WindowSelection }
+                      | AuiNotebookPageClose  { newSel ::  WindowSelection, oldSel ::  WindowSelection }
+                      | AuiNotebookPageClosed  { newSel ::  WindowSelection, oldSel ::  WindowSelection }
+                      | AuiNotebookTabMiddleDown  { newSel ::  WindowSelection, oldSel ::  WindowSelection }
+                      | AuiNotebookTabMiddleUp  { newSel ::  WindowSelection, oldSel ::  WindowSelection }
+                      | AuiNotebookTabRightDown  { newSel ::  WindowSelection, oldSel ::  WindowSelection }
+                      | AuiNotebookTabRightUp  { newSel ::  WindowSelection, oldSel ::  WindowSelection }
+                      | AuiNotebookUnknown
+                      | AuiTabCtrlPageChanging  { newSel ::  WindowSelection, oldSel ::  WindowSelection }
+                      | AuiTabCtrlUnknown
+                      deriving (Show, Eq)
+
+
+auiTabCtrlEvents :: AuiNotebook a -> [(Int, AuiNotebookEvent b -> IO EventAuiNotebook)]
+auiTabCtrlEvents nb
+  = [(wxEVT_AUINOTEBOOK_PAGE_CHANGING, auiWithSelection nb AuiTabCtrlPageChanging)]
+
+auiNotebookEvents :: AuiNotebook a -> [(Int, AuiNotebookEvent b -> IO EventAuiNotebook)]
+auiNotebookEvents nb
+  = [(wxEVT_AUINOTEBOOK_ALLOW_DND, auiWithSelection nb AuiNotebookAllowDnd)
+    ,(wxEVT_AUINOTEBOOK_BEGIN_DRAG, auiWithSelection nb AuiNotebookBeginDrag)
+    ,(wxEVT_AUINOTEBOOK_BG_DCLICK, auiWithSelection nb AuiNotebookBgDclick)
+    ,(wxEVT_AUINOTEBOOK_BUTTON, auiWithSelection nb AuiNotebookButton)
+    ,(wxEVT_AUINOTEBOOK_DRAG_DONE,  auiWithSelection nb AuiNotebookDragDone)
+    ,(wxEVT_AUINOTEBOOK_DRAG_MOTION, auiWithSelection nb AuiNotebookDragMotion)
+    ,(wxEVT_AUINOTEBOOK_END_DRAG, auiWithSelection nb AuiNotebookEndDrag)
+    ,(wxEVT_AUINOTEBOOK_PAGE_CHANGED, auiWithSelection nb AuiNotebookPageChanged)
+    ,(wxEVT_AUINOTEBOOK_PAGE_CHANGING, auiWithSelection nb AuiNotebookPageChanging)
+    ,(wxEVT_AUINOTEBOOK_PAGE_CLOSE, auiWithSelection nb AuiNotebookPageClose)
+    ,(wxEVT_AUINOTEBOOK_PAGE_CLOSED, auiWithSelection nb AuiNotebookPageClosed)
+    ,(wxEVT_AUINOTEBOOK_TAB_MIDDLE_DOWN,auiWithSelection nb AuiNotebookTabMiddleDown)
+    ,(wxEVT_AUINOTEBOOK_TAB_MIDDLE_UP, auiWithSelection nb AuiNotebookTabMiddleUp)
+    ,(wxEVT_AUINOTEBOOK_TAB_RIGHT_DOWN, auiWithSelection nb AuiNotebookTabRightDown)
+    ,(wxEVT_AUINOTEBOOK_TAB_RIGHT_UP,  auiWithSelection nb AuiNotebookTabRightUp)]
+           
+
+auiWithSelection nb eventAN auiNEvent = do 
+    selection <-  bookCtrlEventGetSelection auiNEvent
+    oldSelection <-  bookCtrlEventGetOldSelection auiNEvent
+    eventObj <-  eventGetEventObject auiNEvent
+    winSel <-  fromSelId nb eventObj selection auiNEvent
+    winOldSel <-  fromSelId nb eventObj oldSelection auiNEvent
+    return $ eventAN winSel winOldSel
+  where 
+      fromSelId nb eventObj selId ev = do
+         pageCount <- auiNotebookGetPageCount nb
+         if selId < pageCount && selId /= wxNOT_FOUND then do
+             pg <-  auiNotebookGetPage nb selId
+             id <-  windowGetId pg
+             return $ WindowSelection selId $ Just $ PageWindow (WindowId id)  pg
+           else return noWindowSelection
+
+fromAuiNotebookEvent :: Object a -> String -> AuiNotebookEvent q -> IO EventAuiNotebook
+fromAuiNotebookEvent eventObj cName anEvent 
+    = do eventType <-  eventGetEventType anEvent
+         case cName of
+              "wxAuiNotebook" -> 
+                 lookupEvent eventType (auiNotebookEvents $ objectCast eventObj) AuiNotebookUnknown
+              "wxAuiTabCtrl" -> 
+               do par <- windowGetParent $ objectCast eventObj
+                  let t =  (auiTabCtrlEvents . objectCast) par
+                  lookupEvent eventType t AuiTabCtrlUnknown
+
+              --lookup an event in the given evtTable, if not found use defaul
+      where lookupEvent eventType evtTable defaul = case lookup eventType evtTable of
+                                    Just f  -> f anEvent
+                                    Nothing -> return defaul
+
+-- | accept an event and return the wxWidgets class name of the event's eventObject
+objectClassName :: WxObject a ->  IO String
+objectClassName obj = do cInfo <-  objectGetClassInfo obj
+                         classInfoGetClassNameEx cInfo
+
+-- | use when you want to handle just wxAuiNotebook
+auiNotebookOnAuiNotebookEvent ::  String -> EventId ->  AuiNotebook a -> (EventAuiNotebook -> IO ()) -> IO ()
+auiNotebookOnAuiNotebookEvent s eventId notebook eventHandler
+  = windowOnEvent notebook [eventId] handler (const handler)
+       where handler = withCurrentEvent (\event -> do
+               eventObj <-  eventGetEventObject (objectCast event)
+               cName <-   objectClassName eventObj
+               case cName of
+                      "wxAuiNotebook" -> 
+                       do ean <- fromAuiNotebookEvent eventObj cName (objectCast event)
+                          eventHandler ean
+                      _              -> skipCurrentEvent
+               )
+
+-- | use when you want to handle both wxAuiNotebook and wxAuiTabCtrl
+auiNotebookOnAuiNotebookEventEx ::  String -> EventId ->  AuiNotebook a -> (EventAuiNotebook -> IO ()) -> IO ()
+auiNotebookOnAuiNotebookEventEx s eventId notebook eventHandler
+  = windowOnEvent notebook [eventId] handler (const handler)
+       where handler = withCurrentEvent (\event -> do
+               eventObj <-  eventGetEventObject (objectCast event)
+               cName <-   objectClassName eventObj
+               ean <- fromAuiNotebookEvent eventObj cName (objectCast event)
+               eventHandler ean
+               )
+
+auiNotebookGetOnAuiNotebookEvent ::  EventId -> AuiNotebook a -> IO (EventAuiNotebook -> IO ())
+auiNotebookGetOnAuiNotebookEvent eventId notebook
+  = unsafeWindowGetHandlerState notebook eventId (const skipCurrentEvent)
 
 ------------------------------------------------------------------------------------------
 -- TimerEx is handled specially.
