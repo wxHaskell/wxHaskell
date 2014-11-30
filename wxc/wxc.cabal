@@ -26,6 +26,7 @@ extra-source-files:
     src/cpp/dragimage.cpp
     src/cpp/eljaccelerator.cpp
     src/cpp/eljartprov.cpp
+    src/cpp/eljaui.cpp
     src/cpp/eljbitmap.cpp
     src/cpp/eljbrush.cpp
     src/cpp/eljbusyinfo.cpp
@@ -166,6 +167,7 @@ library
     src/cpp/dragimage.cpp
     src/cpp/eljaccelerator.cpp
     src/cpp/eljartprov.cpp
+    src/cpp/eljaui.cpp
     src/cpp/eljbitmap.cpp
     src/cpp/eljbrush.cpp
     src/cpp/eljbusyinfo.cpp

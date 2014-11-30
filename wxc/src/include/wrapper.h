@@ -51,6 +51,10 @@ typedef int intptr_t;
 #include "wx/socket.h"
 #include "wx/artprov.h"
 #include "wx/sound.h"
+#include "wx/aui/auibar.h"
+#include "wx/aui/dockart.h"
+#include "wx/aui/auibook.h"
+#include "wx/aui/framemanager.h"
 
 #define MAKE_EVENT_WRAPPER(evt) EWXWEXPORT(int,exp##evt)() { return (int)wx##evt; }
 #define MAKE_UNDEFEVENT_WRAPPER(evt) EWXWEXPORT(int, exp##evt)() { return (int) wxEVT_NULL; }
