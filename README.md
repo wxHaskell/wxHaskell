@@ -6,14 +6,14 @@ wxWidgets wrapper for Haskell
 Status
 ======
 
-This fork builds & compiles
-- against: wxWidgets (http://www.wxwidgets.org/) 2.9.3, 2.9.4, 2.9.5, 3.0.0 and 3.0.1
+Builds & compiles
+- against: wxWidgets (http://www.wxwidgets.org/) 2.9.3 up to and including 3.0.2
 - with: Haskell platform (http://www.haskell.org/platform/) 2013.2.0.0 and 2014.2.0.0
 - on: MacOSX 10.8.4, 64 bits Haskell platform; Windows XP; Windows 8.1
 
-Patches up and until 2014-08-11 have been merged into this fork.
+Patches until 2014-12-08 have been merged.
 
-All packages have cabal version 0.91.0.0
+All packages have cabal version 0.92.0.0
 
 
 Build & installation
@@ -21,7 +21,7 @@ Build & installation
 
 As of 2014-08-11:
 - Prerequisites:
-  - install wxWidgets 2.9.3, 2.9.4, 2.9.5, 3.0.0 or 3.0.1 directly from a source release or use a platform specific installer.
+  - install wxWidgets (2.9.3 ... 3.0.2) directly from a source release or use a platform specific installer.
     - if installed from source release configure with
         ./configure --disable-debug_flag	# to avoid debugging popups
 
