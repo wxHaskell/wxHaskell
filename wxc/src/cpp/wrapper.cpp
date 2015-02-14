@@ -21,7 +21,7 @@ void initImageHandlers()
 {
   static int InitImageHandlers_done = 0;
 
-  if (!InitImageHandlers_done)
+  // if (!InitImageHandlers_done) // HJvT: Temporarily disabled
   {
     InitImageHandlers_done = 1;
     wxInitAllImageHandlers();
