@@ -2,6 +2,7 @@
 {-# LANGUAGE CPP #-}
 
 import Control.Monad (filterM, join, mapM_, when)
+import Data.Char     ( ord )
 import Data.Functor  ( (<$>) )
 import Data.List (foldl', intersperse, intercalate, nub, lookup, isPrefixOf, isInfixOf)
 import Data.Maybe (fromJust, isNothing, isJust, listToMaybe)
@@ -27,7 +28,7 @@ import System.Directory ( createDirectoryIfMissing, doesFileExist
 import System.Environment (lookupEnv)
 import System.Exit (ExitCode (..), exitFailure)
 import System.FilePath ((</>), (<.>), replaceExtension, takeFileName, dropFileName, addExtension)
-import System.IO (hPutStrLn, stderr)
+import System.IO (hPutStrLn, readFile, stderr)
 import System.IO.Unsafe (unsafePerformIO)
 import qualified System.Process as Process
 import qualified Control.Exception as E
@@ -135,17 +136,27 @@ data CheckResult
 
 {-
    Extract bitness info from a dynamic library and compare to the
-   bitness of this program.
-   Preconditions (when buildArch == I386 || buildArch == X86_64):
-    - Command "file" must exist
-    - The specified file must exist
+   bitness of this program. Works for architectures I386 and X86_64.
 -}
 checkBitness :: FilePath -> IO CheckResult
 checkBitness file =
   if thisBitness == Unknown
     then return NotChecked
-    else compareBitness . readBitness <$> readProcess "file" [file] ""
+    else
+      if buildOS == Windows
+        then compareBitness <$> getWindowsBitness file
+        else compareBitness . readBitness <$> readProcess "file" [file] ""
   where
+    getWindowsBitness :: FilePath -> IO Bitness
+    getWindowsBitness fp = getWindowsBitness' <$> readFile fp
+      where
+        getWindowsBitness' ('M' : 'Z' : contents) =
+          case ord (contents !! 129) of
+            0x4C -> Bits32
+            0x64 -> Bits64
+            _    -> Unknown
+        getWindowsBitness' _ = Unknown
+    
     compareBitness :: Bitness -> CheckResult
     compareBitness thatBitness =
       if thatBitness == Unknown
@@ -185,20 +196,9 @@ checkBitness file =
 -}
 bitnessMismatch :: IO Bool
 bitnessMismatch =
-  case buildOS of
-    Windows ->
-      do
-        fileCommandPresent <- isJust <$> findExecutable "file"
-        if fileCommandPresent
-          then check
-          else
-            do
-              putStrLn "No file command present, bitness not checked"
-              return False -- No check on bitness, just continue installing
-
-    Linux   -> check
-    OSX     -> check
-    _       -> return False -- Other OSes are not checked
+  if buildOS `elem` [Windows, Linux, OSX]
+    then check
+    else return False -- Other OSes are not checked
   where
     check =
       do
