@@ -294,9 +294,11 @@ readWxConfig =
           putStrLn ("Configuring wxc to build against wxWidgets " ++ wxVersion)
 
           -- The Windows port of wx-config doesn't let you specify a version (yet)
-          case buildOS of
+          isMsys <- isWindowsMsys
+          case (buildOS,isMsys) of
             -- wx-config-win does not list all libraries if --cppflags comes after --libs :-(
-            Windows -> wx_config ["--cppflags", "--libs", "all"]
+            (Windows,False) -> wx_config ["--cppflags", "--libs", "all"]
+            (Windows,True) -> wx_config ["--libs", "all", "--gl-libs", "--cppflags"]
             _       -> wx_config ["--version=" ++ wxVersion, "--libs", "all", "--cppflags"]
 
 
