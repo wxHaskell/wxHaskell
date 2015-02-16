@@ -4,7 +4,7 @@
 import Control.Monad (filterM, join, mapM_, when)
 import Data.Char     ( ord )
 import Data.Functor  ( (<$>) )
-import Data.List (foldl', intersperse, intercalate, nub, lookup, isPrefixOf, isInfixOf)
+import Data.List (foldl', foldr, intersperse, intercalate, nub, lookup, isPrefixOf, isInfixOf)
 import Data.Maybe (fromJust, isNothing, isJust, listToMaybe)
 import Distribution.PackageDescription
 import Distribution.Simple
@@ -17,21 +17,24 @@ import Distribution.Simple.Setup ( BuildFlags, ConfigFlags
                                  , InstallFlags, installVerbosity
                                  , fromFlag
                                  )
-import Distribution.Simple.Utils (installOrdinaryFile)
+import Distribution.Simple.Utils (installOrdinaryFile, rawSystemExitWithEnv, rawSystemStdInOut, die)
 import Distribution.System (OS (..), Arch (..), buildOS, buildArch)
 import Distribution.Verbosity (Verbosity, normal, verbose)
+import Distribution.Compat.Exception (catchIO)
 import System.Process (system)
 import System.Directory ( createDirectoryIfMissing, doesFileExist
                         , findExecutable,           getCurrentDirectory
                         , getDirectoryContents,     getModificationTime
                         )
-import System.Environment (lookupEnv)
+import System.Environment (lookupEnv, getEnvironment)
 import System.Exit (ExitCode (..), exitFailure)
 import System.FilePath ((</>), (<.>), replaceExtension, takeFileName, dropFileName, addExtension)
 import System.IO (hPutStrLn, readFile, stderr)
+import System.IO.Error (isDoesNotExistError)
 import System.IO.Unsafe (unsafePerformIO)
 import qualified System.Process as Process
 import qualified Control.Exception as E
+import Control.Monad (unless)
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
@@ -78,13 +81,31 @@ includeDirectory = "include"
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
+rawShellSystemStdInOut :: Verbosity                     -- Verbosity level
+                       -> FilePath                      -- Path to command
+                       -> [String]                      -- Command arguments
+                       -> IO (String, String, ExitCode) -- (Command result, Errors, Command exit status)
+rawShellSystemStdInOut v f as = rawSystemStdInOut v "sh" (f:as) Nothing Nothing Nothing False
+
+
+isWindowsMsys :: IO Bool
+isWindowsMsys = (buildOS == Windows&&) . isJust <$> lookupEnv "MSYSTEM"
+
 -- Comment out type signature because of a Cabal API change from 1.6 to 1.7
 myConfHook (pkg0, pbi) flags = do
-
-    whenM (isNothing <$> findExecutable "wx-config") $
-      do
-        putStrLn "Error: wx-config not found, please install wx-config before installing wxc"
-        exitFailure
+    mswMsys <- isWindowsMsys 
+    if mswMsys then do
+        (r, e, c) <- rawShellSystemStdInOut normal "wx-config" ["--release"] 
+        unless (c == ExitSuccess) $ do
+            putStrLn ("Error: MSYS environment wx-config script not found, please install wx-config before installing wxc" ++ "\n" 
+                      ++ e ++ "\n"
+                      ++ show c)
+            exitFailure
+    else
+        whenM (isNothing <$> findExecutable "wx-config") $
+        do
+            putStrLn "Error: wx-config not found, please install wx-config before installing wxc"
+            exitFailure
 
     whenM bitnessMismatch
       exitFailure
@@ -95,7 +116,7 @@ myConfHook (pkg0, pbi) flags = do
     let libbi     = libBuildInfo lib
     let custom_bi = customFieldsBI libbi
 
-    wx <- fmap parseWxConfig readWxConfig
+    wx <- fmap parseWxConfig readWxConfig >>= deMsysPaths
 
     let libbi' = libbi
           { extraLibDirs = extraLibDirs libbi ++ extraLibDirs wx
@@ -280,9 +301,18 @@ readWxConfig =
 
 
 wx_config :: [String] -> IO String
-wx_config parms = 
-  readProcess "wx-config" parms ""
-    `E.onException` return ""
+wx_config parms = do
+  b <- isWindowsMsys
+  if b 
+    then do
+        (r, e, c) <- rawShellSystemStdInOut normal "wx-config" parms
+        unless (c == ExitSuccess) $ do
+            putStrLn $ "Error: Failed to execute wx-config command \n" ++ e
+            exitFailure
+        return r
+    else 
+        readProcess "wx-config" parms ""
+            `E.onException` return ""
 
 
  -- Try to find a compatible version of wxWidgets
@@ -328,6 +358,21 @@ parseWxConfig s =
           ('-':'I':v) -> b { includeDirs  = v : includeDirs b }
           ('-':'D':_) -> b { ccOptions    = w : ccOptions b }
           _           -> b
+
+deMsysPaths :: BuildInfo -> IO BuildInfo
+deMsysPaths bi = do
+    b <- isWindowsMsys
+    if b 
+    then do
+        let cor ph = do
+            (r, e, c ) <- rawSystemStdInOut normal "sh" ["-c", "cd " ++ ph ++ "; pwd -W"] Nothing Nothing Nothing False  
+            unless (c == ExitSuccess) (putStrLn ("Error: failed to convert MSYS path to native path \n" ++ e) >> exitFailure)
+            return . head . lines $ r
+        elds <- mapM cor (extraLibDirs bi)
+        incds <- mapM cor (includeDirs bi)
+        return $ bi {extraLibDirs = elds, includeDirs = incds}
+    else
+        return bi
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
