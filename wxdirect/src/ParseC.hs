@@ -14,8 +14,10 @@ module ParseC( parseC, readHeaderFile ) where
 
 import Data.Char( isSpace )
 import Data.List( isPrefixOf )
+import Data.Maybe( isJust )
 import Data.Functor( (<$>) )
 import System.Process( readProcess )
+import System.Environment (lookupEnv)
 import Text.ParserCombinators.Parsec
 import qualified Text.ParserCombinators.Parsec.Token as P
 import Text.ParserCombinators.Parsec.Language
@@ -55,10 +57,24 @@ readHeaderFile fname =
         )
         ""
 
+readShellProcess :: FilePath -> [String] -> IO String
+readShellProcess f as = readProcess "sh" (f:as) "" 
+
+isMsys :: IO Bool
+isMsys = isJust <$> lookupEnv "MSYSTEM"
+
+deMsysPaths :: String -> IO String
+deMsysPaths s = head . lines <$> readProcess "sh" ["-c", "cd " ++ s ++ "; pwd -W"] ""
+
 getIncludeDirectories :: IO [String]
-getIncludeDirectories = 
-  filter (isPrefixOf "-I") . words <$> 
-    readProcess "wx-config" ["--cppflags"] ""
+getIncludeDirectories = do
+  im <- isMsys
+  if im
+    then readShellProcess "wx-config" ["--cppflags"] >>= 
+            mapM (fmap ("-I"++) . deMsysPaths . drop 2) . filter (isPrefixOf "-I") . words
+    else
+        filter (isPrefixOf "-I") . words <$> 
+            readProcess "wx-config" ["--cppflags"] ""
     
                       
 -- flaky, but suitable
