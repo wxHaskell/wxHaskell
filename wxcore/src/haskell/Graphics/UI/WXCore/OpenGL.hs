@@ -53,7 +53,11 @@ data GLAttribute
   | GL_MIN_ACCUM_GREEN Int -- ^ Use green buffer with at least /argument/ bits 
   | GL_MIN_ACCUM_BLUE Int  -- ^ Use blue buffer with at least /argument/ bits 
   | GL_MIN_ACCUM_ALPHA Int -- ^ Use blue buffer with at least /argument/ bits 
-
+  | GL_SAMPLE_BUFFERS Int  -- ^ 1 for multisampling support (antialiasing)
+  | GL_SAMPLES Int         -- ^ 4 for 2x2 antialiasing supersampling on most graphics cards
+  | GL_CORE_PROFILE        -- ^ request an OpenGL core profile. This will result in also requesting OpenGL at least version 3.0, since wx 3.1
+  | GL_MAJOR_VERSION Int   -- ^ request a specific OpenGL major version number (>= 3), since wx 3.1
+  | GL_MINOR_VERSION Int   -- ^ request a specific OpenGL minor version number (e.g. 2 for 3.2), since wx 3.1
 
 encodeAttributes :: [GLAttribute] -> [Int]
 encodeAttributes attributes
@@ -77,6 +81,11 @@ encodeAttribute attr
       GL_MIN_ACCUM_GREEN n   -> [14,n]
       GL_MIN_ACCUM_BLUE n    -> [15,n]
       GL_MIN_ACCUM_ALPHA n   -> [16,n]
+      GL_SAMPLE_BUFFERS n    -> [17,n]
+      GL_SAMPLES n           -> [18,n]
+      GL_CORE_PROFILE        -> [19]
+      GL_MAJOR_VERSION n     -> [20,n]
+      GL_MINOR_VERSION n     -> [21,n]
 
 -- | Create a standard openGL canvas window with a certain title and attributes.
 glCanvasCreateDefault :: Window a -> Style -> String -> [GLAttribute] -> IO (GLCanvas ())
