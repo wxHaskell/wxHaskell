@@ -6,6 +6,8 @@
     namely bitmapButtons, righ click menus, vertical labels on notebooks, usage of tooltips
 -}
  
+{-# LANGUAGE FlexibleContexts      #-}
+
 module Main where
  
 import Graphics.UI.WX

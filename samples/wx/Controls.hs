@@ -6,6 +6,9 @@
  - many different kind of controls
  - message logging.
 --------------------------------------------------------------------------------}
+
+{-# LANGUAGE FlexibleContexts      #-}
+
 module Main where
 
 import Graphics.UI.WX

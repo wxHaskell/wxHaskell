@@ -1,5 +1,5 @@
 name:         wxcore
-version:      0.91.0.0
+version:      0.92.0.0
 license:      OtherLicense
 license-file: LICENSE
 author:       Daan Leijen
@@ -71,7 +71,7 @@ library
     filepath,
     parsec,
     stm,
-    wxc >= 0.91,
+    wxc >= 0.92,
     wxdirect >= 0.91,
     directory,
     time

@@ -3,6 +3,8 @@
 -- for each one of the strings
 -- Eric Kow 2006
 
+{-# LANGUAGE FlexibleContexts      #-}
+
 module Main where
 
 import UTF8

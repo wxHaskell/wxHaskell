@@ -1,9 +1,11 @@
 
 {-# LANGUAGE CPP #-}
 
-import Control.Monad (filterM, mapM_, when)
+import Control.Monad (filterM, join, mapM_, when)
+import qualified Data.ByteString.Lazy as B
+import Data.Char     ( ord )
 import Data.Functor  ( (<$>) )
-import Data.List (foldl', intersperse, intercalate, nub, lookup, isPrefixOf, isInfixOf)
+import Data.List (foldl', foldr, intersperse, intercalate, nub, lookup, isPrefixOf, isInfixOf)
 import Data.Maybe (fromJust, isNothing, isJust, listToMaybe)
 import Distribution.PackageDescription
 import Distribution.Simple
@@ -16,21 +18,24 @@ import Distribution.Simple.Setup ( BuildFlags, ConfigFlags
                                  , InstallFlags, installVerbosity
                                  , fromFlag
                                  )
-import Distribution.Simple.Utils (installOrdinaryFile)
+import Distribution.Simple.Utils (installOrdinaryFile, rawSystemExitWithEnv, rawSystemStdInOut, die)
 import Distribution.System (OS (..), Arch (..), buildOS, buildArch)
 import Distribution.Verbosity (Verbosity, normal, verbose)
+import Distribution.Compat.Exception (catchIO)
 import System.Process (system)
 import System.Directory ( createDirectoryIfMissing, doesFileExist
                         , findExecutable,           getCurrentDirectory
                         , getDirectoryContents,     getModificationTime
                         )
-import System.Environment (lookupEnv)
+import System.Environment (lookupEnv, getEnvironment)
 import System.Exit (ExitCode (..), exitFailure)
 import System.FilePath ((</>), (<.>), replaceExtension, takeFileName, dropFileName, addExtension)
-import System.IO (hPutStrLn, stderr)
+import System.IO (hPutStrLn, readFile, stderr)
+import System.IO.Error (isDoesNotExistError)
 import System.IO.Unsafe (unsafePerformIO)
 import qualified System.Process as Process
 import qualified Control.Exception as E
+import Control.Monad (unless)
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
@@ -48,10 +53,17 @@ whenM :: Monad m => m Bool -> m () -> m ()
 whenM mp e = mp >>= \p -> when p e
 
 
-findM :: (Functor m, Monad m) => (a -> m Bool) -> [a] -> m (Maybe a)
-findM p xs = listToMaybe <$> filterM p xs
+-- Find the first element in a list that matches a condition
+findM :: Monad m => (a -> m Bool) -> [a] -> m (Maybe a)
+findM _  []       = return Nothing
+findM mp (x : xs) =
+  do
+    r <- mp x
+    if r 
+      then return $ Just x
+      else findM mp xs
 
-
+    
 main :: IO ()
 main = defaultMainWithHooks simpleUserHooks
      { confHook = myConfHook
@@ -70,13 +82,31 @@ includeDirectory = "include"
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
+rawShellSystemStdInOut :: Verbosity                     -- Verbosity level
+                       -> FilePath                      -- Path to command
+                       -> [String]                      -- Command arguments
+                       -> IO (String, String, ExitCode) -- (Command result, Errors, Command exit status)
+rawShellSystemStdInOut v f as = rawSystemStdInOut v "sh" (f:as) Nothing Nothing Nothing False
+
+
+isWindowsMsys :: IO Bool
+isWindowsMsys = (buildOS == Windows&&) . isJust <$> lookupEnv "MSYSTEM"
+
 -- Comment out type signature because of a Cabal API change from 1.6 to 1.7
 myConfHook (pkg0, pbi) flags = do
-
-    whenM (isNothing <$> findExecutable "wx-config") $
-      do
-        putStrLn "Error: wx-config not found, please install wx-config before installing wxc"
-        exitFailure
+    mswMsys <- isWindowsMsys 
+    if mswMsys then do
+        (r, e, c) <- rawShellSystemStdInOut normal "wx-config" ["--release"] 
+        unless (c == ExitSuccess) $ do
+            putStrLn ("Error: MSYS environment wx-config script not found, please install wx-config before installing wxc" ++ "\n" 
+                      ++ e ++ "\n"
+                      ++ show c)
+            exitFailure
+    else
+        whenM (isNothing <$> findExecutable "wx-config") $
+        do
+            putStrLn "Error: wx-config not found, please install wx-config before installing wxc"
+            exitFailure
 
     whenM bitnessMismatch
       exitFailure
@@ -87,7 +117,7 @@ myConfHook (pkg0, pbi) flags = do
     let libbi     = libBuildInfo lib
     let custom_bi = customFieldsBI libbi
 
-    wx <- fmap parseWxConfig readWxConfig
+    wx <- fmap parseWxConfig readWxConfig >>= deMsysPaths
 
     let libbi' = libbi
           { extraLibDirs = extraLibDirs libbi ++ extraLibDirs wx
@@ -128,17 +158,45 @@ data CheckResult
 
 {-
    Extract bitness info from a dynamic library and compare to the
-   bitness of this program.
-   Preconditions (when buildArch == I386 || buildArch == X86_64):
-    - Command "file" must exist
-    - The specified file must exist
+   bitness of this program. Works for architectures I386 and X86_64.
 -}
 checkBitness :: FilePath -> IO CheckResult
 checkBitness file =
   if thisBitness == Unknown
     then return NotChecked
-    else compareBitness . readBitness <$> readProcess "file" [file] ""
+    else
+      if buildOS == Windows
+        then compareBitness <$> getWindowsBitness file
+        else compareBitness . readBitness <$> readProcess "file" [file] ""
   where
+    getWindowsBitness :: FilePath -> IO Bitness
+    getWindowsBitness fp =
+      do
+        contents <- B.unpack <$> B.readFile file
+        if take 2 contents /= [0x4D, 0x5A]   -- "MZ"
+          then return Unknown  -- The file is not an executable
+          else
+            do
+              -- The offset of the PE header is at 0x3C.
+              -- In the PE header, after "PE\0\0", one finds the type of
+              -- machine the executable is compiled for.
+              -- According to
+              --   http://www.opensource.apple.com/source/cctools/cctools-795/include/coff/ms_dos_stub.h?txt
+              -- the index is four byte long. It is in little endian order.
+              --
+              -- N.B. Might need an update when Windows runs on ARM
+              let machineOffsetList = reverse $ take 4 $ drop 0x3C $ contents
+              let machineOffset = listToInt machineOffsetList + 4
+              return $ 
+                case contents !! machineOffset of
+                  0x4C -> Bits32   -- "The file is 32 bit"
+                  0x64 -> Bits64   -- "The file is 64 bit"
+                  _    -> Unknown  -- "The bitness is not recognized"
+        where
+          listToInt :: Integral a => [a] -> Int
+          listToInt xs = foldl1 (\x y -> 256 * x + y) (map fromIntegral xs)
+
+    
     compareBitness :: Bitness -> CheckResult
     compareBitness thatBitness =
       if thatBitness == Unknown
@@ -178,20 +236,9 @@ checkBitness file =
 -}
 bitnessMismatch :: IO Bool
 bitnessMismatch =
-  case buildOS of
-    Windows ->
-      do
-        fileCommandPresent <- isJust <$> findExecutable "file"
-        if fileCommandPresent
-          then check
-          else
-            do
-              putStrLn "No file command present, bitness not checked"
-              return False -- No check on bitness, just continue installing
-
-    Linux   -> check
-    OSX     -> check
-    _       -> return False -- Other OSes are not checked
+  if buildOS `elem` [Windows, Linux, OSX]
+    then check
+    else return False -- Other OSes are not checked
   where
     check =
       do
@@ -266,16 +313,27 @@ readWxConfig =
           putStrLn ("Configuring wxc to build against wxWidgets " ++ wxVersion)
 
           -- The Windows port of wx-config doesn't let you specify a version (yet)
-          case buildOS of
+          isMsys <- isWindowsMsys
+          case (buildOS,isMsys) of
             -- wx-config-win does not list all libraries if --cppflags comes after --libs :-(
-            Windows -> wx_config ["--cppflags", "--libs", "all"]
+            (Windows,False) -> wx_config ["--cppflags", "--libs", "all"]
+            (Windows,True) -> wx_config ["--libs", "all", "--gl-libs", "--cppflags"]
             _       -> wx_config ["--version=" ++ wxVersion, "--libs", "all", "--cppflags"]
 
 
 wx_config :: [String] -> IO String
-wx_config parms = 
-  readProcess "wx-config" parms ""
-    `E.onException` return ""
+wx_config parms = do
+  b <- isWindowsMsys
+  if b 
+    then do
+        (r, e, c) <- rawShellSystemStdInOut normal "wx-config" parms
+        unless (c == ExitSuccess) $ do
+            putStrLn $ "Error: Failed to execute wx-config command \n" ++ e
+            exitFailure
+        return r
+    else 
+        readProcess "wx-config" parms ""
+            `E.onException` return ""
 
 
  -- Try to find a compatible version of wxWidgets
@@ -290,11 +348,11 @@ findWxVersion =
       where
         readVersionWindows :: IO String
         readVersionWindows =
-          wx_config ["--release"]
+          wx_config ["--version"]                          -- Sample output: 3.0.1
 
         readVersion :: String -> IO String
         readVersion x =
-          wx_config ["--version=" ++ x, "--version-full"]
+          wx_config ["--version=" ++ x, "--version-full"]  -- Sample output: 3.0.1.0
 
         isCompatible :: String -> Bool
         isCompatible xs =
@@ -321,6 +379,21 @@ parseWxConfig s =
           ('-':'I':v) -> b { includeDirs  = v : includeDirs b }
           ('-':'D':_) -> b { ccOptions    = w : ccOptions b }
           _           -> b
+
+deMsysPaths :: BuildInfo -> IO BuildInfo
+deMsysPaths bi = do
+    b <- isWindowsMsys
+    if b 
+    then do
+        let cor ph = do
+            (r, e, c ) <- rawSystemStdInOut normal "sh" ["-c", "cd " ++ ph ++ "; pwd -W"] Nothing Nothing Nothing False  
+            unless (c == ExitSuccess) (putStrLn ("Error: failed to convert MSYS path to native path \n" ++ e) >> exitFailure)
+            return . head . lines $ r
+        elds <- mapM cor (extraLibDirs bi)
+        incds <- mapM cor (includeDirs bi)
+        return $ bi {extraLibDirs = elds, includeDirs = incds}
+    else
+        return bi
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
@@ -389,7 +462,8 @@ linkCxxOpts ver out_dir basename basepath =
       Windows -> ["-Wl,--dll", "-shared", 
                   "-o", out_dir </> sharedLibName ver basename,
                   "-Wl,--out-implib," ++ "lib" ++ addExtension basename ".a",
-                  "-Wl,--export-all-symbols", "-Wl,--enable-auto-import"]
+                  "-Wl,--export-all-symbols", "-Wl,--enable-auto-import",
+                  "-Wl,-no-undefined,--enable-runtime-pseudo-reloc"]
       OSX -> ["-dynamiclib",
                   "-o", out_dir </> sharedLibName ver basename,
                   "-install_name", basepath </> sharedLibName ver basename,
