@@ -2,6 +2,7 @@
 {-# LANGUAGE CPP #-}
 
 import Control.Monad (filterM, join, mapM_, when)
+import qualified Data.ByteString.Lazy as B
 import Data.Char     ( ord )
 import Data.Functor  ( (<$>) )
 import Data.List (foldl', foldr, intersperse, intercalate, nub, lookup, isPrefixOf, isInfixOf)
@@ -169,14 +170,32 @@ checkBitness file =
         else compareBitness . readBitness <$> readProcess "file" [file] ""
   where
     getWindowsBitness :: FilePath -> IO Bitness
-    getWindowsBitness fp = getWindowsBitness' <$> readFile fp
-      where
-        getWindowsBitness' ('M' : 'Z' : contents) =
-          case ord (contents !! 129) of
-            0x4C -> Bits32
-            0x64 -> Bits64
-            _    -> Unknown
-        getWindowsBitness' _ = Unknown
+    getWindowsBitness fp =
+      do
+        contents <- B.unpack <$> B.readFile file
+        if take 2 contents /= [0x4D, 0x5A]   -- "MZ"
+          then return Unknown  -- The file is not an executable
+          else
+            do
+              -- The offset of the PE header is at 0x3C.
+              -- In the PE header, after "PE\0\0", one finds the type of
+              -- machine the executable is compiled for.
+              -- According to
+              --   http://www.opensource.apple.com/source/cctools/cctools-795/include/coff/ms_dos_stub.h?txt
+              -- the index is four byte long. It is in little endian order.
+              --
+              -- N.B. Might need an update when Windows runs on ARM
+              let machineOffsetList = reverse $ take 4 $ drop 0x3C $ contents
+              let machineOffset = listToInt machineOffsetList + 4
+              return $ 
+                case contents !! machineOffset of
+                  0x4C -> Bits32   -- "The file is 32 bit"
+                  0x64 -> Bits64   -- "The file is 64 bit"
+                  _    -> Unknown  -- "The bitness is not recognized"
+        where
+          listToInt :: Integral a => [a] -> Int
+          listToInt xs = foldl1 (\x y -> 256 * x + y) (map fromIntegral xs)
+
     
     compareBitness :: Bitness -> CheckResult
     compareBitness thatBitness =
