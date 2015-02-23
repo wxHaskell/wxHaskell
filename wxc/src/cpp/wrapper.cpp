@@ -17,17 +17,6 @@ int copyStrToBuf(void* dst, wxString& src) {
   return src.Length();
 }
 
-void initImageHandlers()
-{
-  static int InitImageHandlers_done = 0;
-
-  // if (!InitImageHandlers_done) // HJvT: Temporarily disabled
-  {
-    InitImageHandlers_done = 1;
-    wxInitAllImageHandlers();
-  }
-}
-
 /*-----------------------------------------------------------------------------
     The global idle timer
 -----------------------------------------------------------------------------*/
@@ -70,7 +59,6 @@ bool ELJApp::OnInit (void)
   if (!wxApp::OnInit())
     return false;
 
-  initImageHandlers();
   initIdleTimer();
   if (initClosure) {
     delete initClosure; /* special: init is only called once with a NULL event */
@@ -98,7 +86,7 @@ void ELJApp::InitZipFileSystem()
 
 void ELJApp::InitImageHandlers()
 {
-  initImageHandlers();
+  wxInitAllImageHandlers();
 }
 
 
@@ -459,7 +447,7 @@ EWXWEXPORT(void,ELJApp_SetTooltipDelay)(int _ms)
 
 EWXWEXPORT(void,ELJApp_InitAllImageHandlers)()
 {
-  initImageHandlers();
+  wxInitAllImageHandlers();
 }
 
 EWXWEXPORT(void,ELJApp_Bell)()
