@@ -43,7 +43,7 @@ gui = do
 convWG (WX.Size w h) = (GL.Size (convInt32  w) (convInt32  h))
 convInt32 = fromInteger . toInteger
 
-paintGL :: GLCanvas a -> GLCanvas a -> DC() -> WX.Rect -> [WX.Rect]-> IO ()
+paintGL :: GLCanvas a -> GLCanvas a -> DC b -> WX.Rect -> [WX.Rect]-> IO ()
 paintGL gl1 gl2 dc myrect _ = do
 
 -- Now we switch to the first one
