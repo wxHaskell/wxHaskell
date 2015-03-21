@@ -159,7 +159,7 @@ library
     wxc_types.h
 
   build-depends:
-    base >= 4 && < 5,
+    base >= 4.6 && < 5,
     wxdirect >= 0.90.1.1
 
   x-dll-sources:
