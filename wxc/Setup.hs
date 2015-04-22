@@ -121,7 +121,12 @@ myConfHook (pkg0, pbi) flags = do
 
     let libbi' = libbi
           { extraLibDirs = extraLibDirs libbi ++ extraLibDirs wx
-          , extraLibs    = extraLibs    libbi ++ reverse (extraLibs    wx)
+          -- Remove wx libraries from here on windows because archive names differ from dlls
+          -- causing GHCI to fail to load them
+          , extraLibs    = if buildOS == Windows then
+                                extraLibs libbi
+                           else
+                                extraLibs libbi ++ reverse (extraLibs    wx)
           , ldOptions    = ldOptions    libbi ++ ldOptions    wx
           , frameworks   = frameworks   libbi ++ frameworks   wx
           , includeDirs  = includeDirs  libbi ++ includeDirs  wx
@@ -425,9 +430,14 @@ myBuildHook pkg_descr local_bld_info user_hooks bld_flags =
     -- Compile C/C++ sources - output directory is dist/build/src/cpp
     putStrLn "Building wxc"
     objs <- mapM (compileCxx gcc cc_opts inc_dirs bld_dir) dll_srcs
+    
     -- Link C/C++ sources as a DLL - output directory is dist/build
-    linkSharedLib gcc ld_opts lib_dirs (libs ++ dll_libs) objs ver bld_dir dll_name inst_lib_dir
-
+    if buildOS == Windows then do
+        -- Since we removed wx libraries in myConfHook we need to add them here when linking wxc.dll
+        wx <- fmap parseWxConfig readWxConfig >>= deMsysPaths
+        linkSharedLib gcc ld_opts lib_dirs (libs ++ reverse (extraLibs wx) ++ dll_libs) objs ver bld_dir dll_name inst_lib_dir
+    else
+        linkSharedLib gcc ld_opts lib_dirs (libs ++ dll_libs) objs ver bld_dir dll_name inst_lib_dir
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
 -- | Return any compiler options required to support shared library creation
