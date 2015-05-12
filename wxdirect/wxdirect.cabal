@@ -50,7 +50,7 @@ executable wxdirect
     parsec     >= 2.1.0 && < 4,
     strict,
     time       >= 1.0,
-    filepath   <  1.4,
+    filepath   <  1.5,
     process    >= 1.1   && < 1.3
 
   if flag(splitBase)
