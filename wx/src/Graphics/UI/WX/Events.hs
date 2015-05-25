@@ -66,6 +66,8 @@ module Graphics.UI.WX.Events
              , Selecting, select
              -- ** Commanding
              , Commanding, command
+             -- ** Updating
+             , Updating, update
              -- ** Reactive
              , Reactive
              , mouse, keyboard
@@ -151,6 +153,13 @@ class Selecting w where
 class Commanding w where
   -- | A commanding event, for example a button press.
   command :: Event w (IO ())
+
+-- | 'Updating' widgets fire an 'update' event.
+class Updating w where
+  -- | An update event, for example when the text of a 'TextCtrl' changes.
+  -- An update event, unlike a 'command' event, is typically a passive state
+  -- change and doesn't require a response.
+  update :: Event w (IO ())
 
 -- | 'Reactive' widgets are almost all visible widgets on the screen.
 class Reactive w where
