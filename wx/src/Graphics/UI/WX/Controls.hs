@@ -346,7 +346,7 @@ getRichTE2 = if (os == "mingw32") || (os == "win32")
 -- be set at creation time (or the entry has default alignment (=left) ).
 -- This is an alias for textEntry
 --
--- * Instances: 'Wrap', 'Aligned', 'Commanding' -- 'Textual', 'Literate', 'Dimensions', 'Colored', 'Visible', 'Child',
+-- * Instances: 'Wrap', 'Aligned', 'Commanding', 'Updating' -- 'Textual', 'Literate', 'Dimensions', 'Colored', 'Visible', 'Child',
 --             'Able', 'Tipped', 'Identity', 'Styled', 'Reactive', 'Paint'.
 --
 entry :: Window a -> [Prop (TextCtrl ())] -> IO (TextCtrl ())
@@ -356,7 +356,7 @@ entry parent props
 -- | Create a single-line text entry control. Note: 'alignment' has to
 -- be set at creation time (or the entry has default alignment (=left) ).
 --
--- * Instances: 'Wrap', 'Aligned', 'Commanding' -- 'Textual', 'Literate', 'Dimensions', 'Colored', 'Visible', 'Child',
+-- * Instances: 'Wrap', 'Aligned', 'Commanding', 'Updating' -- 'Textual', 'Literate', 'Dimensions', 'Colored', 'Visible', 'Child',
 --             'Able', 'Tipped', 'Identity', 'Styled', 'Reactive', 'Paint'.
 --
 textEntry :: Window a -> [Prop (TextCtrl ())] -> IO (TextCtrl ())
@@ -366,7 +366,7 @@ textEntry parent props
 -- | Create a multi-line text control. Note: the 'wrap' and 'alignment'
 -- have to be set at creation time or the default to 'WrapNone' and 'AlignLeft' respectively.
 --
--- * Instances: 'Wrap', 'Aligned', 'Commanding' -- 'Textual', 'Literate', 'Dimensions', 'Colored', 'Visible', 'Child',
+-- * Instances: 'Wrap', 'Aligned', 'Commanding', 'Updating' -- 'Textual', 'Literate', 'Dimensions', 'Colored', 'Visible', 'Child',
 --             'Able', 'Tipped', 'Identity', 'Styled', 'Reactive', 'Paint'.
 --
 textCtrl :: Window a -> [Prop (TextCtrl ())] -> IO (TextCtrl ())
@@ -379,7 +379,7 @@ textCtrl parent props
 -- on other platforms. Note: the 'wrap' and 'alignment'
 -- have to be set at creation time or the default to 'WrapNone' and 'AlignLeft' respectively.
 --
--- * Instances: 'Wrap', 'Aligned', 'Commanding' -- 'Textual', 'Literate', 'Dimensions', 'Colored', 'Visible', 'Child',
+-- * Instances: 'Wrap', 'Aligned', 'Commanding', 'Updating' -- 'Textual', 'Literate', 'Dimensions', 'Colored', 'Visible', 'Child',
 --             'Able', 'Tipped', 'Identity', 'Styled', 'Reactive', 'Paint'.
 --
 textCtrlRich :: Window a -> [Prop (TextCtrl ())] -> IO (TextCtrl ())
@@ -388,7 +388,7 @@ textCtrlRich parent props
 
 -- | Create a generic text control given a certain style.
 --
--- * Instances: 'Wrap', 'Aligned', 'Commanding' -- 'Textual', 'Literate', 'Dimensions', 'Colored', 'Visible', 'Child',
+-- * Instances: 'Wrap', 'Aligned', 'Commanding', 'Updating' -- 'Textual', 'Literate', 'Dimensions', 'Colored', 'Visible', 'Child',
 --             'Able', 'Tipped', 'Identity', 'Styled', 'Reactive', 'Paint'.
 --
 textCtrlEx :: Window a -> Style -> [Prop (TextCtrl ())] -> IO (TextCtrl ())
@@ -405,7 +405,7 @@ textCtrlEx parent stl props
 -- | Complete the construction of a text control instance which has been loaded
 --   from a resource file.
 --
--- * Instances: 'Wrap', 'Aligned', 'Commanding' -- 'Textual', 'Literate', 'Dimensions', 'Colored', 'Visible', 'Child',
+-- * Instances: 'Wrap', 'Aligned', 'Commanding', 'Updating' -- 'Textual', 'Literate', 'Dimensions', 'Colored', 'Visible', 'Child',
 --             'Able', 'Tipped', 'Identity', 'Styled', 'Reactive', 'Paint'.
 --
 textCtrlRes :: Window a -> String -> [Prop (TextCtrl ())] -> IO (TextCtrl ())
@@ -413,6 +413,9 @@ textCtrlRes parent name props =
     do t <- xmlResourceGetTextCtrl parent name
        set t props
        return t
+
+instance Updating (TextCtrl a) where
+  update = newEvent "update" controlGetOnText controlOnText
 
 instance Commanding (TextCtrl a) where
   command = newEvent "command" textCtrlGetOnTextEnter textCtrlOnTextEnter
@@ -634,6 +637,10 @@ instance Commanding (ComboBox a) where
   command
     = newEvent "command" comboBoxGetOnTextEnter comboBoxOnTextEnter
 
+instance Updating (ComboBox a) where
+  update
+    = newEvent "update" controlGetOnText controlOnText
+
 instance Selecting (ComboBox a) where
   select
     = newEvent "select" comboBoxGetOnCommand comboBoxOnCommand
@@ -661,7 +668,7 @@ instance Items (ComboBox a) String where
 
 -- | Create a new combo box.
 --
--- * Instances: 'Selecting', 'Commanding','Selection','Items' -- 'Textual', 'Literate', 'Dimensions',
+-- * Instances: 'Selecting', 'Commanding', 'Updating', 'Selection', 'Items' -- 'Textual', 'Literate', 'Dimensions',
 --              'Colored', 'Visible', 'Child',
 --             'Able', 'Tipped', 'Identity', 'Styled', 'Reactive', 'Paint'.
 --
@@ -674,7 +681,7 @@ comboBox parent props
 
 -- | Create a new combo box with a given set of flags.
 --
--- * Instances: 'Selecting', 'Commanding','Selection','Items' -- 'Textual', 'Literate', 'Dimensions',
+-- * Instances: 'Selecting', 'Commanding', 'Updating', 'Selection', 'Items' -- 'Textual', 'Literate', 'Dimensions',
 --              'Colored', 'Visible', 'Child',
 --             'Able', 'Tipped', 'Identity', 'Styled', 'Reactive', 'Paint'.
 --
