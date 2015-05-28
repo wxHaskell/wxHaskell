@@ -29,6 +29,7 @@ typedef int intptr_t;
 #include "wx/statline.h"
 #include "wx/checklst.h"
 #include "wx/treectrl.h"
+#include "wx/splash.h"
 #include "wx/grid.h"
 #include "wx/calctrl.h"
 #include "wx/dnd.h"
