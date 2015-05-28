@@ -93,6 +93,7 @@ extra-source-files:
     src/cpp/eljregion.cpp
     src/cpp/eljregioniter.cpp
     src/cpp/eljsash.cpp
+    src/cpp/eljsplash.cpp
     src/cpp/eljscrollbar.cpp
     src/cpp/eljscrolledwindow.cpp
     src/cpp/eljsingleinst.cpp
@@ -234,6 +235,7 @@ library
     src/cpp/eljregion.cpp
     src/cpp/eljregioniter.cpp
     src/cpp/eljsash.cpp
+    src/cpp/eljsplash.cpp
     src/cpp/eljscrollbar.cpp
     src/cpp/eljscrolledwindow.cpp
     src/cpp/eljsingleinst.cpp

@@ -5004,6 +5004,10 @@ void       wxSpinEvent_SetPosition( TSelf(wxSpinEvent) _obj, int pos );
 
 /* wxSplashScreen */
 TClassDefExtend(wxSplashScreen,wxFrame)
+TClass(wxSplashScreen) wxSplashScreen_Create( TClass(wxBitmap) _bmp, long _sstl, int _ms, TClass(wxWindow) parent, int id, TRect(_lft,_top,_wdt,_hgt), long _stl);
+
+long       wxSplashScreen_GetSplashStyle( TSelf(wxSplashScreen) _obj );
+int        wxSplashScreen_GetTimeout( TSelf(wxSplashScreen) _obj );
 
 /* wxSplitterEvent */
 TClassDefExtend(wxSplitterEvent,wxNotifyEvent)
