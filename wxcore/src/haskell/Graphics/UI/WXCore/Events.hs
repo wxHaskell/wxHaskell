@@ -1,12 +1,12 @@
 {-# LANGUAGE ForeignFunctionInterface #-}
 -----------------------------------------------------------------------------------------
-{-|	Module      :  Events
-	Copyright   :  (c) Daan Leijen 2003
-	License     :  wxWindows
+{-|     Module      :  Events
+        Copyright   :  (c) Daan Leijen 2003
+        License     :  wxWindows
 
-	Maintainer  :  wxhaskell-devel@lists.sourceforge.net
-	Stability   :  provisional
-	Portability :  portable
+        Maintainer  :  wxhaskell-devel@lists.sourceforge.net
+        Stability   :  provisional
+        Portability :  portable
 
 Dynamically set (and get) Haskell event handlers for basic wxWidgets events.
 Note that one should always call 'skipCurrentEvent' when an event is not
@@ -457,17 +457,17 @@ data EventSTC
     | STCSavePointLeft      -- ^ ! wxEVT_STC_SAVEPOINTLEFT.
     | STCROModifyAttempt    -- ^ ! wxEVT_STC_ROMODIFYATTEMPT.
     | STCKey                -- ^ * wxEVT_STC_KEY.
-			    -- kolmodin 20050304:
-			    -- is this event ever raised? not under linux.
-			    -- according to davve, not under windows either
+                            -- kolmodin 20050304:
+                            -- is this event ever raised? not under linux.
+                            -- according to davve, not under windows either
     | STCDoubleClick        -- ^ ! wxEVT_STC_DOUBLECLICK.
     | STCUpdateUI           -- ^ ! wxEVT_STC_UPDATEUI.
     | STCModified Int Int (Maybe String) Int Int Int Int Int          -- ^ ? wxEVT_STC_MODIFIED.
     | STCMacroRecord Int Int Int  -- ^ ! wxEVT_STC_MACRORECORD iMessage wParam lParam
     | STCMarginClick Bool Bool Bool Int Int -- ^ ? wxEVT_STC_MARGINCLICK.
-					    -- kolmodin 20050304:
-					    -- Add something nicer for alt, shift and ctrl?
-					    -- Perhaps a new datatype or a tuple.
+                                            -- kolmodin 20050304:
+                                            -- Add something nicer for alt, shift and ctrl?
+                                            -- Perhaps a new datatype or a tuple.
     | STCNeedShown Int Int  -- ^ ! wxEVT_STC_NEEDSHOWN length position.
     | STCPainted            -- ^ ! wxEVT_STC_PAINTED. 
     | STCUserListSelection Int String -- ^ ! wxEVT_STC_USERLISTSELECTION listType text
@@ -518,36 +518,36 @@ fromSTCEvent event
   = do et <- eventGetEventType event
        case lookup et stcEvents of
          Just action -> action event
-	 Nothing -> return STCUnknown
+         Nothing -> return STCUnknown
 
 stcEvents :: [(EventId, StyledTextEvent a -> IO EventSTC)]
 stcEvents = [ (wxEVT_STC_CHANGE,            \_ -> return STCChange)
-	    , (wxEVT_STC_STYLENEEDED,       \_ -> return STCStyleNeeded)
-	    , (wxEVT_STC_CHARADDED,         charAdded)
-	    , (wxEVT_STC_SAVEPOINTREACHED,  \_ -> return STCSavePointReached)
-	    , (wxEVT_STC_SAVEPOINTLEFT,     \_ -> return STCSavePointLeft)
-	    , (wxEVT_STC_ROMODIFYATTEMPT,   \_ -> return STCROModifyAttempt)
-	    , (wxEVT_STC_KEY,               \_ -> return STCKey)
-	    , (wxEVT_STC_DOUBLECLICK,       \_ -> return STCDoubleClick)
-	    , (wxEVT_STC_UPDATEUI,          \_ -> return STCUpdateUI)
-	    , (wxEVT_STC_MODIFIED,          modified)
-	    , (wxEVT_STC_MACRORECORD,       macroRecord)
-	    , (wxEVT_STC_MARGINCLICK,       marginClick)
-	    , (wxEVT_STC_NEEDSHOWN,         needShown)
-	    , (wxEVT_STC_PAINTED,           \_ -> return STCPainted)
-	    , (wxEVT_STC_USERLISTSELECTION, userListSelection)
-	    , (wxEVT_STC_URIDROPPED,        uriDropped)
-	    , (wxEVT_STC_DWELLSTART,        dwellStart)
-	    , (wxEVT_STC_DWELLEND,          dwellEnd)
-	    , (wxEVT_STC_START_DRAG,        startDrag)
-	    , (wxEVT_STC_DRAG_OVER,         dragOver)
-	    , (wxEVT_STC_DO_DROP,           doDrop)
-	    , (wxEVT_STC_ZOOM,              \_ -> return STCZoom)
-	    , (wxEVT_STC_HOTSPOT_CLICK,     \_ -> return STCHotspotClick)
-	    , (wxEVT_STC_CALLTIP_CLICK,     \_ -> return STCCalltipClick)
-	    -- TODO: STCAutocompSelection event is not tested yet.
-	    , (wxEVT_STC_AUTOCOMP_SELECTION,    \_ -> return STCAutocompSelection)
-	    ]
+            , (wxEVT_STC_STYLENEEDED,       \_ -> return STCStyleNeeded)
+            , (wxEVT_STC_CHARADDED,         charAdded)
+            , (wxEVT_STC_SAVEPOINTREACHED,  \_ -> return STCSavePointReached)
+            , (wxEVT_STC_SAVEPOINTLEFT,     \_ -> return STCSavePointLeft)
+            , (wxEVT_STC_ROMODIFYATTEMPT,   \_ -> return STCROModifyAttempt)
+            , (wxEVT_STC_KEY,               \_ -> return STCKey)
+            , (wxEVT_STC_DOUBLECLICK,       \_ -> return STCDoubleClick)
+            , (wxEVT_STC_UPDATEUI,          \_ -> return STCUpdateUI)
+            , (wxEVT_STC_MODIFIED,          modified)
+            , (wxEVT_STC_MACRORECORD,       macroRecord)
+            , (wxEVT_STC_MARGINCLICK,       marginClick)
+            , (wxEVT_STC_NEEDSHOWN,         needShown)
+            , (wxEVT_STC_PAINTED,           \_ -> return STCPainted)
+            , (wxEVT_STC_USERLISTSELECTION, userListSelection)
+            , (wxEVT_STC_URIDROPPED,        uriDropped)
+            , (wxEVT_STC_DWELLSTART,        dwellStart)
+            , (wxEVT_STC_DWELLEND,          dwellEnd)
+            , (wxEVT_STC_START_DRAG,        startDrag)
+            , (wxEVT_STC_DRAG_OVER,         dragOver)
+            , (wxEVT_STC_DO_DROP,           doDrop)
+            , (wxEVT_STC_ZOOM,              \_ -> return STCZoom)
+            , (wxEVT_STC_HOTSPOT_CLICK,     \_ -> return STCHotspotClick)
+            , (wxEVT_STC_CALLTIP_CLICK,     \_ -> return STCCalltipClick)
+            -- TODO: STCAutocompSelection event is not tested yet.
+            , (wxEVT_STC_AUTOCOMP_SELECTION,    \_ -> return STCAutocompSelection)
+            ]
   where
     charAdded evt = do
       c <- styledTextEventGetKey evt

@@ -1,11 +1,11 @@
 -----------------------------------------------------------------------------------------
-{-|	Module      :  Print
-	Copyright   :  (c) Daan Leijen 2003
-	License     :  wxWindows
+{-|     Module      :  Print
+        Copyright   :  (c) Daan Leijen 2003
+        License     :  wxWindows
 
-	Maintainer  :  wxhaskell-devel@lists.sourceforge.net
-	Stability   :  provisional
-	Portability :  portable
+        Maintainer  :  wxhaskell-devel@lists.sourceforge.net
+        Stability   :  provisional
+        Portability :  portable
 
 Printer abstraction layer. See @samples/wx/Print.hs@ for a demo.
 
@@ -134,11 +134,11 @@ printableArea pageInfo printInfo
         bottom= ppmmH * (max minY (toDouble mbottom))
         right = ppmmW * (max minX (toDouble mright))
 
-	dw = round (right + left)
-	dh = round (bottom + top)
-	(dw', dh') = if sizeW (printPageSize printInfo) < sizeH (printPageSize printInfo)
-		     then (dw, dh)
-		     else (dh, dw)
+        dw = round (right + left)
+        dh = round (bottom + top)
+        (dw', dh') = if sizeW (printPageSize printInfo) < sizeH (printPageSize printInfo)
+                     then (dw, dh)
+                     else (dh, dw)
 
         -- the actual printable page size
         printSize = sz (sizeW (printPageSize printInfo) - dw') 

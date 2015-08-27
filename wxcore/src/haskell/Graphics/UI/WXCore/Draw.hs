@@ -1,11 +1,11 @@
 -----------------------------------------------------------------------------------------
-{-|	Module      :  Draw
-	Copyright   :  (c) Daan Leijen 2003
-	License     :  wxWindows
+{-|     Module      :  Draw
+        Copyright   :  (c) Daan Leijen 2003
+        License     :  wxWindows
 
-	Maintainer  :  wxhaskell-devel@lists.sourceforge.net
-	Stability   :  provisional
-	Portability :  portable
+        Maintainer  :  wxhaskell-devel@lists.sourceforge.net
+        Stability   :  provisional
+        Portability :  portable
 
 Drawing.
 -}
@@ -600,8 +600,8 @@ brushCreateFromStyle brushStyle
   = case brushStyle of
       BrushStyle BrushTransparent color
         -> do brush <- if (wxToolkit == WxMac)
-	                then brushCreateFromColour color wxBRUSHSTYLE_TRANSPARENT
-			else brushCreateFromStock 7   {- transparent brush -}
+                        then brushCreateFromColour color wxBRUSHSTYLE_TRANSPARENT
+                        else brushCreateFromStock 7   {- transparent brush -}
               return (brush,return ())
       BrushStyle BrushSolid color
         -> case lookup color stockBrushes of
@@ -853,16 +853,16 @@ dcBufferedAux withWinDC withMemoryDC dc clear mbVar view draw
            dcSetDeviceOrigin memdc (pointFromVec (vecNegate (vecFromPoint (rectTopLeft view))))
            dcSetClippingRegion memdc view
            -- dcBlit memdc view dc (rectTopLeft view) wxCOPY False
-	   bracket (dcGetBackground dc)
+           bracket (dcGetBackground dc)
                    (\brush -> do dcSetBrush memdc nullBrush
                                  brushDelete brush)
                    (\brush -> do -- set the background to the owner brush
                                  dcSetBackground memdc brush
                                  if (wxToolkit == WxMac)
-				  then withBrushStyle brushTransparent (dcSetBrush memdc)
-				  else dcSetBrush memdc brush
+                                  then withBrushStyle brushTransparent (dcSetBrush memdc)
+                                  else dcSetBrush memdc brush
                                  clear (downcastDC memdc)
-				 -- and finally do the drawing!
+                                 -- and finally do the drawing!
                                  withMemoryDC memdc draw
                    )
            -- blit the memdc into the owner dc.
