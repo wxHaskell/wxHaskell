@@ -1,12 +1,13 @@
 
 -----------------------------------------------------------------------------------------
-{-|	Module      :  Layout
-	Copyright   :  (c) Daan Leijen 2003
-	License     :  BSD-style
+{-|
+Module      :  Layout
+Copyright   :  (c) Daan Leijen 2003
+License     :  BSD-style
 
-	Maintainer  :  wxhaskell-devel@lists.sourceforge.net
-	Stability   :  provisional
-	Portability :  portable
+Maintainer  :  wxhaskell-devel@lists.sourceforge.net
+Stability   :  provisional
+Portability :  portable
 
 Just re-exports functionality of "Graphics.UI.WXCore.Layout". See that module
 for a description of layout combinators. 

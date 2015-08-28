@@ -1,14 +1,15 @@
 {-# LANGUAGE TypeSynonymInstances, FlexibleInstances #-}
 --------------------------------------------------------------------------------
-{-|	Module      :  Timer
-	Copyright   :  (c) Daan Leijen 2003
-	License     :  wxWindows
+{-|
+Module      :  Timer
+Copyright   :  (c) Daan Leijen 2003
+License     :  wxWindows
 
-	Maintainer  :  wxhaskell-devel@lists.sourceforge.net
-	Stability   :  provisional
-	Portability :  portable
+Maintainer  :  wxhaskell-devel@lists.sourceforge.net
+Stability   :  provisional
+Portability :  portable
 
-Support for milli-second timers.
+Support for millisecond timers.
 -}
 --------------------------------------------------------------------------------
 module Graphics.UI.WX.Timer
@@ -27,7 +28,7 @@ import Graphics.UI.WX.Events
 {--------------------------------------------------------------------
 
 --------------------------------------------------------------------}
--- | A timer generates a 'command' event on a specified milli-second 'interval'.
+-- | A timer generates a 'command' event on a specified millisecond 'interval'.
 --
 -- * Attributes: 'interval'
 --
@@ -44,7 +45,7 @@ timer parent props
        set t props
        return t
 
--- | The milli-second interval of the timer.
+-- | The millisecond interval of the timer.
 interval :: Attr Timer Int
 interval
   = newAttr "timer-interval"

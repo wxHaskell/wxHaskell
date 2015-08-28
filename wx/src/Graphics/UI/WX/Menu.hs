@@ -1,13 +1,14 @@
 {-# LANGUAGE TypeSynonymInstances, FlexibleInstances #-}
 --------------------------------------------------------------------------------
-{-|	Module      :  Menu
-	Copyright   :  (c) Daan Leijen 2003
-	               (c) Shelarcy (shelarcy@gmail.com) 2006
-	License     :  wxWindows
+{-|
+Module      :  Menu
+Copyright   :  (c) Daan Leijen 2003
+               (c) Shelarcy (shelarcy@gmail.com) 2006
+License     :  wxWindows
 
-	Maintainer  :  wxhaskell-devel@lists.sourceforge.net
-	Stability   :  provisional
-	Portability :  portable
+Maintainer  :  wxhaskell-devel@lists.sourceforge.net
+Stability   :  provisional
+Portability :  portable
 
 Defines Menus, toolbars, and statusbars.
     
@@ -15,7 +16,7 @@ The function 'menuPane' is used to create a menu
 that can contain 'menuItem's. Menu items can contain event handlers
 using ('on' 'command'), but they can also be set, using the 'menu'
 function, on a frame or (mdi) window so that the menu command is handled
-in the context of the active window instead of the context of the
+in the context of the active window, instead of the context of the
 entire application. 
 
 > do frame  <- frame    [text := "Demo"]
@@ -131,8 +132,6 @@ menuHelp :: [Prop (Menu ())] -> IO (Menu ())
 menuHelp props
   = menuPane ([text := "&Help"] ++ props)
 
--- | Complete the construction of a menu which has been loaded
---   from a resource file.
 -- | Get a menu by name from a menu loaded from a resource file, 
 --   given the frame which owns the menu. You
 --   can directly set properties on the item as part of the call, which
@@ -176,7 +175,7 @@ menuLine menu
 
 -- | Append a menu item. The label can contain
 -- menu accellerators by using an ampersand. It can also contain keyboard accellerators
--- after a tab (@'\\t'@) character.
+-- after a tab (@'\t'@) character.
 --
 -- > menuItem menu [text := "&Open\tCtrl+O", help := "Opens an existing document"] 
 --
@@ -514,7 +513,7 @@ instance Commanding ToolBarItem where
       setter (ToolBarItem toolbar id isToggle) io
         = evtHandlerOnMenuCommand toolbar id io
 
--- | React on tool event. (normally handled by 'menu' though, so only use this
+-- | React on tool event (normally handled by 'menu' though, so only use this
 -- for orphan toolbar items).
 tool :: ToolBarItem -> Event (Window w) (IO ())
 tool (ToolBarItem toolbar id isToggle)
@@ -525,11 +524,11 @@ tool (ToolBarItem toolbar id isToggle)
     setter w io
       = evtHandlerOnMenuCommand w id io
 
--- | Create a tool bar item based on a menu. Takes a a relevant menu
--- item, a label and an image file (bmp, png, gif, ico, etc.) as arguments. The image
--- file is normally 16x15 pixels.
+-- | Create a tool bar item based on a menu. Takes a relevant menu
+-- item, a label and an image file (bmp, png, gif, ico, etc.) as arguments. The image from the
+-- file is normally 16 pixels wide and 15 pixels high.
 -- The toolbar item will fire the relevant menu items just as if the menu has been selected.
--- Checkable menus will give a checkable toolbar item. Beware though that checkable tools
+-- Checkable menus will give a checkable toolbar item. Beware though, that checkable tools
 -- normally require a specific @on command@ handler to keep them synchronised with the 
 -- corresponding menu item.
 toolMenu :: ToolBar a -> MenuItem a -> String -> FilePath -> [Prop ToolBarItem] -> IO ToolBarItem

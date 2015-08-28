@@ -1,12 +1,13 @@
 {-# LANGUAGE TypeSynonymInstances, FlexibleInstances #-}
 --------------------------------------------------------------------------------
-{-|	Module      :  TopLevelWindow
-	Copyright   :  (c) Jeremy O'Donoghue, 2007
-	License     :  wxWindows
+{-|
+Module      :  TopLevelWindow
+Copyright   :  (c) Jeremy O'Donoghue, 2007
+License     :  wxWindows
 
-	Maintainer  :  wxhaskell-devel@lists.sourceforge.net
-	Stability   :  provisional
-	Portability :  portable
+Maintainer  :  wxhaskell-devel@lists.sourceforge.net
+Stability   :  provisional
+Portability :  portable
 
 wxTopLevelwindow (wxWidgets >= 2.8.0) defines an (abstract) common base class
 for wxFrame and wxDialog.

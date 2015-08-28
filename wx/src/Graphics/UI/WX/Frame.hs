@@ -1,13 +1,14 @@
 
 --------------------------------------------------------------------------------
-{-|	Module      :  Frame
-	Copyright   :  (c) Daan Leijen 2003
-	               (c) Jeremy O'Donoghue 2007
-	License     :  wxWindows
+{-|
+Module      :  Frame
+Copyright   :  (c) Daan Leijen 2003
+               (c) Jeremy O'Donoghue 2007
+License     :  wxWindows
 
-	Maintainer  :  wxhaskell-devel@lists.sourceforge.net
-	Stability   :  provisional
-	Portability :  portable
+Maintainer  :  wxhaskell-devel@lists.sourceforge.net
+Stability   :  provisional
+Portability :  portable
 
 Frames.
     
@@ -83,7 +84,7 @@ frameLoadRes :: FilePath -> String -> [Prop (Frame ())] -> IO (Frame ())
 frameLoadRes rc name props = 
     frameLoadChildRes objectNull rc name props
 
--- | Complete the construction of a frame whcih is the child of some
+-- | Complete the construction of a frame which is the child of some
 --   existing parent window.
 frameLoadChildRes :: Window a -> FilePath -> String -> [Prop (Frame ())] -> IO (Frame ())
 frameLoadChildRes parent rc name props =

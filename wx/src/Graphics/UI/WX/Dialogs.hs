@@ -1,12 +1,13 @@
 {-# LANGUAGE TypeSynonymInstances, FlexibleInstances #-}
 --------------------------------------------------------------------------------
-{-| Module      :  Dialogs
-    Copyright   :  (c) Daan Leijen 2003
-    License     :  wxWindows
+{-|
+Module      :  Dialogs
+Copyright   :  (c) Daan Leijen 2003
+License     :  wxWindows
 
-    Maintainer  :  wxhaskell-devel@lists.sourceforge.net
-    Stability   :  provisional
-    Portability :  portable
+Maintainer  :  wxhaskell-devel@lists.sourceforge.net
+Stability   :  provisional
+Portability :  portable
 
 Defines common dialogs.
 

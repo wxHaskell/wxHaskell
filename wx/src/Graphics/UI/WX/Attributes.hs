@@ -1,12 +1,13 @@
 {-# LANGUAGE ExistentialQuantification #-}
 --------------------------------------------------------------------------------
-{-| Module      :  Attributes
-    Copyright   :  (c) Daan Leijen 2003
-    License     :  wxWindows
+{-|
+Module      :  Attributes
+Copyright   :  (c) Daan Leijen 2003
+License     :  wxWindows
 
-    Maintainer  :  wxhaskell-devel@lists.sourceforge.net
-    Stability   :  provisional
-    Portability :  portable
+Maintainer  :  wxhaskell-devel@lists.sourceforge.net
+Stability   :  provisional
+Portability :  portable
 
 
 Widgets @w@ can have attributes of type @a@ represented by the type 'Attr' @w a@.
@@ -141,7 +142,7 @@ castProps :: (v -> w) -> [Prop w] -> [Prop v]
 castProps coerce props
   = map (castProp coerce) props
 
--- | Create a /reflective/ attribute with a specified name: value can possibly
+-- | Create a /reflective/ attribute with a specified name: value can possibly be
 -- retrieved using 'getPropValue'. Note: the use of this function is discouraged
 -- as it leads to non-compositional code.
 reflectiveAttr :: Typeable a => String -> (w -> IO a) -> (w -> a -> IO ()) -> Attr w a
@@ -150,7 +151,7 @@ reflectiveAttr name getter setter
   where
     updater w f   = do x <- getter w; setter w (f x); return x
 
--- | Create a /reflective/ attribute with a specified name: value can possibly
+-- | Create a /reflective/ attribute with a specified name: value can possibly be
 -- retrieved using 'getPropValue'. Note: the use of this function is discouraged
 -- as it leads to non-compositional code.
 createAttr :: Typeable a => String -> (w -> IO a) -> (w -> a -> IO ()) -> CreateAttr w a
@@ -325,7 +326,7 @@ withProperty attr def cont props
       (PropModify f, ps) -> cont (f def) ps
       (PropNone, ps)     -> cont def ps
 
--- | Try to find a property value. Return |Nothing| if not found at all.
+-- | Try to find a property value. Return @Nothing@ if not found at all.
 findProperty :: Typeable a => Attr w a -> a -> [Prop w] -> Maybe (a,[Prop w])
 findProperty attr def props
   = case filterProperty attr props of
@@ -340,7 +341,7 @@ withStyleProperty :: Attr w Bool -> Style -> ([Prop w] -> Style -> a) -> [Prop w
 withStyleProperty prop flag 
   = withStylePropertyEx prop (bitsSet flag) (\isSet style -> if isSet then (style .+. flag) else (style .-. flag)) 
 
--- | Transform the properties based on a style property. The flag is interpreted negatively, i.e. |True|
+-- | Transform the properties based on a style property. The flag is interpreted negatively, i.e. @True@
 -- removes the bit instead of setting it.
 withStylePropertyNot :: Attr w Bool -> Style -> ([Prop w] -> Style -> a) -> [Prop w] -> Style -> a
 withStylePropertyNot prop flag 

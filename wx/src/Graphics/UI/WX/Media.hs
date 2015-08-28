@@ -1,13 +1,14 @@
 {-# LANGUAGE TypeSynonymInstances, FlexibleInstances #-}
 --------------------------------------------------------------------------------
-{-|	Module      :  Media
-	Copyright   :  (c) Daan Leijen 2003
-	               (c) shelarcy 2007
-	License     :  wxWindows
+{-|
+Module      :  Media
+Copyright   :  (c) Daan Leijen 2003
+               (c) shelarcy 2007
+License     :  wxWindows
 
-	Maintainer  :  wxhaskell-devel@lists.sourceforge.net
-	Stability   :  provisional
-	Portability :  portable
+Maintainer  :  wxhaskell-devel@lists.sourceforge.net
+Stability   :  provisional
+Portability :  portable
 
 Images, Media, Sounds, and action!
 -}
@@ -38,7 +39,7 @@ import Graphics.UI.WX.Classes
 -- | Return a managed bitmap object. Bitmaps are abstract images used
 -- for drawing to a device context. The file path should point to
 -- a valid bitmap file, normally a @.ico@, @.bmp@, @.xpm@, or @.png@,
--- but any file format supported by |Image| is correctly loaded.
+-- but any file format supported by 'Image' is correctly loaded.
 --
 -- Instances: 'Sized'.
 bitmap :: FilePath -> Bitmap ()
@@ -58,7 +59,7 @@ bitmapFromImage image
 --------------------------------------------------------------------}
 -- | Return a managed image. Images are platform independent representations
 -- of pictures, using an array of rgb pixels. See "Graphics.UI.WXCore.Image" for
--- lowlevel pixel manipulation. The file path should point to
+-- low-level pixel manipulation. The file path should point to
 -- a valid image file, like @.jpg@, @.bmp@, @.xpm@, or @.png@, for example.
 --
 -- Instances: 'Sized'.

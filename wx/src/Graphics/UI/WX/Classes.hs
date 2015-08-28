@@ -1,12 +1,13 @@
 {-# LANGUAGE MultiParamTypeClasses, FunctionalDependencies, DeriveDataTypeable, ScopedTypeVariables #-}
 --------------------------------------------------------------------------------
-{-| Module      :  Classes
-    Copyright   :  (c) Daan Leijen 2003
-    License     :  wxWindows
+{-|
+Module      :  Classes
+Copyright   :  (c) Daan Leijen 2003
+License     :  wxWindows
 
-    Maintainer  :  wxhaskell-devel@lists.sourceforge.net
-    Stability   :  provisional
-    Portability :  portable
+Maintainer  :  wxhaskell-devel@lists.sourceforge.net
+Stability   :  provisional
+Portability :  portable
 
 This modules defines attributes common to many widgets and
 organizes them into Haskell classes. Look at the instance definitions
@@ -69,7 +70,7 @@ import Graphics.UI.WX.Layout
 -- | Widgets with a label or text field.
 class Textual w where
   -- | The text of a widget. It is interpreted differently for
-  -- for different widgets, for example, the title of a frame or the content of a
+  -- different widgets, for example, the title of a frame or the content of a
   -- static text control.
   text       :: Attr w String
   appendText :: w -> String -> IO ()
@@ -379,7 +380,7 @@ class Sized w where
 class HasDefault w where
   -- | Define a default item as any type deriving from 'Window'. Great care
   --   is required when using this option as you will have to cast the item
-  --   to/from Window() using 'objectCast'. 
+  --   to/from @Window ()@ using 'objectCast'. 
   --   For the common use case where the window in question is a 'Button', 
   --   please use 'defaultButton' as it is typesafe.
   unsafeDefaultItem :: Attr w (Window ())

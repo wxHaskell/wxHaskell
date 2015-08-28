@@ -1,13 +1,14 @@
 
 --------------------------------------------------------------------------------
-{-|	Module      :  Events
-	Copyright   :  (c) Daan Leijen 2003
-	               (c) Shelarcy (shelarcy@gmail.com) 2006
-	License     :  wxWindows
+{-|
+Module      :  Events
+Copyright   :  (c) Daan Leijen 2003
+               (c) Shelarcy (shelarcy@gmail.com) 2006
+License     :  wxWindows
 
-	Maintainer  :  wxhaskell-devel@lists.sourceforge.net
-	Stability   :  provisional
-	Portability :  portable
+Maintainer  :  wxhaskell-devel@lists.sourceforge.net
+Stability   :  provisional
+Portability :  portable
 
 Define event handling. Events are parametrised by the widget that can
 correspond to a certain event and the type of the event handler.
@@ -16,7 +17,7 @@ For example, the 'resize' event has type:
 > Reactive w => Event w (IO ())
 
 This means that all widgets in the 'Reactive' class can respond to
-'resize' events. (and since 'Window' is an instance of this class, this
+'resize' events (and since 'Window' is an instance of this class, this
 means that basically all visible widgets are reactive).
 
 An @Event w a@ can be transformed into an attribute of type 'Attr' @w a@
@@ -28,7 +29,7 @@ using the 'on' function.
 For convenience, the 'mouse' and 'keyboard' have a serie of /event filters/:
 'click', 'drag', 'enterKey', 'charKey', etc. These filters are write-only
 and do not overwrite any previous mouse or keyboard handler but all stay
-active at the same time. However, all filter will be overwritten again
+active at the same time. However, all filters will be overwritten again
 when 'mouse' or 'keyboard' is set again. For example, the following program
 makes sense:
 
@@ -40,7 +41,7 @@ But in the following program, only the handler for 'mouse' will be called:
 
 If you want to set the 'mouse' later but retain the old event filters,
 you can first read the current 'mouse' handler and call it in the 
-new handler (and the same for the 'keyboard' of course). This implemenation
+new handler (and the same for the 'keyboard', of course). This implementation
 technique is used to implement event filters themselves and is also
 very useful when setting an event handler for a 'closing' event:
 

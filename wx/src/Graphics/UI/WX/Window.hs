@@ -2,13 +2,14 @@
 {-# LANGUAGE FlexibleInstances     #-}
 {-# LANGUAGE TypeSynonymInstances  #-}
 --------------------------------------------------------------------------------
-{-|	Module      :  Window
-	Copyright   :  (c) Daan Leijen 2003
-	License     :  wxWindows
+{-|
+Module      :  Window
+Copyright   :  (c) Daan Leijen 2003
+License     :  wxWindows
 
-	Maintainer  :  wxhaskell-devel@lists.sourceforge.net
-	Stability   :  provisional
-	Portability :  portable
+Maintainer  :  wxhaskell-devel@lists.sourceforge.net
+Stability   :  provisional
+Portability :  portable
 
 Exports default instances for generic windows.
 
@@ -340,7 +341,7 @@ instance Child (Window a) where
 
 -- | Ensure that a widget is refitted inside a window when
 -- its size changes, for example when the 'text' of a 
--- 'staticText' control changes. (calls 'windowReFit')
+-- 'staticText' control changes. (Calls 'windowReFit')
 refit :: Window a -> IO ()
 refit w
   = windowReFit w
@@ -348,7 +349,7 @@ refit w
 -- | Ensure that a widget is refitted inside a window when
 -- its size changes, for example when the 'text' of a 
 -- 'staticText' control changes. Always resizes the
--- window to its minimal acceptable size. (calls 'windowReFitMinimal')
+-- window to its minimal acceptable size. (Calls 'windowReFitMinimal')
 refitMinimal :: Window a -> IO ()
 refitMinimal w
   = windowReFitMinimal w

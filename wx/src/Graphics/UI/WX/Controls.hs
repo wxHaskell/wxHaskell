@@ -1,13 +1,14 @@
 {-# LANGUAGE TypeSynonymInstances, FlexibleInstances, MultiParamTypeClasses, DeriveDataTypeable #-}
 --------------------------------------------------------------------------------
-{-| Module      :  Controls
-    Copyright   :  (c) Daan Leijen 2003
-                   (c) Shelarcy (shelarcy@gmail.com) 2006
-    License     :  wxWindows
+{-| 
+Module      :  Controls
+Copyright   :  (c) Daan Leijen 2003
+               (c) Shelarcy (shelarcy@gmail.com) 2006
+License     :  wxWindows
 
-    Maintainer  :  wxhaskell-devel@lists.sourceforge.net
-    Stability   :  provisional
-    Portability :  portable
+Maintainer  :  wxhaskell-devel@lists.sourceforge.net
+Stability   :  provisional
+Portability :  portable
 
 Defines common GUI controls.
 -}
@@ -101,7 +102,7 @@ defaultStyle
 -- controls. It has a standard background and maintains standard keyboard
 -- navigation (ie. /Tab/ moves through the controls).
 --
--- Note: 'defaultButton' attibute is removed. Set 'defaultButton' to parent
+-- Note: the 'defaultButton' attribute is removed. Set 'defaultButton' to parent
 -- 'Frame' or 'Dialog' instead of this control now. This is an incompatible
 -- change to support wxWidgets 2.8.x.
 --
@@ -117,7 +118,7 @@ panel parent props
 
 -- | Create a 'Panel' with a specific style.
 --
--- Note: 'defaultButton' attibute is removed. Set 'defaultButton' to parent
+-- Note: the 'defaultButton' attribute is removed. Set 'defaultButton' to parent
 -- 'Frame' or 'Dialog' instead of this control now. This is an incompatible
 -- change to support wxWidgets 2.8.x.
 --
@@ -353,8 +354,8 @@ entry :: Window a -> [Prop (TextCtrl ())] -> IO (TextCtrl ())
 entry parent props
   = textCtrlEx parent getRichTE props
 
--- | Create a single-line text entry control. Note: 'alignment' has to
--- be set at creation time (or the entry has default alignment (=left) ).
+-- | Create a single-line text entry control. Note: 'alignment' can only
+-- be set at creation time (default is left alignment).
 --
 -- * Instances: 'Wrap', 'Aligned', 'Commanding', 'Updating' -- 'Textual', 'Literate', 'Dimensions', 'Colored', 'Visible', 'Child',
 --             'Able', 'Tipped', 'Identity', 'Styled', 'Reactive', 'Paint'.
@@ -364,7 +365,7 @@ textEntry parent props
   = textCtrlEx parent getRichTE props
 
 -- | Create a multi-line text control. Note: the 'wrap' and 'alignment'
--- have to be set at creation time or the default to 'WrapNone' and 'AlignLeft' respectively.
+-- can only be set at creation time, the defaults are 'WrapNone' and 'AlignLeft' respectively.
 --
 -- * Instances: 'Wrap', 'Aligned', 'Commanding', 'Updating' -- 'Textual', 'Literate', 'Dimensions', 'Colored', 'Visible', 'Child',
 --             'Able', 'Tipped', 'Identity', 'Styled', 'Reactive', 'Paint'.
@@ -377,7 +378,7 @@ textCtrl parent props
 -- | Create a multi-line text rich-text control with a certain wrap mode
 -- Enables font and color settings on windows, while being equal to 'textCtrl'
 -- on other platforms. Note: the 'wrap' and 'alignment'
--- have to be set at creation time or the default to 'WrapNone' and 'AlignLeft' respectively.
+-- can only be set at creation time, the defaults are 'WrapNone' and 'AlignLeft' respectively.
 --
 -- * Instances: 'Wrap', 'Aligned', 'Commanding', 'Updating' -- 'Textual', 'Literate', 'Dimensions', 'Colored', 'Visible', 'Child',
 --             'Able', 'Tipped', 'Identity', 'Styled', 'Reactive', 'Paint'.
@@ -421,7 +422,7 @@ instance Commanding (TextCtrl a) where
   command = newEvent "command" textCtrlGetOnTextEnter textCtrlOnTextEnter
 
 -- | Process @enter@ key events, used in a 'comboBox' or 'textCtrl' and
--- catched using a 'on' 'command' handler.
+-- catched using an 'on' 'command' handler
 -- (otherwise pressing @Enter@ is either processed
 -- internally by the control or used for navigation between dialog controls).
 processEnter :: Styled w => Attr w Bool
@@ -598,7 +599,7 @@ instance Items (Choice a) String where
     = choiceDelete w i
 
 
--- | Create a choice item to select a one of a list of strings.
+-- | Create a choice item to select one of a list of strings.
 --
 -- * Instances: 'Sorted', 'Selecting','Selection','Items' -- 'Textual', 'Literate', 'Dimensions', 'Colored', 'Visible', 'Child',
 --             'Able', 'Tipped', 'Identity', 'Styled', 'Reactive', 'Paint'.
@@ -608,7 +609,7 @@ choice parent props
   = choiceEx parent 0 props
 
 
--- | Create a choice item, given a set of style flags, to select a one of a list of strings
+-- | Create a choice item, given a set of style flags, to select one of a list of strings
 --
 -- * Instances: 'Selecting','Selection','Items' -- 'Textual', 'Literate', 'Dimensions', 'Colored', 'Visible', 'Child',
 --             'Able', 'Tipped', 'Identity', 'Styled', 'Reactive', 'Paint'.
@@ -976,7 +977,7 @@ instance Commanding (Slider a) where
   command = newEvent "command" sliderGetOnCommand sliderOnCommand
 
 -- | Create a horizontal slider with a specified minimum and maximum. Set
--- the 'Bool' argument to 'True' to show labels (minimumn, maximum, and
+-- the 'Bool' argument to 'True' to show labels (minimum, maximum, and
 -- current value). The 'selection' attribute gives the current value.
 --
 -- * Instances: 'Commanding','Selection' -- 'Textual', 'Literate', 'Dimensions', 'Colored', 'Visible', 'Child',
@@ -987,7 +988,7 @@ hslider parent showLabels min max props
   = sliderEx parent min max (wxHORIZONTAL .+. (if showLabels then wxSL_LABELS else 0)) props
 
 -- | Create a vertical slider with a specified minimum and maximum. Set
--- the 'Bool' argument to 'True' to show labels (minimumn, maximum, and
+-- the 'Bool' argument to 'True' to show labels (minimum, maximum, and
 -- current value). The 'selection' attribute gives the current value.
 --
 -- * Instances: 'Commanding','Selection' -- 'Textual', 'Literate', 'Dimensions', 'Colored', 'Visible', 'Child',
@@ -1293,7 +1294,7 @@ listCtrlSetColumnWidths ctrl w = do
 --  let w = 65 --ceiling $ size / realToFrac cols
   forM_ [0 .. cols - 1] $ \i -> listCtrlSetColumnWidth ctrl i w
 
--- | A small wrapper over WX's ListCtrl, allowing us to keep the data
+-- | A small wrapper over WX's 'ListCtrl', allowing us to keep the data
 --   we're representing as well as its string form (shown to the user as
 --   rows).
 data ListView a = ListView {
@@ -1373,16 +1374,16 @@ imageListFromFiles size files
   MediaCtrl
 --------------------------------------------------------------------------------}
 
--- | Optional back-end for your MediaCtrl.
---   If you want to know more about back-end, you must see wxWidgets' Document.
---   <http://www.wxwidgets.org/manuals/stable/wx_wxmediactrl.html#choosingbackendwxmediactrl>
+-- | Optional backend for your MediaCtrl.
+--   If you want to know more about backend, you must see wxWidgets' document:
+--   <http://docs.wxwidgets.org/trunk/classwx_media_ctrl.html#mediactrl_choosing_backend>
 data MediaCtrlBackend =
-      DirectShow            -- ^ Use ActiveMovie\/DirectShow. Default back-end on Windows.
+      DirectShow            -- ^ Use ActiveMovie\/DirectShow. Default backend on Windows.
     | MediaControlInterface -- ^ Use Media Command Interface. Windows Only.
     | WindowsMediaPlayer10  -- ^ Use Windows Media Player 10. Windows Only. Require to use wxWidgets 2.8.x.
     | QuickTime             -- ^ Use QuickTime. Mac Only. 
     | GStreamer             -- ^ Use GStreamer. Unix Only. Require GStreamer and GStreamer Support.
-    | DefaultBackend        -- ^ Use default back-end on your platform.
+    | DefaultBackend        -- ^ Use default backend on your platform.
    deriving (Eq,Show)
 
 fromMediaCtrlBackend :: MediaCtrlBackend -> String
@@ -1407,7 +1408,7 @@ mediaCtrl :: Window a -> [Prop (MediaCtrl ())] -> IO (MediaCtrl ())
 mediaCtrl parent props
   = mediaCtrlEx parent defaultStyle DefaultBackend props
 
--- | Create MediaCtrl with choosing back-end. This is useful to select back-end on
+-- | Create MediaCtrl with choosing backend. This is useful to select backend on
 -- Windows. But if you don't want to cause any effect to other platforms, you must
 -- use wxToolkit or #ifdef macro to choose correct function for platforms.
 -- For example,
@@ -1507,7 +1508,7 @@ wizardEvent
   = newEvent "wizardEvent" wizardGetOnWizEvent wizardOnWizEvent
  
 -- | Run the wizard.
--- IMPORTANT: `windowDestroy` needs to be called on the wizard when it is no longer used. After
+-- IMPORTANT: `windowDestroy` must be called on the wizard when it is no longer used. After
 -- `windowDestroy` has been called, the wizard or any of its children must not be accessed anymore.
 runWizard :: Wizard a -> WizardPage b -> IO Bool
 runWizard wiz page = wizardRunWizard wiz page >>= return . (/=0)
