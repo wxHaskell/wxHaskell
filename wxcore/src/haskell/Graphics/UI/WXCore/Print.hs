@@ -1,13 +1,14 @@
 -----------------------------------------------------------------------------------------
-{-|     Module      :  Print
-        Copyright   :  (c) Daan Leijen 2003
-        License     :  wxWindows
+{-|
+Module      :  Print
+Copyright   :  (c) Daan Leijen 2003
+License     :  wxWindows
 
-        Maintainer  :  wxhaskell-devel@lists.sourceforge.net
-        Stability   :  provisional
-        Portability :  portable
+Maintainer  :  wxhaskell-devel@lists.sourceforge.net
+Stability   :  provisional
+Portability :  portable
 
-Printer abstraction layer. See @samples/wx/Print.hs@ for a demo.
+Printer abstraction layer. See @samples\/wx\/Print.hs@ for a demo.
 
 The application should create a 'pageSetupDialog' to hold the printer
 settings of the user.

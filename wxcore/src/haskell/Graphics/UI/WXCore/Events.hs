@@ -1,12 +1,13 @@
 {-# LANGUAGE ForeignFunctionInterface #-}
 -----------------------------------------------------------------------------------------
-{-|     Module      :  Events
-        Copyright   :  (c) Daan Leijen 2003
-        License     :  wxWindows
+{-|
+Module      :  Events
+Copyright   :  (c) Daan Leijen 2003
+License     :  wxWindows
 
-        Maintainer  :  wxhaskell-devel@lists.sourceforge.net
-        Stability   :  provisional
-        Portability :  portable
+Maintainer  :  wxhaskell-devel@lists.sourceforge.net
+Stability   :  provisional
+Portability :  portable
 
 Dynamically set (and get) Haskell event handlers for basic wxWidgets events.
 Note that one should always call 'skipCurrentEvent' when an event is not
@@ -779,9 +780,9 @@ windowGetOnScroll window
   = unsafeWindowGetHandlerState window wxEVT_SCROLLWIN_TOP (\scroll -> skipCurrentEvent)
 
 {--------------------------------------------------------------------------
-  Html event
+  HTML event
 --------------------------------------------------------------------------}
--- | Html window events
+-- | HTML window events
 data EventHtml  
   = HtmlCellClicked String EventMouse  Point 
       -- ^ A /cell/ is clicked. Contains the cell /id/ attribute value, the mouse event and the logical coordinates.
@@ -792,16 +793,16 @@ data EventHtml
   | HtmlSetTitle String
      -- ^ Called when a @<title>@ tag is parsed.
   | HtmlUnknown 
-     -- ^ Unrecognised html event
+     -- ^ Unrecognised HTML event
 
 instance Show EventHtml where
   show ev
     = case ev of
-        HtmlCellClicked id mouse pnt           -> "Html Cell " ++ show id ++ " clicked: " ++ show mouse
-        HtmlLinkClicked href target id mouse p -> "Html Link " ++ show id ++ " clicked: " ++ href
-        HtmlCellHover id                       -> "Html Cell " ++ show id ++ " hover"
-        HtmlSetTitle title                     -> "Html event title: " ++ title
-        HtmlUnknown                            -> "Html event unknown"
+        HtmlCellClicked id mouse pnt           -> "HTML Cell " ++ show id ++ " clicked: " ++ show mouse
+        HtmlLinkClicked href target id mouse p -> "HTML Link " ++ show id ++ " clicked: " ++ href
+        HtmlCellHover id                       -> "HTML Cell " ++ show id ++ " hover"
+        HtmlSetTitle title                     -> "HTML event title: " ++ title
+        HtmlUnknown                            -> "HTML event unknown"
 
 fromHtmlEvent :: WXCHtmlEvent a -> IO EventHtml
 fromHtmlEvent event
@@ -839,7 +840,7 @@ fromHtmlEvent event
            pnt     <- wxcHtmlEventGetLogicalPosition event
            return (HtmlLinkClicked href target id mouse pnt)
       
--- | Set a html event handler for a html window. The first argument determines whether
+-- | Set a html event handler for a HTML window. The first argument determines whether
 -- hover events ('HtmlCellHover') are handled or not.
 htmlWindowOnHtmlEvent :: WXCHtmlWindow a -> Bool -> (EventHtml -> IO ()) -> IO ()
 htmlWindowOnHtmlEvent window allowHover handler
@@ -853,7 +854,7 @@ htmlWindowOnHtmlEvent window allowHover handler
       = do eventHtml <- fromHtmlEvent (objectCast event)
            handler eventHtml
 
--- | Get the current html event handler of a html window.
+-- | Get the current HTML event handler of a HTML window.
 htmlWindowGetOnHtmlEvent :: WXCHtmlWindow a -> IO (EventHtml -> IO ())
 htmlWindowGetOnHtmlEvent window
   = unsafeWindowGetHandlerState window wxEVT_HTML_CELL_CLICKED (\ev -> skipCurrentEvent)
@@ -883,7 +884,7 @@ windowGetOnClose window
   = unsafeWindowGetHandlerState window wxEVT_CLOSE_WINDOW (do windowDestroy window; return ())
 
 -- | Set an event handler that is called when the window is destroyed.
--- /Note: does not seem to work on windows/.
+-- /Note: does not seem to work on Windows/.
 windowOnDestroy :: Window a -> IO () -> IO ()
 windowOnDestroy window eventHandler
   = windowOnEvent window [wxEVT_DESTROY] eventHandler (\ev -> eventHandler)
@@ -973,7 +974,7 @@ windowGetOnFocus window
   = unsafeWindowGetHandlerState window wxEVT_SET_FOCUS (\getfocus -> return ())
 
 
--- | A context menu event is generated when the user righ-clicks in a window
+-- | A context menu event is generated when the user right-clicks in a window
 -- or presses shift-F10.
 windowOnContextMenu :: Window a -> IO () -> IO ()
 windowOnContextMenu window eventHandler
@@ -1201,7 +1202,7 @@ streamStatusFromInt code
 
 -- | Install an event handler on an input stream. The handler is called
 -- whenever input is read (or when an error occurred). The third parameter
--- gives the size of the input batches. The orignal input stream should no longer be referenced after this call!
+-- gives the size of the input batches. The original input stream should no longer be referenced after this call!
 evtHandlerOnInput :: EvtHandler b -> (String -> StreamStatus -> IO ()) -> InputStream a -> Int -> IO ()
 evtHandlerOnInput evtHandler handler stream bufferLen
   = do sink <- inputSinkCreate stream evtHandler bufferLen
@@ -2954,7 +2955,7 @@ propagateEvent
 ------------------------------------------------------------------------------------------
 -- Generic event connection
 ------------------------------------------------------------------------------------------
--- | Retrievs the state associated with a certain event handler. If
+-- | Retrieves the state associated with a certain event handler. If
 -- no event handler is defined for this kind of event or 'Id', the
 -- default value is returned.
 unsafeGetHandlerState :: EvtHandler a -> Id -> EventId -> b -> IO b

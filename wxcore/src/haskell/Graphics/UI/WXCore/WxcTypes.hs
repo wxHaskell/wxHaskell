@@ -1,13 +1,14 @@
 {-# LANGUAGE CPP, ForeignFunctionInterface, DeriveDataTypeable #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 -----------------------------------------------------------------------------------------
-{-|	Module      :  WxcTypes
-	Copyright   :  (c) Daan Leijen 2003, 2004
-	License     :  wxWindows
+{-|
+Module      :  WxcTypes
+Copyright   :  (c) Daan Leijen 2003, 2004
+License     :  wxWindows
 
-	Maintainer  :  wxhaskell-devel@lists.sourceforge.net
-	Stability   :  provisional
-	Portability :  portable
+Maintainer  :  wxhaskell-devel@lists.sourceforge.net
+Stability   :  provisional
+Portability :  portable
 
 Basic types and marshalling code for the wxWidgets C library.
 -}

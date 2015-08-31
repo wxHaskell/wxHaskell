@@ -1,11 +1,12 @@
 -----------------------------------------------------------------------------------------
-{-|	Module      :  WXCore
-	Copyright   :  (c) Daan Leijen 2003
-	License     :  wxWindows
+{-|
+Module      :  WXCore
+Copyright   :  (c) Daan Leijen 2003
+License     :  wxWindows
 
-	Maintainer  :  wxhaskell-devel@lists.sourceforge.net
-	Stability   :  provisional
-	Portability :  portable
+Maintainer  :  wxhaskell-devel@lists.sourceforge.net
+Stability   :  provisional
+Portability :  portable
 
 The "WXCore" module is the interface to the core wxWidgets functionality.
     

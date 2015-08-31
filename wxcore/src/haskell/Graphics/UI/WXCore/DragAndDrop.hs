@@ -1,11 +1,12 @@
 -----------------------------------------------------------------------------------------
-{-|	Module      :  DragAndDrop
-	Copyright   :  (c) shelarcy 2007
-	License     :  wxWidgets
+{-|
+Module      :  DragAndDrop
+Copyright   :  (c) shelarcy 2007
+License     :  wxWidgets
 
-	Maintainer  :  wxhaskell-devel@lists.sourceforge.net
-	Stability   :  provisional
-	Portability :  portable
+Maintainer  :  wxhaskell-devel@lists.sourceforge.net
+Stability   :  provisional
+Portability :  portable
 
 Drag & Drop events.
 -}

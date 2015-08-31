@@ -1,11 +1,12 @@
 -----------------------------------------------------------------------------------------
-{-|	Module      :  Process
-	Copyright   :  (c) Daan Leijen 2003
-	License     :  wxWindows
+{-|
+Module      :  Process
+Copyright   :  (c) Daan Leijen 2003
+License     :  wxWindows
 
-	Maintainer  :  wxhaskell-devel@lists.sourceforge.net
-	Stability   :  provisional
-	Portability :  portable
+Maintainer  :  wxhaskell-devel@lists.sourceforge.net
+Stability   :  provisional
+Portability :  portable
 
 Process and stream wrappers.
 -}
@@ -206,7 +207,7 @@ type OnEndProcess  = Int -> IO ()
 -- process object is returned in @process@ and the process identifier in @pid@.
 --
 -- Note: The method uses idle event timers to process the output channels. On
--- many platforms this is uch more thrustworthy and robust than the 'processExecAsync' that
+-- many platforms this is much more trustworthy and robust than the 'processExecAsync' that
 -- uses threads (which can cause all kinds of portability problems).
 processExecAsyncTimed :: Window a -> String -> Bool -> OnEndProcess -> OnReceive -> OnReceive
                       -> IO (String -> IO StreamStatus, Process (), Int)

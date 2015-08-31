@@ -1,11 +1,12 @@
 --------------------------------------------------------------------------------
-{-|	Module      :  OpenGL
-	Copyright   :  (c) Daan Leijen 2003
-	License     :  wxWindows
+{-|
+Module      :  OpenGL
+Copyright   :  (c) Daan Leijen 2003
+License     :  wxWindows
 
-	Maintainer  :  wxhaskell-devel@lists.sourceforge.net
-	Stability   :  provisional
-	Portability :  portable
+Maintainer  :  wxhaskell-devel@lists.sourceforge.net
+Stability   :  provisional
+Portability :  portable
   
 Convenience wrappers for the openGL canvas window ('GLCanvas').
 -}
@@ -49,10 +50,10 @@ data GLAttribute
   | GL_MIN_ALPHA Int       -- ^ Use alpha buffer with at least /argument/ bits
   | GL_DEPTH_SIZE Int      -- ^ Bits for Z-buffer (0,16,32)  
   | GL_STENCIL_SIZE Int    -- ^ Bits for stencil buffer  
-  | GL_MIN_ACCUM_RED Int   -- ^ Use red accum buffer with at least /argument/ bits 
-  | GL_MIN_ACCUM_GREEN Int -- ^ Use green buffer with at least /argument/ bits 
-  | GL_MIN_ACCUM_BLUE Int  -- ^ Use blue buffer with at least /argument/ bits 
-  | GL_MIN_ACCUM_ALPHA Int -- ^ Use blue buffer with at least /argument/ bits 
+  | GL_MIN_ACCUM_RED Int   -- ^ Use red accumulation buffer with at least /argument/ bits 
+  | GL_MIN_ACCUM_GREEN Int -- ^ Use green accumulation buffer with at least /argument/ bits 
+  | GL_MIN_ACCUM_BLUE Int  -- ^ Use blue accumulation buffer with at least /argument/ bits 
+  | GL_MIN_ACCUM_ALPHA Int -- ^ Use alpha accumulation buffer with at least /argument/ bits 
   | GL_SAMPLE_BUFFERS Int  -- ^ 1 for multisampling support (antialiasing)
   | GL_SAMPLES Int         -- ^ 4 for 2x2 antialiasing supersampling on most graphics cards
   | GL_CORE_PROFILE        -- ^ request an OpenGL core profile. This will result in also requesting OpenGL at least version 3.0, since wx 3.1

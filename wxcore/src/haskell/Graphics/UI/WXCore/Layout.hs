@@ -1,13 +1,14 @@
 {-# LANGUAGE TypeSynonymInstances #-}
 {-# LANGUAGE FlexibleInstances #-}
 -----------------------------------------------------------------------------------------
-{-|	Module      :  Layout
-	Copyright   :  (c) Daan Leijen & Wijnand van Suijlen 2003
-	License     :  wxWindows
+{-|
+Module      :  Layout
+Copyright   :  (c) Daan Leijen & Wijnand van Suijlen 2003
+License     :  wxWindows
 
-	Maintainer  :  wxhaskell-devel@lists.sourceforge.net
-	Stability   :  provisional
-	Portability :  portable
+Maintainer  :  wxhaskell-devel@lists.sourceforge.net
+Stability   :  provisional
+Portability :  portable
 
 Combinators to specify layout. (These combinators use wxWidgets 'Sizer' objects).
 

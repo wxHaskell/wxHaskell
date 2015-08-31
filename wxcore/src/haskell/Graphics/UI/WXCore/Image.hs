@@ -1,12 +1,13 @@
 {-# LANGUAGE FlexibleContexts #-}
 --------------------------------------------------------------------------------
-{-|	Module      :  Image
-	Copyright   :  (c) Daan Leijen 2003
-	License     :  wxWindows
+{-|
+Module      :  Image
+Copyright   :  (c) Daan Leijen 2003
+License     :  wxWindows
 
-	Maintainer  :  wxhaskell-devel@lists.sourceforge.net
-	Stability   :  provisional
-	Portability :  portable
+Maintainer  :  wxhaskell-devel@lists.sourceforge.net
+Stability   :  provisional
+Portability :  portable
 -}
 --------------------------------------------------------------------------------
 module Graphics.UI.WXCore.Image

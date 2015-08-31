@@ -1,12 +1,13 @@
 {-# LANGUAGE ForeignFunctionInterface, FlexibleInstances #-}
 -----------------------------------------------------------------------------------------
-{-|	Module      :  Types
-	Copyright   :  (c) Daan Leijen 2003
-	License     :  wxWindows
+{-|
+Module      :  Types
+Copyright   :  (c) Daan Leijen 2003
+License     :  wxWindows
 
-	Maintainer  :  wxhaskell-devel@lists.sourceforge.net
-	Stability   :  provisional
-	Portability :  portable
+Maintainer  :  wxhaskell-devel@lists.sourceforge.net
+Stability   :  provisional
+Portability :  portable
 
 Basic types and operations.
 -}
@@ -197,7 +198,7 @@ finalize last first
   Variables
 --------------------------------------------------------------------------------}
 
--- | A mutable variable. Use this instead of 'MVar's or 'IORef's to accomodate for
+-- | A mutable variable. Use this instead of 'MVar's or 'IORef's to accommodate for
 -- future expansions with possible concurrency.
 type Var a  = TVar a
 

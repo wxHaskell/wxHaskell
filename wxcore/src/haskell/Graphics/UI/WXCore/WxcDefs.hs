@@ -1,11 +1,12 @@
 --------------------------------------------------------------------------------
-{-| Module      :  WxcDefs
-    Copyright   :  Copyright (c) Daan Leijen 2003, 2004
-    License     :  wxWidgets
+{-| 
+Module      :  WxcDefs
+Copyright   :  Copyright (c) Daan Leijen 2003, 2004
+License     :  wxWidgets
 
-    Maintainer  :  wxhaskell-devel@lists.sourceforge.net
-    Stability   :  provisional
-    Portability :  portable
+Maintainer  :  wxhaskell-devel@lists.sourceforge.net
+Stability   :  provisional
+Portability :  portable
 
 Haskell constant definitions for the wxWidgets C library (@wxc.dll@).
 
@@ -3808,7 +3809,7 @@ wxSTATIC_BORDER = 16777216
 wxBORDER :: Int
 wxBORDER = 33554432
 
--- | This is different from wxBORDER_NONE as by default the controls do
+-- | This is different from wxBORDER_NONE, as by default the controls do
 -- have border
 wxBORDER_DEFAULT :: Int
 wxBORDER_DEFAULT = 0
