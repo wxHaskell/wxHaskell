@@ -70,10 +70,10 @@ import Graphics.UI.WXCore.GHCiSupport
 -- from this initialisation action or from event handlers, otherwise bad
 -- things will happen :-)
 run :: IO a -> IO ()
-run init
+run action
   = do enableGUI
        appOnInit (do wxcAppInitAllImageHandlers
-                     init
+                     _ <- action
                      return ())
        performGC
        performGC

@@ -310,7 +310,7 @@ int wxInputSinkEvent_LastRead( TSelf(wxInputSinkEvent) obj );
 char* wxInputSinkEvent_LastInput( TSelf(wxInputSinkEvent) obj );
 
 
-/* html events */
+/* HTML events */
 TClassDefExtend(wxcHtmlEvent,wxCommandEvent)
 
 TClass(wxMouseEvent) wxcHtmlEvent_GetMouseEvent( TSelf(wxcHtmlEvent) self );
@@ -325,7 +325,7 @@ TClass(wxString)     wxcHtmlEvent_GetHref( TSelf(wxcHtmlEvent) self );
 TClass(wxString)     wxcHtmlEvent_GetTarget( TSelf(wxcHtmlEvent) self );
 TClass(wxPoint)      wxcHtmlEvent_GetLogicalPosition( TSelf(wxcHtmlEvent) self );
 
-/* html window */
+/* HTML window */
 TClassDefExtend(wxcHtmlWindow,wxHtmlWindow)
 TClass(wxcHtmlWindow) wxcHtmlWindow_Create( TClass(wxWindow) _prt, int _id, TRect(_lft,_top,_wdt,_hgt), int _stl, TClass(wxString) _txt );
 

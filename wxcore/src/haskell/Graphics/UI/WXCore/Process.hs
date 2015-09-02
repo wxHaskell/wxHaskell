@@ -34,15 +34,12 @@ module Graphics.UI.WXCore.Process
         ) where
 
 import System.IO.Unsafe( unsafeInterleaveIO )
-import Graphics.UI.WXCore.WxcTypes( ptrCast )
 import Graphics.UI.WXCore.WxcDefs
 import Graphics.UI.WXCore.WxcClasses
 import Graphics.UI.WXCore.Types
 import Graphics.UI.WXCore.Events
 
 import Foreign
-import Foreign.Ptr
-import Foreign.Storable
 import Foreign.C.String
 import Foreign.C.Types
 
@@ -76,11 +73,11 @@ outputStreamPutStringNoWait outputStream s
 -- has been read, otherwise, either the maximum has been reached, or no more
 -- input was available.
 inputStreamGetLineNoWait :: InputStream a -> Int -> IO String
-inputStreamGetLineNoWait inputStream max
-  = read "" 0
+inputStreamGetLineNoWait inputStream maxChars
+  = readInputStream "" 0
   where
-    read acc n
-      = if n >= max
+    readInputStream acc n
+      = if n >= maxChars
          then return (reverse acc)
          else do mbc <- inputStreamGetCharNoWait inputStream
                  case mbc of
@@ -88,25 +85,25 @@ inputStreamGetLineNoWait inputStream max
                   Just '\n'  -> return (reverse ('\n':acc))
                   Just '\r'  -> do mbc2 <- inputStreamGetCharNoWait inputStream
                                    case mbc2 of
-                                     Just c2  | c2 /= '\n' -> do inputStreamUngetch inputStream c2
-                                                                 return ()
+                                     Just c2  | c2 /= '\n' -> inputStreamUngetch inputStream c2 >>
+                                                              return ()
                                      _        -> return ()
                                    return (reverse ('\n':acc))
-                  Just c     -> read (c:acc) (n+1)
+                  Just c     -> readInputStream (c:acc) (n+1)
 
 -- | @inputStreamGetStringNoWait stream n@ reads a line of at most @n@ characters from the
 -- input stream in a non-blocking way. 
 inputStreamGetStringNoWait :: InputStream a -> Int -> IO String
-inputStreamGetStringNoWait input max
-  = read "" 0
+inputStreamGetStringNoWait input maxChars
+  = readInputStream "" 0
   where
-    read acc n
-      = if ( n >= max )
+    readInputStream acc n
+      = if ( n >= maxChars )
          then return (reverse acc)
          else do mbc <- inputStreamGetCharNoWait input
                  case mbc of
                    Nothing -> return (reverse acc)
-                   Just c  -> read (c:acc) (n+1)
+                   Just c  -> readInputStream (c:acc) (n+1)
 
 
 -- | Read a single character from the input, returning @Nothing@ if no input
@@ -126,22 +123,22 @@ inputStreamGetCharNoWait input
 -- has been read, otherwise, either the maximum has been reached, or no more
 -- input was available.
 inputStreamGetLine :: InputStream a -> Int -> IO String
-inputStreamGetLine inputStream max
-  = read "" 0
+inputStreamGetLine inputStream maxChars
+  = readInputStream "" 0
   where
-    read acc n
-      = if n >= max
+    readInputStream acc n
+      = if n >= maxChars
          then return (reverse acc)
          else do c <- inputStreamGetChar inputStream
                  case c of
                   '\n'  -> return (reverse ('\n':acc))
                   '\r'  -> do mbc2 <- inputStreamGetCharNoWait inputStream
                               case mbc2 of
-                                Just c2  | c2 /= '\n' -> do inputStreamUngetch inputStream c2
-                                                            return ()
+                                Just c2  | c2 /= '\n' -> inputStreamUngetch inputStream c2 >>
+                                                         return ()
                                 _        -> return ()
                               return (reverse ('\n':acc))
-                  _     -> read (c:acc) (n+1)
+                  _     -> readInputStream (c:acc) (n+1)
 
 -- | Read a single character from the input. (equals 'inputStreamGetC')
 inputStreamGetChar :: InputStream a -> IO Char
@@ -216,7 +213,7 @@ processExecAsyncTimed parent cmd readInputOnEnd onEndProcess onOutput onErrOutpu
        processRedirect process
        pid        <- wxcAppExecuteProcess cmd wxEXEC_ASYNC process
        if (pid == 0)
-        then return (\s -> return StreamEof, objectNull, pid)
+        then return (\_s -> return StreamEof, objectNull, pid)
         else do v <- varCreate (Just process)
                 windowOnIdle parent (handleAnyInput v)
                 unregister <- appRegisterIdle 100           -- 10 times a second
@@ -244,26 +241,26 @@ processExecAsyncTimed parent cmd readInputOnEnd onEndProcess onOutput onErrOutpu
            return available
 
     handleAllInput :: InputStream a -> OnReceive -> IO ()
-    handleAllInput input onOutput 
-      = do available <- handleInput input onOutput
+    handleAllInput input onOutput' 
+      = do available <- handleInput input onOutput'
            if (available)
-            then handleAllInput input onOutput
+            then handleAllInput input onOutput'
             else return ()
     
     handleInput :: InputStream a -> OnReceive -> IO Bool
-    handleInput input onOutput 
+    handleInput input onOutput' 
       = do txt    <- inputStreamGetLineNoWait input maxLine
            status <- streamBaseStatus input
            if null txt 
             then case status of
                    StreamOk -> return False
-                   _        -> do onOutput "" status
+                   _        -> do onOutput' "" status
                                   return False
-            else do onOutput txt status
+            else do onOutput' txt status
                     return True
 
     handleTerminate :: Var (Maybe (Process a)) -> IO () -> Int -> Int -> IO ()
-    handleTerminate v unregister pid exitCode
+    handleTerminate v unregister _pid exitCode
       = do unregister
            withProcess v () $ \process -> 
             do varSet v Nothing
@@ -299,7 +296,7 @@ processExecAsync parent command bufferSize onEndProcess onOutput onErrOutput
        processRedirect process
        pid        <- wxcAppExecuteProcess command wxEXEC_ASYNC process
        if (pid == 0)
-        then return (\s -> return (), objectNull, pid)
+        then return (\_s -> return (), objectNull, pid)
         else do inputPipe  <- processGetInputStream process
                 outputPipe <- processGetOutputStream process
                 errorPipe  <- processGetErrorStream process
@@ -309,7 +306,7 @@ processExecAsync parent command bufferSize onEndProcess onOutput onErrOutput
                 let send txt   = outputStreamPutString outputPipe txt
                 return (send, process, pid)
   where
-    handleOnEndProcess ourPid process inputPipe outputPipe errorPipe pid exitcode
+    handleOnEndProcess ourPid process _inputPipe _outputPipe _errorPipe pid exitcode
       | ourPid == pid  = do onEndProcess exitcode
                             processDelete process
       | otherwise      = return ()

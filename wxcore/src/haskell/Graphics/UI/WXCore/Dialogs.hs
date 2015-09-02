@@ -47,8 +47,7 @@ import Graphics.UI.WXCore.Draw
 -- when the user clicks the window or when it loses the focus.
 tipWindowMessage :: Window a -> String -> IO ()
 tipWindowMessage parent message
-  = do tipWindowCreate parent message 100
-       return ()
+  = tipWindowCreate parent message 100 >> return ()
 
 -- | Opens a non-modal tip window with a text. The window is closed automatically
 -- when the mouse leaves the specified area, or when the user clicks the window,
@@ -148,9 +147,9 @@ fileDialog parent processResult flags message wildcards directory filename
                 processResult fd r)
 
   where
-    formatWildCards wildcards
+    formatWildCards wildcards'
       = concat (intersperse "|"
-        [desc ++ "|" ++ concat (intersperse ";" patterns) | (desc,patterns) <- wildcards])
+        [desc ++ "|" ++ concat (intersperse ";" patterns) | (desc,patterns) <- wildcards'])
 
 
 -- | Show a font selection dialog with a given initial font. Returns 'Nothing' when cancel was pressed.

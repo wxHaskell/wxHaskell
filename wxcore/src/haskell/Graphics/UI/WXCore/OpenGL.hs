@@ -22,14 +22,10 @@ module Graphics.UI.WXCore.OpenGL
 
 
 import Graphics.UI.WXCore.WxcTypes
-import Graphics.UI.WXCore.WxcDefs
 import Graphics.UI.WXCore.WxcClasses
 import Graphics.UI.WXCore.Types
 
 import Foreign
-import Foreign.Ptr
-import Foreign.C.String
-import Foreign.Marshal.Array
 
 
 
@@ -64,11 +60,12 @@ encodeAttributes :: [GLAttribute] -> [Int]
 encodeAttributes attributes
   = concatMap encodeAttribute attributes
 
+encodeAttribute :: GLAttribute -> [Int]
 encodeAttribute attr
   = case attr of
       GL_RGBA                -> [1]
       GL_BUFFER_SIZE n       -> [2,n]
-      GL_LEVEL n             -> [3,case n of { GT -> 1; LT -> (-1); other -> 0 }]
+      GL_LEVEL n             -> [3, case n of { GT -> 1; LT -> (-1); _other -> 0 }]
       GL_DOUBLEBUFFER        -> [4]
       GL_STEREO              -> [5]
       GL_AUX_BUFFERS n       -> [6,n]
@@ -95,6 +92,6 @@ glCanvasCreateDefault parent style title attrs
 
 -- | Create an openGL window. Use 'nullPalette' to use the default palette.
 glCanvasCreateEx :: Window a -> Id -> Rect -> Style -> String -> [GLAttribute] -> Palette b -> IO (GLCanvas ())
-glCanvasCreateEx parent id rect style title attributes palette
+glCanvasCreateEx parent id' rect' style title attributes palette
   = withArray0 (toCInt 0) (map toCInt (encodeAttributes attributes)) $ \pattrs ->
-    glCanvasCreate parent id pattrs rect style title palette
+    glCanvasCreate parent id' pattrs rect' style title palette

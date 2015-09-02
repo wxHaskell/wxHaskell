@@ -105,11 +105,12 @@ compileClassesFile _showIgnore moduleRoot moduleClassTypesName moduleName output
                               , exportsClassClasses
                               , [ "    ) where"
                                 , ""
+                                , "import Prelude hiding (id, last, length, lines, max, min, show)"
                                 , "import qualified Data.ByteString as B (ByteString, useAsCStringLen)"
                                 , "import qualified Data.ByteString.Lazy as LB (ByteString, length, unpack)"
                                 , "import System.IO.Unsafe( unsafePerformIO )"
-                                , "import Foreign.C.Types(CInt(..), CWchar(..), CChar(..), CDouble(..))"
-                                , "import " ++ moduleRoot ++ "WxcTypes"
+                             -- , "import Foreign.C.Types(CInt(..), CWchar(..), CChar(..), CDouble(..))"
+                                , "import " ++ moduleRoot ++ "WxcTypes hiding (rect, rgb, rgba, sz)"
                                 , "import " ++ moduleRoot ++ moduleClassTypesName
                                 , ""
                                 ]

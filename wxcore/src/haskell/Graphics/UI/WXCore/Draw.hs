@@ -53,7 +53,6 @@ import Graphics.UI.WXCore.WxcClassInfo
 import Graphics.UI.WXCore.Types
 import Graphics.UI.WXCore.Defines
 
-import Foreign.Marshal.Array
 import Foreign.Storable
 import Foreign.Marshal.Alloc
 
@@ -107,12 +106,14 @@ dcClearRect dc r
                          dcWithPenStyle dc penTransparent $ 
                            dcDrawRectangle dc r)
 
+{-
 -- | Fill a rectangle with a certain color.
 dcFillRect :: DC a -> Rect -> Color -> IO ()
 dcFillRect dc r color
   = dcWithBrushStyle dc (brushSolid color) $
      dcWithPenStyle dc penTransparent $
       dcDrawRectangle dc r
+-}
 
 {--------------------------------------------------------------------------------
   Windows
@@ -444,30 +445,45 @@ withPenStyle penStyle f
 penCreateFromStyle :: PenStyle -> IO (Pen (),IO ())
 penCreateFromStyle penStyle
   = case penStyle of
-      PenStyle PenTransparent color width cap join
+      PenStyle PenTransparent _color _width _cap _join
         -> do pen <- penCreateFromStock 5 {- transparent -}
               return (pen,return ())
+              
       PenStyle (PenDash DashShort) color 1 CapRound JoinRound  | color == black
         -> do pen <- penCreateFromStock 6 {- black dashed -}
               return (pen,return ())
+              
       PenStyle PenSolid color 1 CapRound JoinRound
         -> case lookup color stockPens of
              Just idx -> do pen <- penCreateFromStock idx
                             return (pen,return ())
              Nothing  -> colorPen color 1 wxPENSTYLE_SOLID
-      PenStyle PenSolid color width cap join
+             
+      PenStyle PenSolid color width _cap _join
         -> colorPen color width wxPENSTYLE_SOLID
-      PenStyle (PenDash dash) color width cap join
+        
+      PenStyle (PenDash dash) color width _cap _join
         -> case dash of
-             DashDot  -> colorPen color width wxPENSTYLE_DOT
-             DashLong -> colorPen color width wxPENSTYLE_LONG_DASH
-             DashShort-> colorPen color width wxPENSTYLE_SHORT_DASH
+             DashDot      -> colorPen color width wxPENSTYLE_DOT
+             DashLong     -> colorPen color width wxPENSTYLE_LONG_DASH
+             DashShort    -> colorPen color width wxPENSTYLE_SHORT_DASH
              DashDotShort -> colorPen color width wxPENSTYLE_DOT_DASH
-      PenStyle (PenStipple bitmap) color width cap join
+             
+      PenStyle (PenStipple bitmap) _color width _cap _join
         -> do pen <- penCreateFromBitmap bitmap width
               setCap pen
               setJoin pen
               return (pen,penDelete pen)
+              
+      PenStyle (PenHatch hatch) color width _cap _join
+        -> case hatch of
+             HatchBDiagonal  -> colorPen color width wxPENSTYLE_BDIAGONAL_HATCH
+             HatchCrossDiag  -> colorPen color width wxPENSTYLE_CROSSDIAG_HATCH
+             HatchFDiagonal  -> colorPen color width wxPENSTYLE_FDIAGONAL_HATCH
+             HatchCross      -> colorPen color width wxPENSTYLE_CROSS_HATCH
+             HatchHorizontal -> colorPen color width wxPENSTYLE_HORIZONTAL_HATCH
+             HatchVertical   -> colorPen color width wxPENSTYLE_VERTICAL_HATCH
+
   where
     colorPen color width style
       = do pen <- penCreateFromColour color width style
@@ -616,7 +632,7 @@ brushCreateFromStyle brushStyle
       BrushStyle (BrushHatch HatchCross) color       -> colorBrush color wxBRUSHSTYLE_CROSS_HATCH
       BrushStyle (BrushHatch HatchHorizontal) color  -> colorBrush color wxBRUSHSTYLE_HORIZONTAL_HATCH
       BrushStyle (BrushHatch HatchVertical) color    -> colorBrush color wxBRUSHSTYLE_VERTICAL_HATCH
-      BrushStyle (BrushStipple bitmap) color         -> do brush <- brushCreateFromBitmap bitmap
+      BrushStyle (BrushStipple bitmap)      _color   -> do brush <- brushCreateFromBitmap bitmap
                                                            return (brush, brushDelete brush)
   where
     colorBrush color style
@@ -705,8 +721,8 @@ drawStateDelete (DrawState pen brush font _ _)
 
 -- | Draw connected lines.
 drawLines :: DC a -> [Point] -> IO ()
-drawLines dc []  = return ()
-drawLines dc ps
+drawLines _dc [] = return ()
+drawLines dc  ps
   = withArray xs $ \pxs ->
     withArray ys $ \pys ->
     dcDrawLines dc n pxs pys (pt 0 0)
@@ -718,8 +734,8 @@ drawLines dc ps
 
 -- | Draw a polygon. The polygon is filled with the odd-even rule.
 drawPolygon :: DC a -> [Point] -> IO ()
-drawPolygon dc []  = return ()
-drawPolygon dc ps
+drawPolygon _dc [] = return ()
+drawPolygon dc  ps
   = withArray xs $ \pxs ->
     withArray ys $ \pys ->
     dcDrawPolygon dc n pxs pys (pt 0 0) wxODDEVEN_RULE
@@ -731,8 +747,8 @@ drawPolygon dc ps
 -- | Gets the dimensions of the string using the currently selected font.
 getTextExtent :: DC a -> String -> IO Size
 getTextExtent dc txt
-  = do (sz,_,_) <- getFullTextExtent dc txt
-       return sz
+  = do (sz',_,_) <- getFullTextExtent dc txt
+       return sz'
 
 -- | Gets the dimensions of the string using the currently selected font.
 -- Takes text string to measure, and returns the size, /descent/ and /external leading/.
@@ -773,7 +789,7 @@ dcBuffer dc r draw
 -- memory 'DC'. 
 dcBufferWithRef :: WindowDC a -> Maybe (Var (Bitmap ())) -> Rect -> (DC () -> IO ()) -> IO ()
 dcBufferWithRef dc mbVar viewArea draw
-  = dcBufferWithRefEx dc (\dc -> dcClearRect dc viewArea) mbVar viewArea draw
+  = dcBufferWithRefEx dc (\dc' -> dcClearRect dc' viewArea) mbVar viewArea draw
 
 
 -- | Optimized double buffering. Takes a /clear/ routine as its first argument.
@@ -793,7 +809,7 @@ dcBufferWithRefExGcdc =
   dcBufferedAux (withGC gcdcCreate) (withGC gcdcCreateFromMemory)
     where withGC create dc_ draw = do
             dc <- create dc_
-            draw dc
+            _  <- draw dc
             gcdcDelete dc
 
 dcBufferedAux :: (WindowDC a -> f -> IO ()) -> (MemoryDC c -> f -> IO ())
@@ -842,7 +858,7 @@ dcBufferedAux withWinDC withMemoryDC dc clear mbVar view draw
      doneBitmap bitmap
        = case mbVar of
            Nothing -> when (bitmap/=objectNull) (bitmapDelete bitmap)
-           Just v  -> return ()
+           Just _v -> return ()
 
 
      drawUnbuffered
@@ -867,6 +883,6 @@ dcBufferedAux withWinDC withMemoryDC dc clear mbVar view draw
                                  withMemoryDC memdc draw
                    )
            -- blit the memdc into the owner dc.
-           dcBlit dc view memdc (rectTopLeft view) wxCOPY False
+           _ <- dcBlit dc view memdc (rectTopLeft view) wxCOPY False
            return ()
 

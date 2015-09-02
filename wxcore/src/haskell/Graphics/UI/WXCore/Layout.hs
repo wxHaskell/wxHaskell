@@ -160,7 +160,7 @@ module Graphics.UI.WXCore.Layout( -- * Types
                                -- ** Vertical floating alignment
                              , vfloatTop, vfloatCentre, vfloatCenter, vfloatBottom
                                -- ** Alignment
-                             , centre
+                             , center, centre
                              , alignTopLeft, alignTop, alignTopRight
                              , alignLeft, alignCentre, alignCenter, alignRight
                              , alignBottomLeft, alignBottom, alignBottomRight
@@ -177,7 +177,6 @@ import Graphics.UI.WXCore.WxcClasses
 import Graphics.UI.WXCore.WxcClassInfo
 import Graphics.UI.WXCore.Types
 import Graphics.UI.WXCore.Frame
-import Graphics.UI.WXCore.Defines
 
 {-----------------------------------------------------------------------------------------
   Classes
@@ -239,8 +238,8 @@ vfill
 
 -- | Layout elements in a horizontal direction with a certain amount of space between the elements.
 row :: Int -> [Layout] -> Layout
-row w row
-  = grid w 0 [row]
+row w row'
+  = grid w 0 [row']
 
 -- | Layout elements in a vertical direction with a certain amount of space between the elements.
 column :: Int -> [Layout] -> Layout
@@ -446,26 +445,26 @@ vspace h
 
 -- | (primitive) Set the minimal size of a widget.
 minsize :: Size -> Layout -> Layout
-minsize sz layout
-  = updateOptions layout (\options -> options{ minSize = Just sz })
+minsize sz' layout
+  = updateOptions layout (\options' -> options'{ minSize = Just sz' })
 
 -- | (primitive) Never resize the layout, but align it in the assigned area
 -- (default, except for containers like 'grid' and 'boxed' where it depends on the child layouts).
 rigid :: Layout -> Layout
 rigid layout
-  = updateOptions layout (\options -> options{ fillMode = FillNone })
+  = updateOptions layout (\options' -> options'{ fillMode = FillNone })
 
 -- | (primitive) Expand the layout to fill the assigned area but maintain the original proportions
 -- of the layout. Note that the layout can still be aligned in a horizontal or vertical direction.
 shaped :: Layout -> Layout
 shaped layout
-  = updateOptions layout (\options -> options{ fillMode = FillShaped })
+  = updateOptions layout (\options' -> options'{ fillMode = FillShaped })
 
 -- | (primitive) Expand the layout to fill the assigned area entirely, even when the original proportions can not
 -- be maintained. Note that alignment will have no effect on such layout. See also 'fill'.
 expand :: Layout -> Layout
 expand layout
-  = updateOptions layout (\options -> options{ fillMode = Fill })
+  = updateOptions layout (\options' -> options'{ fillMode = Fill })
 
 
 -- | (primitive) The layout is not stretchable. In a 'grid', the row and column that contain this layout will
@@ -474,70 +473,70 @@ expand layout
 -- (default, except for containers like 'grid' and 'boxed' where it depends on the child layouts).
 static :: Layout -> Layout
 static layout
-  = updateOptions layout (\options -> options{ stretchV = False, stretchH = False })
+  = updateOptions layout (\options' -> options'{ stretchV = False, stretchH = False })
 
 -- | (primitive) The layout is stretchable and can be assigned a larger area in both the horizontal and vertical
 -- direction. See also combinators like 'fill' and 'floatCentre'.
 stretch :: Layout -> Layout
 stretch layout
-  = updateOptions layout (\options -> options{ stretchV = True, stretchH = True })
+  = updateOptions layout (\options' -> options'{ stretchV = True, stretchH = True })
 
 -- | (primitive) The layout is stretchable in the vertical direction. See also combinators like 'vfill' and 'vfloatCentre'.
 vstretch :: Layout -> Layout
 vstretch layout
-  = updateOptions layout (\options -> options{ stretchV = True, stretchH = False })
+  = updateOptions layout (\options' -> options'{ stretchV = True, stretchH = False })
 
 -- | (primitive) The layout is stretchable in the horizontal direction. See also combinators like 'hfill' and 'hfloatCentre'.
 hstretch :: Layout -> Layout
 hstretch layout
-  = updateOptions layout (\options -> options{ stretchH = True, stretchV = False })
+  = updateOptions layout (\options' -> options'{ stretchH = True, stretchV = False })
 
 
 -- | Add a margin of a certain width around the entire layout.
 margin :: Int -> Layout -> Layout
 margin i layout
-  = updateOptions layout (\options -> options{ margins = [MarginLeft,MarginRight,MarginTop,MarginBottom], marginW = i })
+  = updateOptions layout (\options' -> options'{ margins = [MarginLeft,MarginRight,MarginTop,MarginBottom], marginW = i })
 
 -- | (primitive) Set the width of the margin (default is 10 pixels).
 marginWidth :: Int -> Layout -> Layout
 marginWidth w layout
-  = updateOptions layout (\options -> options{ marginW = w })
+  = updateOptions layout (\options' -> options'{ marginW = w })
 
 -- | (primitive) Remove the margin of a layout (default).
 marginNone  :: Layout -> Layout
 marginNone layout
-  = updateOptions layout (\options -> options{ margins = [] })
+  = updateOptions layout (\options' -> options'{ margins = [] })
 
 -- | (primitive) Add a margin to the left.
 marginLeft  :: Layout -> Layout
 marginLeft layout
-  = updateOptions layout (\options -> options{ margins = MarginLeft:margins options })
+  = updateOptions layout (\options' -> options'{ margins = MarginLeft:margins options' })
 
 -- | (primitive) Add a right margin.
 marginRight  :: Layout -> Layout
 marginRight layout
-  = updateOptions layout (\options -> options{ margins = MarginRight:margins options })
+  = updateOptions layout (\options' -> options'{ margins = MarginRight:margins options' })
 
 -- | (primitive) Add a margin to the top.
 marginTop  :: Layout -> Layout
 marginTop layout
-  = updateOptions layout (\options -> options{ margins = MarginTop:margins options })
+  = updateOptions layout (\options' -> options'{ margins = MarginTop:margins options' })
 
 -- | (primitive) Add a margin to the bottom.
 marginBottom  :: Layout -> Layout
 marginBottom layout
-  = updateOptions layout (\options -> options{ margins = MarginBottom:margins options })
+  = updateOptions layout (\options' -> options'{ margins = MarginBottom:margins options' })
 
 
 -- | (primitive) Align horizontally to the left when the layout is assigned to a larger area (default).
 halignLeft :: Layout -> Layout
 halignLeft layout
-  = updateOptions layout (\options -> options{ alignH = AlignLeft })
+  = updateOptions layout (\options' -> options'{ alignH = AlignLeft })
 
 -- | (primitive) Align horizontally to the right when the layout is assigned to a larger area.
 halignRight :: Layout -> Layout
 halignRight layout
-  = updateOptions layout (\options -> options{ alignH = AlignRight })
+  = updateOptions layout (\options' -> options'{ alignH = AlignRight })
 
 -- | (primitive) Center horizontally when assigned to a larger area.
 halignCenter :: Layout -> Layout
@@ -547,17 +546,17 @@ halignCenter
 -- | (primitive) Center horizontally when assigned to a larger area.
 halignCentre :: Layout -> Layout
 halignCentre layout
-  = updateOptions layout (\options -> options{ alignH = AlignHCentre })
+  = updateOptions layout (\options' -> options'{ alignH = AlignHCentre })
 
 -- | (primitive) Align vertically to the top when the layout is assigned to a larger area (default).
 valignTop :: Layout -> Layout
 valignTop layout
-  = updateOptions layout (\options -> options{ alignV = AlignTop })
+  = updateOptions layout (\options' -> options'{ alignV = AlignTop })
 
 -- | (primitive) Align vertically to the bottom when the layout is assigned to a larger area.
 valignBottom :: Layout -> Layout
 valignBottom layout
-  = updateOptions layout (\options -> options{ alignV = AlignBottom })
+  = updateOptions layout (\options' -> options'{ alignV = AlignBottom })
 
 -- | (primitive) Center vertically when the layout is assigned to a larger area.
 valignCenter :: Layout -> Layout
@@ -567,7 +566,7 @@ valignCenter layout
 -- | (primitive) Center vertically when the layout is assigned to a larger area.
 valignCentre :: Layout -> Layout
 valignCentre layout
-  = updateOptions layout (\options -> options{ alignV = AlignVCentre })
+  = updateOptions layout (\options' -> options'{ alignV = AlignVCentre })
 
 
 -- | Adjust the minimal size of a control dynamically when the content changes.
@@ -576,7 +575,7 @@ valignCentre layout
 -- 'StaticText', 'label's, and 'button's.
 dynamic :: Layout -> Layout
 dynamic layout
-  = updateOptions layout (\options -> options{ adjustMinSize = True })
+  = updateOptions layout (\options' -> options'{ adjustMinSize = True })
 
 updateOptions :: Layout -> (LayoutOptions -> LayoutOptions) -> Layout
 updateOptions layout f
@@ -589,22 +588,22 @@ updateOptions layout f
 -- Just like a 'grid', the horizontal or vertical stretch of the child layout determines
 -- the stretch and expansion mode of the box.
 boxed :: String -> Layout -> Layout
-boxed txt content
+boxed txt' content'
   = TextBox optionsDefault{ stretchV = hasvstretch, stretchH = hashstretch
                           , fillMode = hasfill, adjustMinSize = True }
-      txt (extramargin content)
+      txt' (extramargin content')
   where
-    hasvstretch  = stretchV (options content)
-    hashstretch  = stretchH (options content)
+    hasvstretch  = stretchV (options content')
+    hashstretch  = stretchH (options content')
     hasfill   = if (hasvstretch || hashstretch) then Fill else FillNone
 
-    extramargin | null (margins (options content)) = marginWidth 5 . marginTop
+    extramargin | null (margins (options content')) = marginWidth 5 . marginTop
                 | otherwise                        = id
 
 -- | (primitive) Create a static label label (= 'StaticText').
 label :: String -> Layout
-label txt
-  = Label optionsDefault txt
+label txt'
+  = Label optionsDefault txt'
 
 -- | (primitive) The expression (@grid w h rows@) creates a grid of @rows@. The @w@ argument
 -- is the extra horizontal space between elements and @h@ the extra vertical space between elements.
@@ -615,11 +614,11 @@ label txt
 -- When any column or row in a grid can stretch, the grid itself will also stretch in that direction
 -- and the grid will 'expand' to fill the assigned area by default (instead of being 'static').
 grid :: Int -> Int -> [[Layout]] -> Layout
-grid w h rows
-  = Grid optionsDefault{ stretchV = hasvstretch, stretchH = hashstretch, fillMode = hasfill } (sz w h) rows
+grid w h rows'
+  = Grid optionsDefault{ stretchV = hasvstretch, stretchH = hashstretch, fillMode = hasfill } (sz w h) rows'
   where
-    hasvstretch  = any (all (stretchV.options)) rows
-    hashstretch  = any (all (stretchH.options)) (transpose rows)
+    hasvstretch  = any (all (stretchV.options)) rows'
+    hashstretch  = any (all (stretchH.options)) (transpose rows')
     hasfill   = if (hasvstretch || hashstretch) then Fill else FillNone
 
 -- | (primitive) Add a container widget (for example, a 'Panel').
@@ -689,12 +688,12 @@ imageTab title bitmap layout
 -- Just like a 'grid', the horizontal or vertical stretch of the child layout determines
 -- the stretch and expansion mode of the notebook.
 tabs :: Notebook a -> [TabPage] -> Layout
-tabs notebook pages
+tabs notebook pages'
   = XNotebook optionsDefault{ stretchV = hasvstretch, stretchH = hashstretch, fillMode = hasfill }
-              (downcastNotebook notebook) pages
+              (downcastNotebook notebook) pages'
   where
-    hasvstretch  = all stretchV [options layout | (_,_,layout) <- pages]
-    hashstretch  = all stretchH [options layout | (_,_,layout) <- pages]
+    hasvstretch  = all stretchV [options layout | (_,_,layout) <- pages']
+    hashstretch  = all stretchH [options layout | (_,_,layout) <- pages']
     hasfill      = if (hasvstretch || hashstretch) then Fill else FillNone
 
 -- | Add a horizontal sash bar between two windows. The two integer
@@ -712,8 +711,8 @@ vsplit
   = split False
 
 split :: Bool -> SplitterWindow a -> Int -> Int -> Layout -> Layout -> Layout
-split splitHorizontal splitter sashWidth paneWidth pane1 pane2
-  = Splitter optionsDefault (downcastSplitterWindow splitter) pane1 pane2 splitHorizontal sashWidth paneWidth
+split splitHorizontal' splitter' sashWidth' paneWidth' pane1' pane2'
+  = Splitter optionsDefault (downcastSplitterWindow splitter') pane1' pane2' splitHorizontal' sashWidth' paneWidth'
 
 
 optionsDefault :: LayoutOptions
@@ -776,7 +775,7 @@ windowReFitMinimal w
 -- also shrink a window so that it always minimally sized).
 windowReLayout :: Window a -> IO ()
 windowReLayout w
-  = do windowLayout w
+  = do _   <- windowLayout w
        old <- windowGetClientSize w
        szr <- windowGetSizer w
        when (not (objectIsNull szr)) (sizerSetSizeHints szr w)
@@ -789,7 +788,7 @@ windowReLayout w
 -- acceptable size ('windowFit').
 windowReLayoutMinimal :: Window a -> IO ()  
 windowReLayoutMinimal w
-  = do windowLayout w
+  = do _   <- windowLayout w
        szr <- windowGetSizer w
        when (not (objectIsNull szr)) (sizerSetSizeHints szr w)
        windowFit w
@@ -797,10 +796,10 @@ windowReLayoutMinimal w
 -- | Set the layout of a window (automatically calls 'sizerFromLayout').
 windowSetLayout :: Window a -> Layout -> IO ()
 windowSetLayout window layout
-  = do sizer <- sizerFromLayout window layout
+  = do sizer' <- sizerFromLayout window layout
        windowSetAutoLayout window True
-       windowSetSizer window sizer
-       sizerSetSizeHints sizer window
+       windowSetSizer window sizer'
+       sizerSetSizeHints sizer' window
        return ()
 
 -- | Create a 'Sizer' from a 'Layout' and a parent window.
@@ -809,169 +808,170 @@ sizerFromLayout parent layout
   = insert objectNull (grid 0 0 [[stretch layout]])
   where
     insert :: Sizer () -> Layout -> IO (Sizer ())
-    insert container (Spacer options sz)
-      = do sizerAddWithOptions 0 (sizerAdd container sz) (\sz -> return ()) options
-           return container
+    insert container' (Spacer options' sz')
+      = do sizerAddWithOptions 0 (sizerAdd container' sz') (\_sz -> return ()) options'
+           return container'
 
-    insert container (Widget options win)
-      = do sizerAddWindowWithOptions container win options
-           return container
+    insert container' (Widget options' win')
+      = do sizerAddWindowWithOptions container' win' options'
+           return container'
 
-    insert container (Grid goptions gap rows)
-      = do g <- flexGridSizerCreate (length rows) (maximum (map length rows)) (sizeH gap) (sizeW gap)
-           mapM_ (stretchRow g) (zip [0..] (map (all (stretchV.options)) rows))
-           mapM_ (stretchCol g) (zip [0..] (map (all (stretchH.options)) (transpose rows)))
-           mapM_ (insert (downcastSizer g)) (concat rows)
-           when (container /= objectNull) 
-             (sizerAddSizerWithOptions container g goptions)
+    insert container' (Grid goptions gap' rows')
+      = do g <- flexGridSizerCreate (length rows') (maximum (map length rows')) (sizeH gap') (sizeW gap')
+           mapM_ (stretchRow g) (zip [0..] (map (all (stretchV.options)) rows'))
+           mapM_ (stretchCol g) (zip [0..] (map (all (stretchH.options)) (transpose rows')))
+           mapM_ (insert (downcastSizer g)) (concat rows')
+           when (container' /= objectNull) 
+             (sizerAddSizerWithOptions container' g goptions)
            return (downcastSizer g)
 
-    insert container (Label options txt)
-      = do t <- staticTextCreate parent idAny txt rectNull 0
-           sizerAddWindowWithOptions container t options
-           return container
+    insert container' (Label options' txt')
+      = do t <- staticTextCreate parent idAny txt' rectNull 0
+           sizerAddWindowWithOptions container' t options'
+           return container'
 
-    insert container (TextBox options txt layout)
-      = do box   <- staticBoxCreate parent idAny txt rectNull (wxCLIP_CHILDREN .+. wxNO_FULL_REPAINT_ON_RESIZE)
-           sizer <- staticBoxSizerCreate box wxVERTICAL
-           insert (downcastSizer sizer) layout
-           when (container /= objectNull) 
-             (sizerAddSizerWithOptions container sizer options)
+    insert container' (TextBox options' txt' layout')
+      = do box    <- staticBoxCreate parent idAny txt' rectNull (wxCLIP_CHILDREN .+. wxNO_FULL_REPAINT_ON_RESIZE)
+           sizer' <- staticBoxSizerCreate box wxVERTICAL
+           _      <- insert (downcastSizer sizer') layout'
+           when (container' /= objectNull) 
+             (sizerAddSizerWithOptions container' sizer' options')
            windowLower box
-           return (downcastSizer sizer)
+           return (downcastSizer sizer')
 
-    insert container (Line options (Size w h))
+    insert container' (Line options' (Size w h))
       = do l <- staticLineCreate parent idAny (rectNull{ rectWidth = w, rectHeight = h }) 
                   (if (w >= h) then wxHORIZONTAL else wxVERTICAL)
-           sizerAddWindowWithOptions container l options
-           return container
+           sizerAddWindowWithOptions container' l options'
+           return container'
 
-    insert container (XSizer options sizer)
-      = do sizerAddSizerWithOptions container sizer options
-           return container
+    insert container' (XSizer options' sizer')
+      = do sizerAddSizerWithOptions container' sizer' options'
+           return container'
 
-    insert container (WidgetContainer options win layout)
-      = do windowSetLayout win layout -- recursively set the layout in the window itself
-           sizerAddWindowWithOptions container win options
-           return container
+    insert container' (WidgetContainer options' win' layout')
+      = do windowSetLayout win' layout' -- recursively set the layout' in the window itself
+           sizerAddWindowWithOptions container' win' options'
+           return container'
 
-    insert container (Splitter options splitter pane1 pane2 splitHorizontal sashWidth paneWidth)
-      = do splitterWindowSetMinimumPaneSize splitter 20
-           -- splitterWindowSetSashSize is obsolete
-           -- splitterWindowSetSashSize splitter sashWidth
-           sizerAddWindowWithOptions container splitter options
-           if splitHorizontal
-            then splitterWindowSplitHorizontally splitter win1 win2 paneWidth
-            else splitterWindowSplitVertically splitter win1 win2 paneWidth
-           paneSetLayout pane1
-           paneSetLayout pane2
+    insert container' (Splitter options' splitter' pane1' pane2' splitHorizontal' _sashWidth paneWidth')
+      = do splitterWindowSetMinimumPaneSize splitter' 20
+           sizerAddWindowWithOptions container' splitter' options'
+           _ <- if splitHorizontal'
+                  then splitterWindowSplitHorizontally splitter' win1 win2 paneWidth'
+                  else splitterWindowSplitVertically   splitter' win1 win2 paneWidth'
+           paneSetLayout pane1'
+           paneSetLayout pane2'
            
-           return container
+           return container'
       where
-        win1  = getWinFromLayout pane1
-        win2  = getWinFromLayout pane2
+        win1  = getWinFromLayout pane1'
+        win2  = getWinFromLayout pane2'
 
-        getWinFromLayout layout
-          = case layout of
-              Widget _ win            -> downcastWindow win
-              WidgetContainer _ win _ -> downcastWindow win
-              Splitter _ splitter _ _ _ _ _ -> downcastWindow splitter
-              other                   -> error "Layout: hsplit/vsplit need widgets or containers as arguments"
+        getWinFromLayout layout'
+          = case layout' of
+              Widget _ win'            -> downcastWindow win'
+              WidgetContainer _ win' _ -> downcastWindow win'
+              Splitter _ splitter'' _ _ _ _ _ -> downcastWindow splitter''
+              _other                   -> error "Layout: hsplit/vsplit need widgets or containers as arguments"
 
-        paneSetLayout layout
-          = case layout of
-              Widget _ win            -> return ()
-              WidgetContainer options win layout -> windowSetLayout win layout
-              Splitter options splitter pane1 pane2 splitHorizontal sashWidth paneWidth 
-                                      ->  do splitterWindowSetMinimumPaneSize splitter 20
-                                             -- splitterWindowSetSashSize is obsolete
-                                             -- splitterWindowSetSashSize splitter sashWidth
-                                             -- sizerAddWindowWithOptions container splitter options
-                                             let win1 = getWinFromLayout pane1
-                                                 win2 = getWinFromLayout pane2
-                                             if splitHorizontal
-                                              then splitterWindowSplitHorizontally splitter win1 win2 paneWidth
-                                              else splitterWindowSplitVertically splitter win1 win2 paneWidth
-                                             paneSetLayout pane1
-                                             paneSetLayout pane2
-                                             return ()
-              other                   -> error "Layout: hsplit/vsplit need widgets or containers as arguments"
+        paneSetLayout layout'
+          = case layout' of
+              Widget _ _win
+                -> return ()
+              
+              WidgetContainer _options win' layout''
+                -> windowSetLayout win' layout''
+              
+              Splitter _options splitter'' pane1'' pane2'' splitHorizontal'' _sashWidth paneWidth'' 
+                ->  do splitterWindowSetMinimumPaneSize splitter'' 20
+                       -- sizerAddWindowWithOptions container' splitter'' options'
+                       let win1' = getWinFromLayout pane1''
+                           win2' = getWinFromLayout pane2''
+                       _ <- if splitHorizontal''
+                              then splitterWindowSplitHorizontally splitter'' win1' win2' paneWidth''
+                              else splitterWindowSplitVertically   splitter'' win1' win2' paneWidth''
+                       paneSetLayout pane1''
+                       paneSetLayout pane2''
+                       return ()
+              _other
+                -> error "Layout: hsplit/vsplit need widgets or containers as arguments"
 
 
-    insert container (XNotebook options nbook pages)
-      = do pages' <- addImages objectNull pages
-           mapM_ addPage pages'
-           sizerAddWindowWithOptions container nbook options
-           return container
+    insert container' (XNotebook options' nbook' pages')
+      = do pages'' <- addImages objectNull pages'
+           mapM_ addPage pages''
+           sizerAddWindowWithOptions container' nbook' options'
+           return container'
       where
-        addPage (title,idx,WidgetContainer options win layout)
+        addPage (title,idx,WidgetContainer _options win' layout')
           = do pagetitle <- if (null title)
-                             then windowGetLabel win
+                             then windowGetLabel win'
                              else return title
-               notebookAddPage nbook win pagetitle False idx
-               windowSetLayout win layout  -- recursively set layout
+               _ <- notebookAddPage nbook' win' pagetitle False idx
+               windowSetLayout win' layout'  -- recursively set layout'
 
-        addPage (title,idx,other)
+        addPage (_title, _idx, _other)
           = error "Graphics.UI.WXCore.sizerFromLayout: notebook page needs to be a 'container' layout!"
 
         addImages il []
           = if (objectIsNull il)
              then return []
-             else do notebookAssignImageList nbook il
+             else do notebookAssignImageList nbook' il
                      return []
 
-        addImages il ((title,bm,layout):xs)   | objectIsNull bm 
+        addImages il ((title, bm, layout'):xs) | objectIsNull bm 
           = do xs' <- addImages il xs
-               return ((title,-1,layout):xs')
+               return ((title,-1,layout'):xs')
 
-        addImages il ((title,bm,layout):xs)
+        addImages il ((title, bm, layout'):xs)
           = do il' <- addImage il bm
                i   <- imageListGetImageCount il'
                xs' <- addImages il' xs
-               return ((title,i,layout):xs')
+               return ((title,i,layout'):xs')
 
         addImage il bm
           = if (objectIsNull il)
-             then do w  <- bitmapGetWidth bm
-                     h  <- bitmapGetHeight bm
-                     il <- imageListCreate (sz w h) False 1
-                     imageListAddBitmap il bm objectNull
-                     return il
-             else do imageListAddBitmap il bm objectNull
-                     return il
+             then do w   <- bitmapGetWidth bm
+                     h   <- bitmapGetHeight bm
+                     il' <- imageListCreate (sz w h) False 1
+                     _   <- imageListAddBitmap il' bm objectNull
+                     return il'
+             else imageListAddBitmap il bm objectNull >>
+                  return il
 
 
-    stretchRow g (i,stretch)
-      = when stretch (flexGridSizerAddGrowableRow g i)
+    stretchRow g (i,stretch')
+      = when stretch' (flexGridSizerAddGrowableRow g i)
 
-    stretchCol g (i,stretch)
-      = when stretch (flexGridSizerAddGrowableCol g i)
+    stretchCol g (i,stretch')
+      = when stretch' (flexGridSizerAddGrowableCol g i)
 
     
 
     sizerAddWindowWithOptions :: Sizer a -> Window b -> LayoutOptions -> IO ()
-    sizerAddWindowWithOptions container window options
-      = sizerAddWithOptions (flagsAdjustMinSize window options) 
-                            (sizerAddWindow container window) (sizerSetItemMinSizeWindow container window) options
+    sizerAddWindowWithOptions container' window options'
+      = sizerAddWithOptions (flagsAdjustMinSize window options') 
+                            (sizerAddWindow container' window) (sizerSetItemMinSizeWindow container' window) options'
 
     sizerAddSizerWithOptions :: Sizer a -> Sizer b -> LayoutOptions -> IO ()
-    sizerAddSizerWithOptions container sizer options
-      = sizerAddWithOptions 0 (sizerAddSizer container sizer) (sizerSetItemMinSizeSizer container sizer) options
+    sizerAddSizerWithOptions container' sizer' options'
+      = sizerAddWithOptions 0 (sizerAddSizer container' sizer') (sizerSetItemMinSizeSizer container' sizer') options'
            
 
     sizerAddWithOptions :: Int -> (Int -> Int -> Int -> Ptr p -> IO ()) -> (Size -> IO ()) -> LayoutOptions -> IO ()
-    sizerAddWithOptions miscflags addSizer setMinSize options
-      = do addSizer 1 (flags options .+. miscflags) (marginW options) ptrNull
-           case minSize options of
+    sizerAddWithOptions miscflags addSizer setMinSize options'
+      = do addSizer 1 (flags options' .+. miscflags) (marginW options') ptrNull
+           case minSize options' of
              Nothing -> return ()
-             Just sz -> setMinSize sz
+             Just sz' -> setMinSize sz'
 
-    flags options
-      = flagsFillMode (fillMode options) .+. flagsMargins (margins options)
-        .+. flagsHAlign (alignH options) .+. flagsVAlign (alignV options)
+    flags options'
+      = flagsFillMode (fillMode options') .+. flagsMargins (margins options')
+        .+. flagsHAlign (alignH options') .+. flagsVAlign (alignV options')
 
-    flagsFillMode fillMode
-      = case fillMode of
+    flagsFillMode fillMode'
+      = case fillMode' of
           FillNone    -> 0
           FillShaped  -> wxSHAPED
           Fill        -> wxEXPAND
@@ -988,18 +988,18 @@ sizerFromLayout parent layout
           AlignBottom  -> wxALIGN_BOTTOM
           AlignVCentre -> wxALIGN_CENTRE_VERTICAL
 
-    flagsMargins margins
-      = bits (map flagsMargin margins)
+    flagsMargins margins'
+      = bits (map flagsMargin margins')
 
-    flagsMargin margin
-      = case margin of
+    flagsMargin margin'
+      = case margin' of
           MarginTop    -> wxTOP
           MarginLeft   -> wxLEFT
           MarginBottom -> wxBOTTOM
           MarginRight  -> wxRIGHT
  
 --  wxADJUST_MINSIZE is deprecated 
-    flagsAdjustMinSize window options = 0
+    flagsAdjustMinSize _window _options = 0
 {-
       = if (adjustMinSize options) 
          then wxADJUST_MINSIZE

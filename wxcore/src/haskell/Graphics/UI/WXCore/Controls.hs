@@ -27,11 +27,9 @@ module Graphics.UI.WXCore.Controls
     ) where
 
 import Graphics.UI.WXCore.WxcTypes
-import Graphics.UI.WXCore.WxcDefs
 import Graphics.UI.WXCore.WxcClasses
 import Graphics.UI.WXCore.Types
 
-import Foreign.Storable
 import Foreign.Marshal.Array
 import Foreign.Marshal.Utils
 
@@ -50,14 +48,14 @@ data Cookie       = Cookie TreeItem
 
 -- | Get a @TreeCookie@ to iterate through the children of tree node.
 treeCtrlGetChildCookie :: TreeCtrl a -> TreeItem -> IO TreeCookie
-treeCtrlGetChildCookie treeCtrl parent
+treeCtrlGetChildCookie _treeCtrl parent
   = do pcookie <- varCreate (CookieFirst parent)
        return (TreeCookie pcookie)
 
 -- | Get the next child of a tree node. Returns 'Nothing' when
 -- the end of the list is reached. This also invalidates the tree cookie.
 treeCtrlGetNextChild2 :: TreeCtrl a -> TreeCookie -> IO (Maybe TreeItem)
-treeCtrlGetNextChild2 treeCtrl treeCookie@(TreeCookie pcookie)
+treeCtrlGetNextChild2 treeCtrl (TreeCookie pcookie)
   = do cookie <- varGet pcookie
        case cookie of
          CookieInvalid    -> return Nothing
@@ -100,22 +98,22 @@ listBoxGetSelectionList listBox
   = do n <- listBoxGetSelections listBox ptrNull 0
        let count = abs n
        allocaArray count $ \carr ->
-        do listBoxGetSelections listBox carr count
+        do _  <- listBoxGetSelections listBox carr count
            xs <- peekArray count carr
            return (map fromCInt xs)
 
 -- | Sets the active log target and deletes the old one.
 logDeleteAndSetActiveTarget :: Log a -> IO ()
-logDeleteAndSetActiveTarget log
-  = do oldlog <- logSetActiveTarget log
+logDeleteAndSetActiveTarget log'
+  = do oldlog <- logSetActiveTarget log'
        when (not (objectIsNull oldlog)) (logDelete oldlog)
        
 
 -- | Set a text control as a log target.
 textCtrlMakeLogActiveTarget :: TextCtrl a -> IO ()
 textCtrlMakeLogActiveTarget textCtrl
-  = do log <- logTextCtrlCreate textCtrl
-       logDeleteAndSetActiveTarget log
+  = do log' <- logTextCtrlCreate textCtrl
+       logDeleteAndSetActiveTarget log'
 
 
 -- | Use a 'clipboardSetData' or 'clipboardGetData' in this function. But don't

@@ -1,4 +1,4 @@
-{-# LANGUAGE ForeignFunctionInterface, FlexibleInstances #-}
+{-# LANGUAGE ForeignFunctionInterface #-}
 -----------------------------------------------------------------------------------------
 {-|
 Module      :  Types
@@ -80,16 +80,13 @@ module Graphics.UI.WXCore.Types(
 
             ) where
 
-import Data.List( (\\) )
 import Graphics.UI.WXCore.WxcTypes
 import Graphics.UI.WXCore.WxcDefs
 import Graphics.UI.WXCore.WxcClasses( wxcSystemSettingsGetColour )
 import System.IO.Unsafe( unsafePerformIO )
 
 -- utility
-import Data.Array
 import Data.Bits
-import Data.Word
 import Control.Concurrent.STM
 import qualified Control.Exception as CE
 import qualified Control.Monad as M
@@ -160,7 +157,7 @@ idCreate
 -- | Ignore the result of an 'IO' action.
 unitIO :: IO a -> IO ()
 unitIO io
-  = do io; return ()
+  = io >> return ()
 
 -- | Perform an action when a test succeeds.
 when :: Bool -> IO () -> IO ()
@@ -191,8 +188,8 @@ finally = CE.finally
 finalize ::  IO b -- ^ computation to run last (release resource)
           -> IO a -- ^ computation to run first
           -> IO a
-finalize last first
-  = finally first last
+finalize lastComputation firstComputation
+  = finally firstComputation lastComputation
 
 {--------------------------------------------------------------------------------
   Variables
@@ -249,13 +246,13 @@ pointSub (Point x1 y1) (Point x2 y2) = Point (x1-x2) (y1-y2)
 pointScale :: (Num a) => Point2 a -> a -> Point2 a
 pointScale (Point x y) v = Point (v*x) (v*y)
 
+{- Moved to WxcTypes.hs at 2015-09-01
 
 instance (Num a, Ord a) => Ord (Point2 a) where
   compare (Point x1 y1) (Point x2 y2)             
     = case compare y1 y2 of
         EQ  -> compare x1 x2
         neq -> neq
-
 
 instance Ix (Point2 Int) where
   range (Point x1 y1,Point x2 y2)             
@@ -269,24 +266,27 @@ instance Ix (Point2 Int) where
           h = abs (y2 - y1) + 1
       in w*h
 
-  index bnd@(Point x1 y1, Point x2 y2) p@(Point x y)
+  index bnd@(Point x1 y1, Point x2 _y2) p@(Point x y)
     = if inRange bnd p
        then let w = abs (x2 - x1) + 1
             in (y-y1)*w + x
        else error ("Point index out of bounds: " ++ show p ++ " not in " ++ show bnd)
+-}
 
 {-----------------------------------------------------------------------------------------
   Size
 -----------------------------------------------------------------------------------------}
+{-
 -- | Return the width. (see also 'sizeW').
 sizeWidth :: (Num a) => Size2D a -> a
-sizeWidth (Size w h)
+sizeWidth (Size w _h)
   = w
 
 -- | Return the height. (see also 'sizeH').
 sizeHeight :: (Num a) => Size2D a -> a
-sizeHeight (Size w h)
+sizeHeight (Size _w h)
   = h
+-}
 
 -- | Returns 'True' if the first size totally encloses the second argument.
 sizeEncloses :: (Num a, Ord a) => Size2D a -> Size2D a -> Bool
@@ -353,7 +353,7 @@ rectCentralPoint (Rect l t w h)
   = Point (l + div w 2) (t + div h 2)
 
 rectCentralRect :: Rect2D Int -> Size -> Rect2D Int
-rectCentralRect r@(Rect l t rw rh) (Size w h)
+rectCentralRect r@(Rect _l _t _rw _rh) (Size w h)
   = let c = rectCentralPoint r
     in Rect (pointX c - (w - div w 2)) (pointY c - (h - div h 2)) w h
 
@@ -362,7 +362,7 @@ rectCentralPointDouble (Rect l t w h)
   = Point (l + w/2) (t + h/2)
 
 rectCentralRectDouble :: (Fractional a) => Rect2D a -> Size2D a -> Rect2D a
-rectCentralRectDouble r@(Rect l t rw rh) (Size w h)
+rectCentralRectDouble r@(Rect _l _t _rw _rh) (Size w h)
   = let c = rectCentralPointDouble r
     in Rect (pointX c - (w - w/2)) (pointY c - (h - h/2)) w h
 
@@ -421,21 +421,21 @@ black, darkgrey, dimgrey, mediumgrey, grey, lightgrey, white :: Color
 red, green, blue :: Color
 cyan, magenta, yellow :: Color
 
-black     = colorRGB 0x00 0x00 0x00
-darkgrey  = colorRGB 0x2F 0x2F 0x2F
-dimgrey   = colorRGB 0x54 0x54 0x54
-mediumgrey= colorRGB 0x64 0x64 0x64
-grey      = colorRGB 0x80 0x80 0x80
-lightgrey = colorRGB 0xC0 0xC0 0xC0
-white     = colorRGB 0xFF 0xFF 0xFF
+black     = colorRGB 0x00 0x00 (0x00 :: Int)
+darkgrey  = colorRGB 0x2F 0x2F (0x2F :: Int)
+dimgrey   = colorRGB 0x54 0x54 (0x54 :: Int)
+mediumgrey= colorRGB 0x64 0x64 (0x64 :: Int)
+grey      = colorRGB 0x80 0x80 (0x80 :: Int)
+lightgrey = colorRGB 0xC0 0xC0 (0xC0 :: Int)
+white     = colorRGB 0xFF 0xFF (0xFF :: Int)
 
-red       = colorRGB 0xFF 0x00 0x00
-green     = colorRGB 0x00 0xFF 0x00
-blue      = colorRGB 0x00 0x00 0xFF
+red       = colorRGB 0xFF 0x00 (0x00 :: Int)
+green     = colorRGB 0x00 0xFF (0x00 :: Int)
+blue      = colorRGB 0x00 0x00 (0xFF :: Int)
 
-yellow    = colorRGB 0xFF 0xFF 0x00
-magenta   = colorRGB 0xFF 0x00 0xFF
-cyan      = colorRGB 0x00 0xFF 0xFF
+yellow    = colorRGB 0xFF 0xFF (0x00 :: Int)
+magenta   = colorRGB 0xFF 0x00 (0xFF :: Int)
+cyan      = colorRGB 0x00 0xFF (0xFF :: Int)
 
 
 {--------------------------------------------------------------------------
@@ -476,7 +476,7 @@ data SystemColor
   | ColorBtnHilight       -- ^ Same as BTNHIGHLIGHT.  
 
 instance Enum SystemColor where
-  toEnum i
+  toEnum _i
     = error "Graphics.UI.WXCore.Types.SytemColor.toEnum: can not convert integers to system colors."
 
   fromEnum systemColor

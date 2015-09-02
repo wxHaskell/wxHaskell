@@ -1,12 +1,13 @@
 -----------------------------------------------------------------------------------------
-{-| Module      :  HaskellNames
+{-| 
+    Module      :  HaskellNames
     Copyright   :  (c) Daan Leijen 2003
     License     :  BSD-style
-
+    
     Maintainer  :  wxhaskell-devel@lists.sourceforge.net
     Stability   :  provisional
     Portability :  portable
-
+    
     Utility module to create Haskell compatible names.
 -}
 -----------------------------------------------------------------------------------------

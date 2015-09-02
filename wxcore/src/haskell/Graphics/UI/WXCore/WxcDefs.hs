@@ -3705,6 +3705,7 @@ wxAUI_TBTOOL_TEXT_BOTTOM :: Int
 wxAUI_TBTOOL_TEXT_BOTTOM =  3
 -- end enum wxAuiToolBarToolTextOrientation
 
+{-
 -- enum for wxBookCtrlHitTest
 wxBK_HITTEST_NOWHERE :: Int
 wxBK_HITTEST_NOWHERE = 1
@@ -3732,6 +3733,7 @@ wxBK_RIGHT = 0x0080
 wxBK_ALIGN_MASK :: Int
 wxBK_ALIGN_MASK = 240
 -- end wxBookCtrl flags
+-}
 
 -- enum wxSizerFlagBits
 
@@ -3768,7 +3770,7 @@ wxTILE :: Int
 wxTILE = wxSHAPED .|. wxFIXED_MINSIZE
 
 -- a mask to extract stretch from the combination of flags
-wxSTRETCH_MASK = 0x7000 -- sans wxTILE
+-- wxSTRETCH_MASK = 0x7000 -- sans wxTILE
 
 -- End enum wxStretch
 
@@ -11094,6 +11096,7 @@ wxSTC_CMD_WORDRIGHTEND = 2441
 wxSTC_CMD_WORDRIGHTENDEXTEND :: Int
 wxSTC_CMD_WORDRIGHTENDEXTEND = 2442
 
+{-
 wxSPLASH_CENTRE_ON_PARENT :: Int
 wxSPLASH_CENTRE_ON_PARENT = 1
 
@@ -11108,3 +11111,4 @@ wxSPLASH_TIMEOUT = 4
 
 wxSPLASH_NO_TIMEOUT :: Int
 wxSPLASH_NO_TIMEOUT = 0
+-}

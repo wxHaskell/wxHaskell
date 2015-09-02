@@ -38,7 +38,6 @@ import Graphics.UI.WXCore.WxcTypes
 import Graphics.UI.WXCore.WxcDefs
 import Graphics.UI.WXCore.WxcClassInfo
 import Graphics.UI.WXCore.WxcClasses
-import Graphics.UI.WXCore.WxcClassTypes
 import Graphics.UI.WXCore.Types
 
 
@@ -132,7 +131,7 @@ windowChildren w
        if count <= 0
         then return []
         else withArray (replicate count ptrNull) $ \ptrs ->
-             do windowGetChildren w ptrs count
+             do _  <- windowGetChildren w ptrs count
                 ps <- peekArray count ptrs
                 return (map objectFromPtr ps)
 

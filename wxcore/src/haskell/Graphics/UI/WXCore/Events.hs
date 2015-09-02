@@ -214,6 +214,7 @@ module Graphics.UI.WXCore.Events
         , EventAuiNotebook(..)
         , noWindowSelection 
         , auiNotebookOnAuiNotebookEvent
+        , auiNotebookOnAuiNotebookEventEx
         , auiNotebookGetOnAuiNotebookEvent
 
         -- * Current event
@@ -257,7 +258,7 @@ module Graphics.UI.WXCore.Events
         , unsafeWindowGetHandlerState
         ) where
 
-import Data.List( intersperse, findIndex )
+import Data.List( intersperse )
 import System.Environment( getProgName, getArgs )
 import Foreign.StablePtr
 import Foreign.Ptr
@@ -290,7 +291,7 @@ type Veto = IO ()
 -- | Set an event handler for a push button.
 buttonOnCommand :: Button a -> IO () -> IO ()
 buttonOnCommand button eventHandler
-  = windowOnEvent button [wxEVT_COMMAND_BUTTON_CLICKED] eventHandler (\evt -> eventHandler)
+  = windowOnEvent button [wxEVT_COMMAND_BUTTON_CLICKED] eventHandler (\_evt -> eventHandler)
 
 
 -- | Get the current button event handler on a window.
@@ -302,7 +303,7 @@ buttonGetOnCommand button
 -- | Set an event handler for "updated text", works for example on a 'TextCtrl' and 'ComboBox'.
 controlOnText :: Control a -> IO () -> IO ()
 controlOnText control eventHandler
-  = windowOnEvent control [wxEVT_COMMAND_TEXT_UPDATED] eventHandler (\evt -> eventHandler)
+  = windowOnEvent control [wxEVT_COMMAND_TEXT_UPDATED] eventHandler (\_evt -> eventHandler)
 
 -- | Get the current event handler for updated text.
 controlGetOnText :: Control a -> IO (IO ())
@@ -313,7 +314,7 @@ controlGetOnText control
 -- | Set an event handler for an enter command in a text control.
 textCtrlOnTextEnter :: TextCtrl a -> IO () -> IO ()
 textCtrlOnTextEnter textCtrl eventHandler
-  = windowOnEvent textCtrl [wxEVT_COMMAND_TEXT_ENTER] eventHandler (\evt -> eventHandler)
+  = windowOnEvent textCtrl [wxEVT_COMMAND_TEXT_ENTER] eventHandler (\_evt -> eventHandler)
 
 -- | Get the current text enter event handler.
 textCtrlGetOnTextEnter :: TextCtrl a -> IO (IO ())
@@ -325,7 +326,7 @@ textCtrlGetOnTextEnter textCtrl
 -- allowed text in a text control.
 textCtrlOnTextMaxLen :: IO () -> TextCtrl a -> IO ()
 textCtrlOnTextMaxLen eventHandler textCtrl
-  = windowOnEvent textCtrl [wxEVT_COMMAND_TEXT_MAXLEN] eventHandler (\evt -> eventHandler)
+  = windowOnEvent textCtrl [wxEVT_COMMAND_TEXT_MAXLEN] eventHandler (\_evt -> eventHandler)
 
 -- | Get the current maximal text event handler.
 textCtrlGetOnTextMaxLen :: TextCtrl a -> IO (IO ())
@@ -336,7 +337,7 @@ textCtrlGetOnTextMaxLen textCtrl
 -- | Set an event handler for an enter command in a combo box.
 comboBoxOnTextEnter :: ComboBox a -> IO () -> IO ()
 comboBoxOnTextEnter comboBox eventHandler
-  = windowOnEvent comboBox [wxEVT_COMMAND_TEXT_ENTER] eventHandler (\evt -> eventHandler)
+  = windowOnEvent comboBox [wxEVT_COMMAND_TEXT_ENTER] eventHandler (\_evt -> eventHandler)
 
 -- | Get the current text enter event handler.
 comboBoxGetOnTextEnter :: ComboBox a -> IO (IO ())
@@ -347,7 +348,7 @@ comboBoxGetOnTextEnter comboBox
 -- | Set an event handler for when a combo box item is selected.
 comboBoxOnCommand :: ComboBox a -> IO () -> IO ()
 comboBoxOnCommand comboBox eventHandler
-  = windowOnEvent comboBox [wxEVT_COMMAND_COMBOBOX_SELECTED] eventHandler (\evt -> eventHandler)
+  = windowOnEvent comboBox [wxEVT_COMMAND_COMBOBOX_SELECTED] eventHandler (\_evt -> eventHandler)
 
 -- | Get the current combo box event handler for selections
 comboBoxGetOnCommand :: ComboBox a -> IO (IO ())
@@ -357,7 +358,7 @@ comboBoxGetOnCommand comboBox
 -- | Set an event handler for when a listbox item is (de)selected.
 listBoxOnCommand :: ListBox a -> IO () -> IO ()
 listBoxOnCommand listBox eventHandler
-  = windowOnEvent listBox [wxEVT_COMMAND_LISTBOX_SELECTED] eventHandler (\evt -> eventHandler)
+  = windowOnEvent listBox [wxEVT_COMMAND_LISTBOX_SELECTED] eventHandler (\_evt -> eventHandler)
 
 -- | Get the current listbox event handler for selections.
 listBoxGetOnCommand :: ListBox a -> IO (IO ())
@@ -384,7 +385,7 @@ listBoxGetOnDClick listBox
 -- | Set an event handler for when a choice item is (de)selected.
 choiceOnCommand :: Choice a -> IO () -> IO ()
 choiceOnCommand choice eventHandler
-  = windowOnEvent choice [wxEVT_COMMAND_CHOICE_SELECTED] eventHandler (\evt -> eventHandler)
+  = windowOnEvent choice [wxEVT_COMMAND_CHOICE_SELECTED] eventHandler (\_evt -> eventHandler)
 
 -- | Get the current choice command event handler.
 choiceGetOnCommand :: Choice a -> IO (IO ())
@@ -395,7 +396,7 @@ choiceGetOnCommand choice
 -- | Set an event handler for when a radiobox item is selected.
 radioBoxOnCommand :: RadioBox a -> IO () -> IO ()
 radioBoxOnCommand radioBox eventHandler
-  = windowOnEvent radioBox [wxEVT_COMMAND_RADIOBOX_SELECTED] eventHandler (\evt -> eventHandler)
+  = windowOnEvent radioBox [wxEVT_COMMAND_RADIOBOX_SELECTED] eventHandler (\_evt -> eventHandler)
 
 -- | Get the current radio box command handler.
 radioBoxGetOnCommand :: RadioBox a -> IO (IO ())
@@ -406,7 +407,7 @@ radioBoxGetOnCommand radioBox
 -- | Set an event handler for when a slider item changes.
 sliderOnCommand :: Slider a -> IO () -> IO ()
 sliderOnCommand slider eventHandler
-  = windowOnEvent slider [wxEVT_COMMAND_SLIDER_UPDATED] eventHandler (\evt -> eventHandler)
+  = windowOnEvent slider [wxEVT_COMMAND_SLIDER_UPDATED] eventHandler (\_evt -> eventHandler)
 
 -- | Get the current slider command event handler.
 sliderGetOnCommand :: Slider a -> IO (IO ())
@@ -418,7 +419,7 @@ sliderGetOnCommand slider
 -- | Set an event handler for when a checkbox clicked.
 checkBoxOnCommand :: CheckBox a -> (IO ()) -> IO ()
 checkBoxOnCommand checkBox eventHandler
-  = windowOnEvent checkBox [wxEVT_COMMAND_CHECKBOX_CLICKED] eventHandler (\evt -> eventHandler)
+  = windowOnEvent checkBox [wxEVT_COMMAND_CHECKBOX_CLICKED] eventHandler (\_evt -> eventHandler)
 
 -- | Get the current check box event handler.
 checkBoxGetOnCommand :: CheckBox a -> IO (IO ())
@@ -428,7 +429,7 @@ checkBoxGetOnCommand checkBox
 -- | Set an event handler for when a spinCtrl clicked.
 spinCtrlOnCommand :: SpinCtrl a -> (IO ()) -> IO ()
 spinCtrlOnCommand spinCtrl eventHandler
-  = windowOnEvent spinCtrl [wxEVT_COMMAND_SPINCTRL_UPDATED] eventHandler (\evt -> eventHandler)
+  = windowOnEvent spinCtrl [wxEVT_COMMAND_SPINCTRL_UPDATED] eventHandler (\_evt -> eventHandler)
 
 -- | Get the current check box event handler.
 spinCtrlGetOnCommand :: SpinCtrl a -> IO (IO ())
@@ -438,7 +439,7 @@ spinCtrlGetOnCommand spinCtrl
 -- | Set an event handler for a push button.
 toggleButtonOnCommand :: ToggleButton a -> IO () -> IO ()
 toggleButtonOnCommand button eventHandler
-  = windowOnEvent button [wxEVT_COMMAND_TOGGLEBUTTON_CLICKED] eventHandler (\evt -> eventHandler)
+  = windowOnEvent button [wxEVT_COMMAND_TOGGLEBUTTON_CLICKED] eventHandler (\_evt -> eventHandler)
 
 -- | Get the current button event handler on a window.
 toggleButtonGetOnCommand :: Window a -> IO (IO ())
@@ -637,7 +638,7 @@ stcOnSTCEvent stc handler
 
 stcGetOnSTCEvent :: StyledTextCtrl a -> IO (EventSTC -> IO ())
 stcGetOnSTCEvent window
-  = unsafeWindowGetHandlerState window (head $ map fst stcEvents) (\ev -> skipCurrentEvent)
+  = unsafeWindowGetHandlerState window (head $ map fst stcEvents) (\_ev -> skipCurrentEvent)
 
 {-----------------------------------------------------------------------------------------
   Printing
@@ -671,10 +672,10 @@ printEvents
                                       epage<- wxcPrintEventGetEndPage ev
                                       let cancel = wxcPrintEventSetContinue ev False
                                       return (PrintBeginDoc cancel page epage))
-    ,(wxEVT_PRINT_PREPARE,  \ev -> return PrintPrepare)
-    ,(wxEVT_PRINT_END_DOC,  \ev -> return PrintEndDoc)
-    ,(wxEVT_PRINT_BEGIN,    \ev -> return PrintBegin)
-    ,(wxEVT_PRINT_END,      \ev -> return PrintEnd)
+    ,(wxEVT_PRINT_PREPARE, \_ev -> return PrintPrepare)
+    ,(wxEVT_PRINT_END_DOC, \_ev -> return PrintEndDoc)
+    ,(wxEVT_PRINT_BEGIN,   \_ev -> return PrintBegin)
+    ,(wxEVT_PRINT_END,     \_ev -> return PrintEnd)
     ]
 
 -- | Set an event handler for printing.
@@ -692,7 +693,7 @@ printOutOnPrint printOut eventHandler
 printOutGetOnPrint :: WXCPrintout a -> IO (EventPrint -> IO ())
 printOutGetOnPrint printOut 
   = do evtHandler <- wxcPrintoutGetEvtHandler printOut
-       unsafeGetHandlerState evtHandler idAny wxEVT_PRINT_PAGE (\ev -> skipCurrentEvent)
+       unsafeGetHandlerState evtHandler idAny wxEVT_PRINT_PAGE (\_ev -> skipCurrentEvent)
 
 
 {-----------------------------------------------------------------------------------------
@@ -718,27 +719,27 @@ data Orientation  = Horizontal | Vertical
 scrollOrientation :: EventScroll -> Orientation
 scrollOrientation scroll
   = case scroll of
-      ScrollTop      orient pos   -> orient
-      ScrollBottom   orient pos   -> orient
-      ScrollLineUp   orient pos   -> orient
-      ScrollLineDown orient pos   -> orient
-      ScrollPageUp   orient pos   -> orient
-      ScrollPageDown orient pos   -> orient
-      ScrollTrack    orient pos   -> orient
-      ScrollRelease  orient pos   -> orient
+      ScrollTop      orient _pos   -> orient
+      ScrollBottom   orient _pos   -> orient
+      ScrollLineUp   orient _pos   -> orient
+      ScrollLineDown orient _pos   -> orient
+      ScrollPageUp   orient _pos   -> orient
+      ScrollPageDown orient _pos   -> orient
+      ScrollTrack    orient _pos   -> orient
+      ScrollRelease  orient _pos   -> orient
 
 -- | Get the position of the scroll bar.
 scrollPos :: EventScroll -> Int
 scrollPos scroll
   = case scroll of
-      ScrollTop      orient pos   -> pos
-      ScrollBottom   orient pos   -> pos
-      ScrollLineUp   orient pos   -> pos
-      ScrollLineDown orient pos   -> pos
-      ScrollPageUp   orient pos   -> pos
-      ScrollPageDown orient pos   -> pos
-      ScrollTrack    orient pos   -> pos
-      ScrollRelease  orient pos   -> pos
+      ScrollTop      _orient pos   -> pos
+      ScrollBottom   _orient pos   -> pos
+      ScrollLineUp   _orient pos   -> pos
+      ScrollLineDown _orient pos   -> pos
+      ScrollPageUp   _orient pos   -> pos
+      ScrollPageDown _orient pos   -> pos
+      ScrollTrack    _orient pos   -> pos
+      ScrollRelease  _orient pos   -> pos
 
 
 
@@ -777,7 +778,7 @@ windowOnScroll window eventHandler
 -- | Get the current scroll event handler of a window.
 windowGetOnScroll :: Window a -> IO (EventScroll -> IO ())
 windowGetOnScroll window
-  = unsafeWindowGetHandlerState window wxEVT_SCROLLWIN_TOP (\scroll -> skipCurrentEvent)
+  = unsafeWindowGetHandlerState window wxEVT_SCROLLWIN_TOP (\_scroll -> skipCurrentEvent)
 
 {--------------------------------------------------------------------------
   HTML event
@@ -798,11 +799,11 @@ data EventHtml
 instance Show EventHtml where
   show ev
     = case ev of
-        HtmlCellClicked id mouse pnt           -> "HTML Cell " ++ show id ++ " clicked: " ++ show mouse
-        HtmlLinkClicked href target id mouse p -> "HTML Link " ++ show id ++ " clicked: " ++ href
-        HtmlCellHover id                       -> "HTML Cell " ++ show id ++ " hover"
-        HtmlSetTitle title                     -> "HTML event title: " ++ title
-        HtmlUnknown                            -> "HTML event unknown"
+        HtmlCellClicked id' mouse _pnt             -> "HTML Cell " ++ show id' ++ " clicked: " ++ show mouse
+        HtmlLinkClicked href _target id' _mouse _p -> "HTML Link " ++ show id' ++ " clicked: " ++ href
+        HtmlCellHover   id'                        -> "HTML Cell " ++ show id' ++ " hover"
+        HtmlSetTitle    title                      -> "HTML event title: " ++ title
+        HtmlUnknown                                -> "HTML event unknown"
 
 fromHtmlEvent :: WXCHtmlEvent a -> IO EventHtml
 fromHtmlEvent event
@@ -816,29 +817,29 @@ fromHtmlEvent event
                   ,(wxEVT_HTML_LINK_CLICKED,      htmlLink)
                   ,(wxEVT_HTML_SET_TITLE,         htmlTitle)]
 
-    htmlTitle event
-      = do title <- commandEventGetString event
+    htmlTitle event'
+      = do title <- commandEventGetString event'
            return (HtmlSetTitle title)
 
-    htmlHover event
-      = do id      <- wxcHtmlEventGetHtmlCellId event
-           return (HtmlCellHover id)
+    htmlHover event'
+      = do id'     <- wxcHtmlEventGetHtmlCellId event'
+           return (HtmlCellHover id')
 
-    htmlClicked event
-      = do id      <- wxcHtmlEventGetHtmlCellId event
-           mouseEv <- wxcHtmlEventGetMouseEvent event
+    htmlClicked event'
+      = do id'     <- wxcHtmlEventGetHtmlCellId event'
+           mouseEv <- wxcHtmlEventGetMouseEvent event'
            mouse   <- fromMouseEvent mouseEv
-           pnt     <- wxcHtmlEventGetLogicalPosition event
-           return (HtmlCellClicked id mouse pnt)
+           pnt     <- wxcHtmlEventGetLogicalPosition event'
+           return (HtmlCellClicked id' mouse pnt)
 
-    htmlLink event
-      = do id      <- wxcHtmlEventGetHtmlCellId event
-           mouseEv <- wxcHtmlEventGetMouseEvent event
+    htmlLink event'
+      = do id'     <- wxcHtmlEventGetHtmlCellId event'
+           mouseEv <- wxcHtmlEventGetMouseEvent event'
            mouse   <- fromMouseEvent mouseEv
-           href    <- wxcHtmlEventGetHref event
-           target  <- wxcHtmlEventGetTarget event
-           pnt     <- wxcHtmlEventGetLogicalPosition event
-           return (HtmlLinkClicked href target id mouse pnt)
+           href    <- wxcHtmlEventGetHref event'
+           target  <- wxcHtmlEventGetTarget event'
+           pnt     <- wxcHtmlEventGetLogicalPosition event'
+           return (HtmlLinkClicked href target id' mouse pnt)
       
 -- | Set a html event handler for a HTML window. The first argument determines whether
 -- hover events ('HtmlCellHover') are handled or not.
@@ -857,7 +858,7 @@ htmlWindowOnHtmlEvent window allowHover handler
 -- | Get the current HTML event handler of a HTML window.
 htmlWindowGetOnHtmlEvent :: WXCHtmlWindow a -> IO (EventHtml -> IO ())
 htmlWindowGetOnHtmlEvent window
-  = unsafeWindowGetHandlerState window wxEVT_HTML_CELL_CLICKED (\ev -> skipCurrentEvent)
+  = unsafeWindowGetHandlerState window wxEVT_HTML_CELL_CLICKED (\_ev -> skipCurrentEvent)
 
      
           
@@ -867,27 +868,27 @@ htmlWindowGetOnHtmlEvent window
 -----------------------------------------------------------------------------------------}
 -- | Adds a close handler to the currently installed close handlers.
 windowAddOnClose :: Window a -> IO () -> IO ()
-windowAddOnClose window new
+windowAddOnClose window new'
   = do prev <- windowGetOnClose window
-       windowOnClose window (do{ new; prev })
+       windowOnClose window (do { new'; prev })
 
 -- | Set an event handler that is called when the user tries to close a frame or dialog.
 -- Don't forget to call the previous handler or 'frameDestroy' explicitly or otherwise the
 -- frame won't be closed.
 windowOnClose :: Window a -> IO () -> IO ()
 windowOnClose window eventHandler
-  = windowOnEvent window [wxEVT_CLOSE_WINDOW] eventHandler (\ev -> eventHandler)
+  = windowOnEvent window [wxEVT_CLOSE_WINDOW] eventHandler (\_ev -> eventHandler)
 
 -- | Get the current close event handler.
 windowGetOnClose :: Window a -> IO (IO ())
 windowGetOnClose window
-  = unsafeWindowGetHandlerState window wxEVT_CLOSE_WINDOW (do windowDestroy window; return ())
+  = unsafeWindowGetHandlerState window wxEVT_CLOSE_WINDOW (windowDestroy window >> return ())
 
 -- | Set an event handler that is called when the window is destroyed.
 -- /Note: does not seem to work on Windows/.
 windowOnDestroy :: Window a -> IO () -> IO ()
 windowOnDestroy window eventHandler
-  = windowOnEvent window [wxEVT_DESTROY] eventHandler (\ev -> eventHandler)
+  = windowOnEvent window [wxEVT_DESTROY] eventHandler (\_ev -> eventHandler)
 
 -- | Get the current destroy event handler.
 windowGetOnDestroy :: Window a -> IO (IO ())
@@ -901,15 +902,15 @@ windowGetOnDestroy window
 -- >        windowOnDelete window (do{ new; prev })
 
 windowAddOnDelete :: Window a -> IO () -> IO ()
-windowAddOnDelete window new
+windowAddOnDelete window new'
   = do prev <- windowGetOnDelete window
-       windowOnDelete window (do{ new; prev })
+       windowOnDelete window (do { new'; prev })
 
 -- | Set an event handler that is called when the window is deleted.
 -- Use with care as the window itself is in a deletion state.
 windowOnDelete :: Window a -> IO () -> IO ()
 windowOnDelete window eventHandler
-  = windowOnEventEx window [wxEVT_DELETE] eventHandler onDelete (\ev -> return ())
+  = windowOnEventEx window [wxEVT_DELETE] eventHandler onDelete (\_ev -> return ())
   where
     onDelete ownerDeleted
       | ownerDeleted  = eventHandler
@@ -924,7 +925,7 @@ windowGetOnDelete window
 -- | Set an event handler that is called when the window is created.
 windowOnCreate :: Window a -> IO () -> IO ()
 windowOnCreate window eventHandler
-  = windowOnEvent window [wxEVT_CREATE] eventHandler (\ev -> eventHandler)
+  = windowOnEvent window [wxEVT_CREATE] eventHandler (\_ev -> eventHandler)
 
 -- | Get the current create event handler.
 windowGetOnCreate :: Window a -> IO (IO ())
@@ -934,7 +935,7 @@ windowGetOnCreate window
 -- | Set an event handler that is called when the window is resized.
 windowOnSize :: Window a -> IO () -> IO ()
 windowOnSize window eventHandler
-  = windowOnEvent window [wxEVT_SIZE] eventHandler (\ev -> eventHandler)
+  = windowOnEvent window [wxEVT_SIZE] eventHandler (\_ev -> eventHandler)
 
 -- | Get the current resize event handler.
 windowGetOnSize :: Window a -> IO (IO ())
@@ -954,7 +955,7 @@ windowOnActivate window eventHandler
 -- | Get the current activate event handler.
 windowGetOnActivate :: Window a -> IO (Bool -> IO ())
 windowGetOnActivate window
-  = unsafeWindowGetHandlerState window wxEVT_ACTIVATE (\active -> return ())
+  = unsafeWindowGetHandlerState window wxEVT_ACTIVATE (\_active -> return ())
 
 -- | Set an event handler that is called when the window gets or loses the focus.
 -- The event parameter is 'True' when the window gets the focus.
@@ -963,22 +964,22 @@ windowOnFocus window eventHandler
   = do windowOnEvent window [wxEVT_SET_FOCUS] eventHandler getFocusHandler
        windowOnEvent window [wxEVT_KILL_FOCUS] eventHandler killFocusHandler
   where
-    getFocusHandler event
+    getFocusHandler _event
       = eventHandler True
-    killFocusHandler event
+    killFocusHandler _event
       = eventHandler False
 
 -- | Get the current focus event handler.
 windowGetOnFocus :: Window a -> IO (Bool -> IO ())
 windowGetOnFocus window
-  = unsafeWindowGetHandlerState window wxEVT_SET_FOCUS (\getfocus -> return ())
+  = unsafeWindowGetHandlerState window wxEVT_SET_FOCUS (\_getfocus -> return ())
 
 
 -- | A context menu event is generated when the user right-clicks in a window
 -- or presses shift-F10.
 windowOnContextMenu :: Window a -> IO () -> IO ()
 windowOnContextMenu window eventHandler
-  = windowOnEvent window [wxEVT_CONTEXT_MENU] eventHandler (\ev -> eventHandler)
+  = windowOnEvent window [wxEVT_CONTEXT_MENU] eventHandler (\_ev -> eventHandler)
 
 -- | Get the current context menu event handler.
 windowGetOnContextMenu :: Window a -> IO (IO ())
@@ -988,13 +989,13 @@ windowGetOnContextMenu window
 -- | A menu event is generated when the user selects a menu item.
 -- You should install this handler on the window that owns the menubar or a popup menu.
 evtHandlerOnMenuCommand :: EvtHandler a -> Id -> IO () -> IO ()
-evtHandlerOnMenuCommand window id eventHandler
-  = evtHandlerOnEvent window id id [wxEVT_COMMAND_MENU_SELECTED] eventHandler (\_ -> return ()) (\ev -> eventHandler)
+evtHandlerOnMenuCommand window id' eventHandler
+  = evtHandlerOnEvent window id' id' [wxEVT_COMMAND_MENU_SELECTED] eventHandler (\_ -> return ()) (\_ev -> eventHandler)
 
 -- | Get the current event handler for a certain menu.
 evtHandlerGetOnMenuCommand :: EvtHandler a -> Id -> IO (IO ())
-evtHandlerGetOnMenuCommand window id
-  = unsafeGetHandlerState window id wxEVT_COMMAND_MENU_SELECTED skipCurrentEvent
+evtHandlerGetOnMenuCommand window id'
+  = unsafeGetHandlerState window id' wxEVT_COMMAND_MENU_SELECTED skipCurrentEvent
 
 
 -- | An idle event is generated in idle time. The handler should return whether more
@@ -1019,7 +1020,7 @@ windowGetOnIdle window
 -- /Broken!/ (use 'timerOnCommand' instead).
 windowOnTimer :: Window a -> IO () -> IO ()
 windowOnTimer window eventHandler
-  = windowOnEvent window [wxEVT_TIMER] eventHandler (\ev -> eventHandler)
+  = windowOnEvent window [wxEVT_TIMER] eventHandler (\_ev -> eventHandler)
 
 -- | Get the current timer handler.
 windowGetOnTimer :: Window a -> IO (IO ())
@@ -1043,23 +1044,23 @@ windowOnPaintRaw window paintHandler
       = do obj <- eventGetEventObject event
            if (obj==objectNull)
             then return ()
-            else do let window = objectCast obj
-                    region <- windowGetUpdateRects window
-                    view   <- windowGetViewRect window
-                    withPaintDC window (\paintDC ->
-                     do isScrolled <- objectIsScrolledWindow window
-                        when (isScrolled) (scrolledWindowPrepareDC (objectCast window) paintDC)
+            else do let window' = objectCast obj
+                    region <- windowGetUpdateRects window'
+                    view   <- windowGetViewRect window'
+                    withPaintDC window' (\paintDC ->
+                     do isScrolled <- objectIsScrolledWindow window'
+                        when (isScrolled) (scrolledWindowPrepareDC (objectCast window') paintDC)
                         paintHandler paintDC view region)
 
 -- | Get the current /raw/ paint event handler. 
 windowGetOnPaintRaw :: Window a -> IO (PaintDC () -> Rect -> [Rect] -> IO ())
 windowGetOnPaintRaw window
-  = unsafeWindowGetHandlerState window wxEVT_PAINT (\dc rect region -> return ())
+  = unsafeWindowGetHandlerState window wxEVT_PAINT (\_dc _rect _region -> return ())
 
 -- | Get the current paint event handler.
 windowGetOnPaintGc :: Window a -> IO (GCDC () -> Rect -> IO ())
 windowGetOnPaintGc window
-  = unsafeWindowGetHandlerState window wxEVT_PAINT (\dc view -> return ())
+  = unsafeWindowGetHandlerState window wxEVT_PAINT (\_dc _view -> return ())
 
 
 -- | Set an event handler for paint events. The implementation uses an 
@@ -1075,7 +1076,7 @@ windowOnPaint window paintHandler
   = do v <- varCreate objectNull
        windowOnEventEx window [wxEVT_PAINT] paintHandler (destroy v) (onPaint v)
   where
-    destroy v ownerDeleted
+    destroy v _ownerDeleted
       = do bitmap <- varSwap v objectNull
            when (not (objectIsNull bitmap)) (bitmapDelete bitmap)
 
@@ -1083,11 +1084,11 @@ windowOnPaint window paintHandler
       = do obj <- eventGetEventObject event
            if (obj==objectNull)
             then return ()
-            else do let window = objectCast obj
-                    view  <- windowGetViewRect window
+            else do let window' = objectCast obj
+                    view  <- windowGetViewRect window'
                     withPaintDC window (\paintDC ->
-                     do isScrolled <- objectIsScrolledWindow window
-                        when (isScrolled) (scrolledWindowPrepareDC (objectCast window) paintDC)
+                     do isScrolled <- objectIsScrolledWindow window'
+                        when (isScrolled) (scrolledWindowPrepareDC (objectCast window') paintDC)
                         -- Note: wxMSW 2.4 does not clear the properly scrolled view rectangle.
                         let clear dc  | wxToolkit == WxMSW  = dcClearRect dc view
                                       | otherwise           = dcClear dc
@@ -1111,7 +1112,7 @@ windowOnPaintGc window paintHandler
   = do v <- varCreate objectNull
        windowOnEventEx window [wxEVT_PAINT] paintHandler (destroy v) (onPaint v)
   where
-    destroy v ownerDeleted
+    destroy v _ownerDeleted
       = do bitmap <- varSwap v objectNull
            when (not (objectIsNull bitmap)) (bitmapDelete bitmap)
 
@@ -1119,11 +1120,11 @@ windowOnPaintGc window paintHandler
       = do obj <- eventGetEventObject event
            if (obj==objectNull)
             then return ()
-            else do let window = objectCast obj
-                    view  <- windowGetViewRect window
+            else do let window' = objectCast obj
+                    view  <- windowGetViewRect window'
                     withPaintDC window (\paintDC ->
-                     do isScrolled <- objectIsScrolledWindow window
-                        when (isScrolled) (scrolledWindowPrepareDC (objectCast window) paintDC)
+                     do isScrolled <- objectIsScrolledWindow window'
+                        when (isScrolled) (scrolledWindowPrepareDC (objectCast window') paintDC)
                         -- Note: wxMSW 2.4 does not clear the properly scrolled view rectangle.
                         let clear dc  | wxToolkit == WxMSW  = dcClearRect dc view
                                       | otherwise           = dcClear dc
@@ -1133,7 +1134,7 @@ windowOnPaintGc window paintHandler
 -- | Get the current paint event handler.
 windowGetOnPaint :: Window a -> IO (DC () -> Rect -> IO ())
 windowGetOnPaint window
-  = unsafeWindowGetHandlerState window wxEVT_PAINT (\dc view -> return ())
+  = unsafeWindowGetHandlerState window wxEVT_PAINT (\_dc _view -> return ())
 
 
 -- Get the logical /dirty/ rectangles as a list of 'Rect'.
@@ -1167,7 +1168,7 @@ evtHandlerOnEndProcess :: EvtHandler a -> (Int -> Int -> IO ()) -> IO ()
 evtHandlerOnEndProcess  evtHandler handler
   = evtHandlerOnEvent evtHandler (-1) (-1) [wxEVT_END_PROCESS] handler onDelete onEndProcess
   where
-    onDelete ownerDeleted
+    onDelete _ownerDeleted
       = return ()
 
     onEndProcess event
@@ -1180,7 +1181,7 @@ evtHandlerOnEndProcess  evtHandler handler
 -- | Retrieve the current end process handler.
 evtHandlerGetOnEndProcess :: EvtHandler a -> IO (Int -> Int -> IO ())
 evtHandlerGetOnEndProcess evtHandler
-  = unsafeGetHandlerState evtHandler (-1) wxEVT_END_PROCESS (\pid code -> return ())
+  = unsafeGetHandlerState evtHandler (-1) wxEVT_END_PROCESS (\_pid _code -> return ())
 
 
 -- | The status of a stream (see 'StreamBase')
@@ -1213,10 +1214,10 @@ evtHandlerOnInput evtHandler handler stream bufferLen
 -- use the 'evtHandlerOnInput' whenever retrieval of the handler is not necessary.
 evtHandlerOnInputSink :: EvtHandler b -> (String -> StreamStatus -> IO ()) -> InputSink a -> IO ()
 evtHandlerOnInputSink evtHandler handler sink
-  = do id <- inputSinkGetId sink
-       evtHandlerOnEvent evtHandler id id [wxEVT_INPUT_SINK] handler onDelete onInput
+  = do id' <- inputSinkGetId sink
+       evtHandlerOnEvent evtHandler id' id' [wxEVT_INPUT_SINK] handler onDelete onInput
   where
-    onDelete ownerDeleted
+    onDelete _ownerDeleted
       = return ()
 
     onInput event
@@ -1229,7 +1230,7 @@ evtHandlerOnInputSink evtHandler handler sink
 -- | Retrieve the current input stream handler.
 evtHandlerGetOnInputSink :: EvtHandler b -> IO (String -> StreamStatus -> IO ())
 evtHandlerGetOnInputSink evtHandler
-  = unsafeGetHandlerState evtHandler (-1) wxEVT_INPUT_SINK (\input status -> return ())
+  = unsafeGetHandlerState evtHandler (-1) wxEVT_INPUT_SINK (\_input _status -> return ())
 
 -- | Read the input from an 'InputSinkEvent'.
 inputSinkEventLastString :: InputSinkEvent a -> IO String
@@ -1293,12 +1294,12 @@ isNoneDown (Modifiers shift control alt meta) = not (shift || control || alt || 
 
 -- | Test if no shift, alt, or control key was pressed.
 isNoShiftAltControlDown :: Modifiers -> Bool
-isNoShiftAltControlDown (Modifiers shift control alt meta) = not (shift || control || alt)
+isNoShiftAltControlDown (Modifiers shift control alt _meta) = not (shift || control || alt)
 
 -- | Tranform modifiers into an accelerator modifiers code.
 modifiersToAccelFlags :: Modifiers -> Int
-modifiersToAccelFlags mod
-  = mask (altDown mod) 0x01 + mask (controlDown mod) 0x02 + mask (shiftDown mod) 0x04
+modifiersToAccelFlags mod'
+  = mask (altDown mod') 0x01 + mask (controlDown mod') 0x02 + mask (shiftDown mod') 0x04
   where
     mask test flag = if test then flag else 0
 
@@ -1338,101 +1339,101 @@ showMouse mouse
     (Point x y)  = mousePos mouse
     action
       = case mouse of
-          MouseMotion p m       -> "Motion"
-          MouseEnter p m        -> "Enter"
-          MouseLeave p m        -> "Leave"
-          MouseLeftDown p m     -> "Left down"
-          MouseLeftUp p m       -> "Left up"
-          MouseLeftDClick p m   -> "Left double click"
-          MouseLeftDrag p m     -> "Left drag"
-          MouseRightDown p m    -> "Right down"
-          MouseRightUp p m      -> "Right up"
-          MouseRightDClick p m  -> "Right double click"
-          MouseRightDrag p m    -> "Right drag"
-          MouseMiddleDown p m   -> "Middle down"
-          MouseMiddleUp p m     -> "Middle up"
-          MouseMiddleDClick p m -> "Middle double click"
-          MouseMiddleDrag p m   -> "Middle drag"
-          MouseWheel down p m   -> "Wheel " ++ (if down then "down" else "up")
+          MouseMotion _p _m       -> "Motion"
+          MouseEnter _p _m        -> "Enter"
+          MouseLeave _p _m        -> "Leave"
+          MouseLeftDown _p _m     -> "Left down"
+          MouseLeftUp _p _m       -> "Left up"
+          MouseLeftDClick _p _m   -> "Left double click"
+          MouseLeftDrag _p _m     -> "Left drag"
+          MouseRightDown _p _m    -> "Right down"
+          MouseRightUp _p _m      -> "Right up"
+          MouseRightDClick _p _m  -> "Right double click"
+          MouseRightDrag _p _m    -> "Right drag"
+          MouseMiddleDown _p _m   -> "Middle down"
+          MouseMiddleUp _p _m     -> "Middle up"
+          MouseMiddleDClick _p _m -> "Middle double click"
+          MouseMiddleDrag _p _m   -> "Middle drag"
+          MouseWheel down _p _m   -> "Wheel " ++ (if down then "down" else "up")
 
 
 -- | Extract the position from a 'MouseEvent'.
 mousePos :: EventMouse -> Point
 mousePos mouseEvent
   = case mouseEvent of
-      MouseMotion p m        -> p
-      MouseEnter p m        -> p
-      MouseLeave p m        -> p
-      MouseLeftDown p m     -> p
-      MouseLeftUp p m       -> p
-      MouseLeftDClick p m   -> p
-      MouseLeftDrag p m     -> p
-      MouseRightDown p m    -> p
-      MouseRightUp p m      -> p
-      MouseRightDClick p m  -> p
-      MouseRightDrag p m    -> p
-      MouseMiddleDown p m   -> p
-      MouseMiddleUp p m     -> p
-      MouseMiddleDClick p m -> p
-      MouseMiddleDrag p m   -> p
-      MouseWheel _ p m      -> p
+      MouseMotion p _m       -> p
+      MouseEnter p _m        -> p
+      MouseLeave p _m        -> p
+      MouseLeftDown p _m     -> p
+      MouseLeftUp p _m       -> p
+      MouseLeftDClick p _m   -> p
+      MouseLeftDrag p _m     -> p
+      MouseRightDown p _m    -> p
+      MouseRightUp p _m      -> p
+      MouseRightDClick p _m  -> p
+      MouseRightDrag p _m    -> p
+      MouseMiddleDown p _m   -> p
+      MouseMiddleUp p _m     -> p
+      MouseMiddleDClick p _m -> p
+      MouseMiddleDrag p _m   -> p
+      MouseWheel _ p _m      -> p
 
 -- | Extract the modifiers from a 'MouseEvent'.
 mouseModifiers :: EventMouse -> Modifiers
 mouseModifiers mouseEvent
   = case mouseEvent of
-      MouseMotion p m       -> m
-      MouseEnter p m        -> m
-      MouseLeave p m        -> m
-      MouseLeftDown p m     -> m
-      MouseLeftUp p m       -> m
-      MouseLeftDClick p m   -> m
-      MouseLeftDrag p m     -> m
-      MouseRightDown p m    -> m
-      MouseRightUp p m      -> m
-      MouseRightDClick p m  -> m
-      MouseRightDrag p m    -> m
-      MouseMiddleDown p m   -> m
-      MouseMiddleUp p m     -> m
-      MouseMiddleDClick p m -> m
-      MouseMiddleDrag p m   -> m
-      MouseWheel _ p m      -> m
+      MouseMotion _p m       -> m
+      MouseEnter _p m        -> m
+      MouseLeave _p m        -> m
+      MouseLeftDown _p m     -> m
+      MouseLeftUp _p m       -> m
+      MouseLeftDClick _p m   -> m
+      MouseLeftDrag _p m     -> m
+      MouseRightDown _p m    -> m
+      MouseRightUp _p m      -> m
+      MouseRightDClick _p m  -> m
+      MouseRightDrag _p m    -> m
+      MouseMiddleDown _p m   -> m
+      MouseMiddleUp _p m     -> m
+      MouseMiddleDClick _p m -> m
+      MouseMiddleDrag _p m   -> m
+      MouseWheel _ _p m      -> m
 
 fromMouseEvent :: MouseEvent a -> IO EventMouse
 fromMouseEvent event
   = do x <- mouseEventGetX event
        y <- mouseEventGetY event
        obj   <- eventGetEventObject event
-       point <- windowCalcUnscrolledPosition (objectCast obj) (Point x y)
+       point' <- windowCalcUnscrolledPosition (objectCast obj) (Point x y)
 
-       altDown     <- mouseEventAltDown event
-       controlDown <- mouseEventControlDown event
-       shiftDown   <- mouseEventShiftDown event
-       metaDown    <- mouseEventMetaDown event
-       let modifiers = Modifiers altDown shiftDown controlDown metaDown
+       altDown'     <- mouseEventAltDown event
+       controlDown' <- mouseEventControlDown event
+       shiftDown'   <- mouseEventShiftDown event
+       metaDown'    <- mouseEventMetaDown event
+       let modifiers = Modifiers altDown' shiftDown' controlDown' metaDown'
 
        dragging    <- mouseEventDragging event
        if (dragging)
         then do leftDown <- mouseEventLeftIsDown event
                 if (leftDown)
-                 then return (MouseLeftDrag point modifiers)
+                 then return (MouseLeftDrag point' modifiers)
                  else do middleDown <- mouseEventMiddleIsDown event
                          if (middleDown)
-                          then return (MouseMiddleDrag point modifiers)
+                          then return (MouseMiddleDrag point' modifiers)
                           else do rightDown <- mouseEventRightIsDown event
                                   if (rightDown)
-                                   then return (MouseRightDrag point modifiers)
-                                   else return (MouseMotion point modifiers)
+                                   then return (MouseRightDrag point' modifiers)
+                                   else return (MouseMotion point' modifiers)
         else do tp <- eventGetEventType event
                 case lookup tp mouseEventTypes of
-                  Just mouse  -> return (mouse point modifiers)
+                  Just mouse  -> return (mouse point' modifiers)
                   Nothing     -> if (tp==wxEVT_MOUSEWHEEL)
                                   then do rot   <- mouseEventGetWheelRotation event
                                           delta <- mouseEventGetWheelDelta event
                                           if (abs rot >= delta)
-                                           then return (MouseWheel (rot<0) point modifiers)
-                                           else return (MouseMotion point modifiers)
-                                  else return (MouseMotion point modifiers)
+                                           then return (MouseWheel (rot<0) point' modifiers)
+                                           else return (MouseMotion point' modifiers)
+                                  else return (MouseMotion point' modifiers)
 
 mouseEventTypes :: [(Int,Point -> Modifiers -> EventMouse)]
 mouseEventTypes
@@ -1466,7 +1467,7 @@ windowOnMouse window allowMotion handler
 -- | Get the current mouse event handler of a window.
 windowGetOnMouse :: Window a -> IO (EventMouse -> IO ())
 windowGetOnMouse window
-  = unsafeWindowGetHandlerState window wxEVT_ENTER_WINDOW (\ev -> skipCurrentEvent)
+  = unsafeWindowGetHandlerState window wxEVT_ENTER_WINDOW (\_ev -> skipCurrentEvent)
 
 
 {-----------------------------------------------------------------------------------------
@@ -1485,7 +1486,7 @@ windowOnKeyDown window handler
 -- | Get the current key down handler of a window.
 windowGetOnKeyDown :: Window a -> IO (EventKey -> IO ())
 windowGetOnKeyDown window
-  = unsafeWindowGetHandlerState window wxEVT_KEY_DOWN (\eventKey -> skipCurrentEvent)
+  = unsafeWindowGetHandlerState window wxEVT_KEY_DOWN (\_eventKey -> skipCurrentEvent)
 
 
 -- | Set an event handler for translated key presses.
@@ -1500,7 +1501,7 @@ windowOnKeyChar window handler
 -- | Get the current translated key handler of a window.
 windowGetOnKeyChar :: Window a -> IO (EventKey -> IO ())
 windowGetOnKeyChar window
-  = unsafeWindowGetHandlerState window wxEVT_CHAR (\eventKey -> skipCurrentEvent)
+  = unsafeWindowGetHandlerState window wxEVT_CHAR (\_eventKey -> skipCurrentEvent)
 
 
 -- | Set an event handler for (untranslated) key releases.
@@ -1515,28 +1516,28 @@ windowOnKeyUp window handler
 -- | Get the current key release handler of a window.
 windowGetOnKeyUp :: Window a -> IO (EventKey -> IO ())
 windowGetOnKeyUp window
-  = unsafeWindowGetHandlerState window wxEVT_KEY_UP (\keyInfo -> skipCurrentEvent)
+  = unsafeWindowGetHandlerState window wxEVT_KEY_UP (\_keyInfo -> skipCurrentEvent)
 
 
 eventKeyFromEvent :: KeyEvent a -> IO EventKey
 eventKeyFromEvent event
   = do x <- keyEventGetX event
        y <- keyEventGetY event
-       obj   <- eventGetEventObject event
-       point <- if objectIsNull obj
+       obj    <- eventGetEventObject event
+       point' <- if objectIsNull obj
                  then return (Point x y)
                  else windowCalcUnscrolledPosition (objectCast obj) (Point x y)
 
-       altDown     <- keyEventAltDown event
-       controlDown <- keyEventControlDown event
-       shiftDown   <- keyEventShiftDown event
-       metaDown    <- keyEventMetaDown event
-       let modifiers = Modifiers altDown shiftDown controlDown metaDown
+       altDown'     <- keyEventAltDown event
+       controlDown' <- keyEventControlDown event
+       shiftDown'   <- keyEventShiftDown event
+       metaDown'    <- keyEventMetaDown event
+       let modifiers = Modifiers altDown' shiftDown' controlDown' metaDown'
 
        keyCode <- keyEventGetKeyCode event
        let key = keyCodeToKey keyCode
 
-       return (EventKey key modifiers point)
+       return (EventKey key modifiers point')
 
 
 
@@ -1546,15 +1547,15 @@ data EventKey  = EventKey !Key !Modifiers !Point
 
 -- | Extract the key from a keyboard event.
 keyKey :: EventKey -> Key
-keyKey (EventKey key mods pos) = key
+keyKey (EventKey key _mods _pos) = key
 
 -- | Extract the modifiers from a keyboard event.
 keyModifiers :: EventKey -> Modifiers
-keyModifiers (EventKey key mods pos) = mods
+keyModifiers (EventKey _key mods _pos) = mods
 
 -- | Extract the position from a keyboard event.
 keyPos :: EventKey -> Point
-keyPos (EventKey key mods pos) = pos
+keyPos (EventKey _key _mods pos) = pos
 
 
 -- | A low-level virtual key code.
@@ -1765,7 +1766,7 @@ keyCodeToKey keyCode
 -- Use a big-endian patricia tree to efficiently map key codes to Haskell keys.
 -- Since it is a static map, we could maybe use one of Knuth's optimally balanced
 -- trees....
--- keyCodeMap :: IntMap.IntMap Key
+keyCodeMap :: IntMap.IntMap Key
 keyCodeMap
   = IntMap.fromList
     [(wxK_BACK         , KeyBack)
@@ -2006,45 +2007,54 @@ toDragResult drag
 -- | Set an event handler that is called when the drop target can be filled with data.
 -- This function require to use 'dropTargetGetData' in your event handler to fill data.
 dropTargetOnData :: DropTarget a -> (Point -> DragResult -> IO DragResult) -> IO ()
-dropTargetOnData drop event = do
+dropTargetOnData drop' event = do
     funPtr <- dragThreeFuncHandler event
-    wxcDropTargetSetOnData (objectCast drop) (toCFunPtr funPtr)
+    wxcDropTargetSetOnData (objectCast drop') (toCFunPtr funPtr)
 
--- | Set an event handler for an drop command in a drop target.
+-- | Set an event handler for an drop' command in a drop' target.
 dropTargetOnDrop :: DropTarget a -> (Point -> IO Bool) -> IO ()
-dropTargetOnDrop drop event = do
+dropTargetOnDrop drop' event = do
     funPtr <- dragTwoFuncHandler event
-    wxcDropTargetSetOnDrop (objectCast drop) (toCFunPtr funPtr)
+    wxcDropTargetSetOnDrop (objectCast drop') (toCFunPtr funPtr)
 
--- | Set an event handler for an enter command in a drop target.
+-- | Set an event handler for an enter command in a drop' target.
 dropTargetOnEnter :: DropTarget a -> (Point -> DragResult -> IO DragResult) -> IO ()
-dropTargetOnEnter drop event = do
+dropTargetOnEnter drop' event = do
     funPtr <- dragThreeFuncHandler event
-    wxcDropTargetSetOnEnter (objectCast drop) (toCFunPtr funPtr)
+    wxcDropTargetSetOnEnter (objectCast drop') (toCFunPtr funPtr)
 
--- | Set an event handler for a drag over command in a drop target.
+-- | Set an event handler for a drag over command in a drop' target.
 dropTargetOnDragOver :: DropTarget a -> (Point -> DragResult -> IO DragResult) -> IO ()
-dropTargetOnDragOver drop event = do
+dropTargetOnDragOver drop' event = do
     funPtr <- dragThreeFuncHandler event
-    wxcDropTargetSetOnDragOver (objectCast drop) (toCFunPtr funPtr)
+    wxcDropTargetSetOnDragOver (objectCast drop') (toCFunPtr funPtr)
 
--- | Set an event handler for a leave command in a drop target.
+-- | Set an event handler for a leave command in a drop' target.
 dropTargetOnLeave :: DropTarget a -> (IO ()) -> IO ()
-dropTargetOnLeave drop event = do
+dropTargetOnLeave drop' event = do
     funPtr <- dragZeroFuncHandler event
-    wxcDropTargetSetOnLeave (objectCast drop) (toCFunPtr funPtr)
+    wxcDropTargetSetOnLeave (objectCast drop') (toCFunPtr funPtr)
 
+dragZeroFuncHandler :: IO () -> IO (FunPtr (Ptr obj -> IO ()))
 dragZeroFuncHandler event =
-    dragZeroFunc $ \obj -> do
+    dragZeroFunc $ \_obj -> do
     event
 
+dragTwoFuncHandler :: Num a 
+                   => (Point2 a -> IO Bool)
+                   -> IO (FunPtr (Ptr obj -> CInt -> CInt -> IO CInt))
 dragTwoFuncHandler event =
-    dragTwoFunc $ \obj x y -> do
-    result <- event (point (fromIntegral x) (fromIntegral y))
+    dragTwoFunc $ \_obj x y -> do
+    result   <- event (point (fromIntegral x) (fromIntegral y))
     return $ fromBool result
 
+dragThreeFuncHandler :: Num a 
+                     => (Point2 a 
+                     -> DragResult 
+                     -> IO DragResult)
+                     -> IO (FunPtr (Ptr obj -> CInt -> CInt -> CInt -> IO CInt))
 dragThreeFuncHandler event =
-    dragThreeFunc $ \obj x y pre -> do
+    dragThreeFunc $ \_obj x y pre -> do
     result <- event (point (fromIntegral x) (fromIntegral y)) (toDragResult $ fromIntegral pre)
     return $ fromIntegral $ fromDragResult result
 
@@ -2066,8 +2076,13 @@ textDropTarget window textData event = do
     dropTargetSetDataObject textDrop textData
     windowSetDropTarget window textDrop
 
+dropTextHandler :: Num a
+                =>(Point2 a -> String -> IO ())
+                -> IO (FunPtr
+                        (Ptr obj -> CInt -> CInt -> Ptr CWchar -> IO ())
+                      )
 dropTextHandler event =
-    wrapTextDropHandler $ \obj x y cstr -> do
+    wrapTextDropHandler $ \_obj x y cstr -> do
     str <- peekCWString cstr
     event (point (fromIntegral x) (fromIntegral y)) str
 
@@ -2078,8 +2093,13 @@ fileDropTarget window event = do
     fileDrop <- wxcFileDropTargetCreate nullPtr (toCFunPtr funPtr)
     windowSetDropTarget window fileDrop
 
+dropFileHandler :: Num a
+                => (Point2 a -> [String] -> IO ())
+                -> IO (FunPtr
+                        (Ptr obj -> CInt -> CInt -> Ptr (Ptr CWchar) -> CInt -> IO ())
+                      )
 dropFileHandler event =
-    wrapFileDropHandler $ \obj x y carr size -> do
+    wrapFileDropHandler $ \_obj x y carr size -> do
     arr <- peekArray (fromIntegral size) carr
     files <- mapM peekCWString arr
     event (point (fromIntegral x) (fromIntegral y)) files
@@ -2147,13 +2167,13 @@ gridEvents
     ]
   where
     gridMouse make makeMouse gridEvent row col
-      = do pt          <- gridEventGetPosition gridEvent
-           altDown     <- gridEventAltDown gridEvent
-           controlDown <- gridEventControlDown gridEvent
-           shiftDown   <- gridEventShiftDown gridEvent
-           metaDown    <- gridEventMetaDown gridEvent
-           let modifiers = Modifiers altDown shiftDown controlDown metaDown
-           return (make row col (makeMouse pt modifiers))
+      = do pt'          <- gridEventGetPosition gridEvent
+           altDown'     <- gridEventAltDown gridEvent
+           controlDown' <- gridEventControlDown gridEvent
+           shiftDown'   <- gridEventShiftDown gridEvent
+           metaDown'    <- gridEventMetaDown gridEvent
+           let modifiers = Modifiers altDown' shiftDown' controlDown' metaDown'
+           return (make row col (makeMouse pt' modifiers))
 
     gridVeto make gridEvent row col
       = return (make row col (notifyEventVeto gridEvent))
@@ -2179,7 +2199,7 @@ gridOnGridEvent grid eventHandler
 -- | Get the current grid event handler of a window.
 gridGetOnGridEvent :: Grid a -> IO (EventGrid -> IO ())
 gridGetOnGridEvent grid
-  = unsafeWindowGetHandlerState grid wxEVT_GRID_CELL_CHANGED (\event -> skipCurrentEvent)
+  = unsafeWindowGetHandlerState grid wxEVT_GRID_CELL_CHANGED (\_event -> skipCurrentEvent)
 
 
 {-----------------------------------------------------------------------------------------
@@ -2247,8 +2267,8 @@ treeEvents
            return (TreeEndLabelEdit item lab can (notifyEventVeto treeEvent))
 
     fromDragEvent make treeEvent item
-      = do pt <- treeEventGetPoint treeEvent
-           return (make item pt)
+      = do pt' <- treeEventGetPoint treeEvent
+           return (make item pt')
 
     fromChangeEvent make treeEvent item
       = do olditem <- treeEventGetOldItem treeEvent
@@ -2262,7 +2282,7 @@ treeEvents
       = do f <- make treeEvent item
            return (f (notifyEventVeto treeEvent))
 
-    fromItemEvent make treeEvent item
+    fromItemEvent make _treeEvent item
       = return (make item)
 
 
@@ -2279,7 +2299,7 @@ treeCtrlOnTreeEvent treeCtrl eventHandler
 -- | Get the current tree event handler of a window.
 treeCtrlGetOnTreeEvent :: TreeCtrl a -> IO (EventTree -> IO ())
 treeCtrlGetOnTreeEvent treeCtrl
-  = unsafeWindowGetHandlerState treeCtrl wxEVT_COMMAND_TREE_ITEM_ACTIVATED (\event -> skipCurrentEvent)
+  = unsafeWindowGetHandlerState treeCtrl wxEVT_COMMAND_TREE_ITEM_ACTIVATED (\_event -> skipCurrentEvent)
 
 
 {-----------------------------------------------------------------------------------------
@@ -2340,13 +2360,13 @@ listEvents
     ,(wxEVT_COMMAND_LIST_COL_RIGHT_CLICK,   withColumn ListColRightClick)
     ,(wxEVT_COMMAND_LIST_CACHE_HINT,        withCache  ListCacheHint )
     ,(wxEVT_COMMAND_LIST_KEY_DOWN,          withKeyCode ListKeyDown )
-    ,(wxEVT_COMMAND_LIST_DELETE_ALL_ITEMS,  \event -> return ListDeleteAllItems )
+    ,(wxEVT_COMMAND_LIST_DELETE_ALL_ITEMS,  \_event -> return ListDeleteAllItems )
     ]
   where
     withPoint make listEvent
       = do f   <- make listEvent
-           pt  <- listEventGetPoint listEvent
-           return (f pt)
+           pt'  <- listEventGetPoint listEvent
+           return (f pt')
 
     withCancel make listEvent
       = do f   <- make listEvent
@@ -2390,7 +2410,7 @@ listCtrlOnListEvent listCtrl eventHandler
 -- | Get the current list event handler of a window.
 listCtrlGetOnListEvent :: ListCtrl a -> IO (EventList -> IO ())
 listCtrlGetOnListEvent listCtrl
-  = unsafeWindowGetHandlerState listCtrl wxEVT_COMMAND_LIST_ITEM_ACTIVATED (\event -> skipCurrentEvent)
+  = unsafeWindowGetHandlerState listCtrl wxEVT_COMMAND_LIST_ITEM_ACTIVATED (\_event -> skipCurrentEvent)
 
 
 ------------------------------------------------------------------------------------------
@@ -2443,8 +2463,8 @@ evtHandlerOnTaskBarIconEvent taskbar eventHandler
 
 -- | Get the current event handler for a taskbar icon.
 evtHandlerGetOnTaskBarIconEvent :: EvtHandler a -> Id -> EventTaskBarIcon -> IO (IO ())
-evtHandlerGetOnTaskBarIconEvent window id evt
-  = unsafeGetHandlerState window id
+evtHandlerGetOnTaskBarIconEvent window id' evt
+  = unsafeGetHandlerState window id'
       (fromMaybe wxEVT_TASKBAR_MOVE
           $ lookup evt $ uncurry (flip zip) . unzip $ taskBarIconEvents)
       skipCurrentEvent
@@ -2508,7 +2528,7 @@ wizardOnWizEvent wiz eventHandler
 wizardGetOnWizEvent :: Wizard a -> IO (EventWizard -> IO ())
 wizardGetOnWizEvent wiz
   -- not sure about the wxEVT_WIZARD_PAGE_CHANGED
-  = unsafeWindowGetHandlerState wiz wxEVT_WIZARD_PAGE_CHANGED (\event -> skipCurrentEvent)
+  = unsafeWindowGetHandlerState wiz wxEVT_WIZARD_PAGE_CHANGED (\_event -> skipCurrentEvent)
 
 
 {-----------------------------------------------------------------------------------------
@@ -2553,7 +2573,7 @@ propertyGridOnPropertyGridEvent propertyGrid eventHandler
 propertyGridGetOnPropertyGridEvent :: PropertyGrid a -> IO (EventPropertyGrid -> IO ())
 propertyGridGetOnPropertyGridEvent propertyGrid
   -- I'm not sure what expEVT_PG_HIGHLIGHTED needs to be here for, just followed pattern with `listCtrlGetOnListEvent'
-  = unsafeWindowGetHandlerState propertyGrid wxEVT_PG_HIGHLIGHTED (\event -> skipCurrentEvent)
+  = unsafeWindowGetHandlerState propertyGrid wxEVT_PG_HIGHLIGHTED (\_event -> skipCurrentEvent)
 
 {-----------------------------------------------------------------------------------------
   AuiNotebook events
@@ -2613,20 +2633,24 @@ auiNotebookEvents nb
     ,(wxEVT_AUINOTEBOOK_TAB_RIGHT_UP,  auiWithSelection nb AuiNotebookTabRightUp)]
            
 
-auiWithSelection nb eventAN auiNEvent = do 
-    selection <-  bookCtrlEventGetSelection auiNEvent
-    oldSelection <-  bookCtrlEventGetOldSelection auiNEvent
-    eventObj <-  eventGetEventObject auiNEvent
-    winSel <-  fromSelId nb eventObj selection auiNEvent
-    winOldSel <-  fromSelId nb eventObj oldSelection auiNEvent
+auiWithSelection :: AuiNotebook a1
+                 -> (WindowSelection -> WindowSelection -> r)
+                 -> BookCtrlEvent a
+                 -> IO r
+auiWithSelection nb' eventAN auiNEvent = do 
+    selection    <- bookCtrlEventGetSelection auiNEvent
+    oldSelection <- bookCtrlEventGetOldSelection auiNEvent
+    eventObj     <- eventGetEventObject auiNEvent
+    winSel       <- fromSelId nb' eventObj selection auiNEvent
+    winOldSel    <- fromSelId nb' eventObj oldSelection auiNEvent
     return $ eventAN winSel winOldSel
   where 
-      fromSelId nb eventObj selId ev = do
-         pageCount <- auiNotebookGetPageCount nb
+      fromSelId nb'' _eventObj selId _ev = do
+         pageCount <- auiNotebookGetPageCount nb''
          if selId < pageCount && selId /= wxNOT_FOUND then do
-             pg <-  auiNotebookGetPage nb selId
-             id <-  windowGetId pg
-             return $ WindowSelection selId $ Just $ PageWindow (WindowId id)  pg
+             pg <-  auiNotebookGetPage nb'' selId
+             id' <-  windowGetId pg
+             return $ WindowSelection selId $ Just $ PageWindow (WindowId id')  pg
            else return noWindowSelection
 
 fromAuiNotebookEvent :: Object a -> String -> AuiNotebookEvent q -> IO EventAuiNotebook
@@ -2639,6 +2663,7 @@ fromAuiNotebookEvent eventObj cName anEvent
                do par <- windowGetParent $ objectCast eventObj
                   let t =  (auiTabCtrlEvents . objectCast) par
                   lookupEvent eventType t AuiTabCtrlUnknown
+              _ -> error $ "Graphics.UI.WXCore.Events.fromAuiNotebookEvent: Unexpected cName: " ++ cName
 
               --lookup an event in the given evtTable, if not found use defaul
       where lookupEvent eventType evtTable defaul = case lookup eventType evtTable of
@@ -2652,7 +2677,7 @@ objectClassName obj = do cInfo <-  objectGetClassInfo obj
 
 -- | use when you want to handle just wxAuiNotebook
 auiNotebookOnAuiNotebookEvent ::  String -> EventId ->  AuiNotebook a -> (EventAuiNotebook -> IO ()) -> IO ()
-auiNotebookOnAuiNotebookEvent s eventId notebook eventHandler
+auiNotebookOnAuiNotebookEvent _s eventId notebook eventHandler
   = windowOnEvent notebook [eventId] handler (const handler)
        where handler = withCurrentEvent (\event -> do
                eventObj <-  eventGetEventObject (objectCast event)
@@ -2664,9 +2689,10 @@ auiNotebookOnAuiNotebookEvent s eventId notebook eventHandler
                       _              -> skipCurrentEvent
                )
 
+
 -- | use when you want to handle both wxAuiNotebook and wxAuiTabCtrl
 auiNotebookOnAuiNotebookEventEx ::  String -> EventId ->  AuiNotebook a -> (EventAuiNotebook -> IO ()) -> IO ()
-auiNotebookOnAuiNotebookEventEx s eventId notebook eventHandler
+auiNotebookOnAuiNotebookEventEx _s eventId notebook eventHandler
   = windowOnEvent notebook [eventId] handler (const handler)
        where handler = withCurrentEvent (\event -> do
                eventObj <-  eventGetEventObject (objectCast event)
@@ -2704,7 +2730,7 @@ windowTimerCreate w
 -- objects.
 timerOnCommand :: TimerEx a -> IO () -> IO ()
 timerOnCommand timer io
-  = do closure <- createClosure io (\ownerDeleted -> return ()) (\ev -> io)
+  = do closure <- createClosure io (\_ownerDeleted -> return ()) (\_ev -> io)
        timerExConnect timer closure
 
 -- | Get the current timer event handler.
@@ -2730,11 +2756,12 @@ appIdleIntervals
 -- calls to this method chains the different idle event handlers.
 appRegisterIdle :: Int -> IO (IO ())
 appRegisterIdle interval 
-  = do varUpdate appIdleIntervals (interval:)
+  = do _ <- varUpdate appIdleIntervals (interval:)
        appUpdateIdleInterval 
        return (appUnregisterIdle interval)
 
 -- Update the idle interval to the minimal one.
+appUpdateIdleInterval :: IO ()
 appUpdateIdleInterval
   = do ivals <- varGet appIdleIntervals
        let ival = if null ivals then 0 else minimum ivals   -- zero is off.
@@ -2746,12 +2773,12 @@ appUpdateIdleInterval
 -- Unregister an idle handler       
 appUnregisterIdle :: Int -> IO ()            
 appUnregisterIdle ival
-  = do varUpdate appIdleIntervals (remove ival)
+  = do _ <- varUpdate appIdleIntervals (remove ival)
        appUpdateIdleInterval
   where
-    remove ival []       = [] -- very wrong!
-    remove ival (i:is)   | ival == i  = is
-                         | otherwise  = i : remove ival is
+    remove _ival' []      = []
+    remove ival'  (i:is)  | ival' == i  = is
+                          | otherwise   = i : remove ival' is
 
 
 {-----------------------------------------------------------------------------------------
@@ -2800,7 +2827,7 @@ calendarCtrlOnCalEvent calCtrl eventHandler
 -- | Get the current calendar event handler of a window.
 calendarCtrlGetOnCalEvent :: CalendarCtrl a -> IO (EventCalendar -> IO ())
 calendarCtrlGetOnCalEvent calCtrl
-  = unsafeWindowGetHandlerState calCtrl wxEVT_CALENDAR_SEL_CHANGED (\event -> skipCurrentEvent)
+  = unsafeWindowGetHandlerState calCtrl wxEVT_CALENDAR_SEL_CHANGED (\_event -> skipCurrentEvent)
 
 
 ------------------------------------------------------------------------------------------
@@ -2810,8 +2837,8 @@ calendarCtrlGetOnCalEvent calCtrl
 -- Note: the closure is deleted when initialization is complete, and than the Haskell init function
 -- is started.
 appOnInit :: IO () -> IO ()
-appOnInit init
-  = do closure  <- createClosure (return () :: IO ()) onDelete (\ev -> return ())   -- run init on destroy !
+appOnInit initHandler
+  = do closure  <- createClosure (return () :: IO ()) onDelete (\_ev -> return ())   -- run initHandler on destroy !
        progName <- getProgName
        args     <- getArgs
        argv     <- mapM newCWString (progName:args)
@@ -2819,8 +2846,8 @@ appOnInit init
        withArray (argv ++ [nullPtr]) $ \cargv -> wxcAppInitializeC closure argc cargv
        mapM_ free argv
   where
-    onDelete ownerDeleted
-      = init
+    onDelete _ownerDeleted
+      = initHandler
            
 
 
@@ -2900,21 +2927,21 @@ unsafeTreeCtrlGetItemClientData treeCtrl item
 -- | Set a generic event handler on a certain window.
 windowOnEvent :: Window a -> [EventId] -> handler -> (Event () -> IO ()) -> IO ()
 windowOnEvent window eventIds state eventHandler
-  = windowOnEventEx window eventIds state (\ownerDelete -> return ()) eventHandler
+  = windowOnEventEx window eventIds state (\_ownerDelete -> return ()) eventHandler
 
 -- | Set a generic event handler on a certain window. Takes also a computation
 -- that is run when the event handler is destroyed -- the argument is 'True' if the
 -- owner is deleted, and 'False' if the event handler is disconnected for example.
 windowOnEventEx :: Window a -> [EventId] -> handler -> (Bool -> IO ()) -> (Event () -> IO ()) -> IO ()
 windowOnEventEx window eventIds state destroy eventHandler
-  = do let id = idAny   -- id <- windowGetId window
-       evtHandlerOnEvent window id id eventIds state destroy eventHandler
+  = do let id' = idAny   -- id' <- windowGetId window
+       evtHandlerOnEvent window id' id' eventIds state destroy eventHandler
 
 -- | Retrieve the event handler state for a certain event on a window.
 unsafeWindowGetHandlerState :: Window a -> EventId -> b -> IO b
 unsafeWindowGetHandlerState window eventId def
-  = do id <- windowGetId window
-       unsafeGetHandlerState window id eventId def
+  = do id' <- windowGetId window
+       unsafeGetHandlerState window id' eventId def
 
 ------------------------------------------------------------------------------------------
 -- The current event
@@ -2959,8 +2986,8 @@ propagateEvent
 -- no event handler is defined for this kind of event or 'Id', the
 -- default value is returned.
 unsafeGetHandlerState :: EvtHandler a -> Id -> EventId -> b -> IO b
-unsafeGetHandlerState object id eventId def
-  = do closure <- evtHandlerGetClosure object id eventId
+unsafeGetHandlerState object id' eventId def
+  = do closure <- evtHandlerGetClosure object id' eventId
        unsafeClosureGetState closure def
 
 -- | Type synonym to make the type signatures shorter for the documentation :-)
@@ -3060,7 +3087,7 @@ createClosure st destroy handler
                     when (funptr/=ptrNull)
                       (freeHaskellFunPtr (castPtrToFunPtr funptr))
             else handler event
-           swapMVar currentEvent prev
+           _ <- swapMVar currentEvent prev
            return ()
 
 

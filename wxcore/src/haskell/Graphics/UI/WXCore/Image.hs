@@ -58,14 +58,11 @@ module Graphics.UI.WXCore.Image
 import Data.Char( toLower )
 import Data.Array.IArray ( IArray, listArray, bounds, elems )
 import Foreign.Marshal.Array
-import Foreign.C.String
-import Foreign.Storable
 
 import Graphics.UI.WXCore.WxcTypes
 import Graphics.UI.WXCore.WxcDefs
 import Graphics.UI.WXCore.WxcClasses
 import Graphics.UI.WXCore.Types
-import Graphics.UI.WXCore.Defines
 
 
 {-----------------------------------------------------------------------------------------
@@ -83,7 +80,7 @@ imageListAddIconFromFile images desiredSize fname
   = do image <- imageCreateFromFile fname
        imageRescale image desiredSize
        bitmap <- imageConvertToBitmap image
-       imageListAddBitmap images bitmap nullBitmap
+       _ <- imageListAddBitmap images bitmap nullBitmap
        bitmapDelete bitmap
        imageDelete image
        return ()
@@ -210,7 +207,7 @@ imageTypeFromExtension ext
       "pnm"   -> wxBITMAP_TYPE_PNM
       "pict"  -> wxBITMAP_TYPE_PICT
       "icon"  -> wxBITMAP_TYPE_ICON
-      other   -> wxBITMAP_TYPE_ANY
+      _other  -> wxBITMAP_TYPE_ANY
 
 {-----------------------------------------------------------------------------------------
   Direct image manipulation
@@ -226,17 +223,17 @@ pixelBufferCreate size
 
 -- | Delete a pixel buffer. 
 pixelBufferDelete  :: PixelBuffer -> IO ()
-pixelBufferDelete (PixelBuffer owned size buffer)
+pixelBufferDelete (PixelBuffer owned _size buffer)
   = when (owned && not (ptrIsNull buffer)) (wxcFree buffer)
 
 -- | The size of a pixel buffer
 pixelBufferGetSize :: PixelBuffer -> Size
-pixelBufferGetSize (PixelBuffer owned size buffer)
+pixelBufferGetSize (PixelBuffer _owned size _buffer)
   = size
 
 -- | Get all the pixels of a pixel buffer as a single list.
 pixelBufferGetPixels :: PixelBuffer -> IO [Color]
-pixelBufferGetPixels (PixelBuffer owned (Size w h) buffer)
+pixelBufferGetPixels (PixelBuffer _owned (Size w h) buffer)
   = do let count = w*h
        rgbs <- peekArray (3*count) buffer
        return (convert rgbs)
@@ -244,10 +241,13 @@ pixelBufferGetPixels (PixelBuffer owned (Size w h) buffer)
     convert :: [Word8] -> [Color]
     convert (r:g:b:xs)  = colorRGB r g b : convert xs
     convert []          = []
+    convert _           = 
+      error $ "Graphics.UI.WXCore.Image.pixelBufferGetPixels: " ++
+              "Unexpected number of entries in pixelbuffer"
 
 -- | Set all the pixels of a pixel buffer.
 pixelBufferSetPixels :: PixelBuffer -> [Color] -> IO ()
-pixelBufferSetPixels (PixelBuffer owned (Size w h) buffer) colors
+pixelBufferSetPixels (PixelBuffer _owned (Size w h) buffer) colors
   = do let count = w*h
        pokeArray buffer (convert (take count colors))
   where
@@ -258,12 +258,12 @@ pixelBufferSetPixels (PixelBuffer owned (Size w h) buffer) colors
 -- | Initialize the pixel buffer with a grey color. The second argument
 -- specifies the /greyness/ as a number between 0.0 (black) and 1.0 (white).
 pixelBufferInit :: PixelBuffer -> Color -> IO ()
-pixelBufferInit (PixelBuffer owned size buffer) color
+pixelBufferInit (PixelBuffer _owned size buffer) color
   = wxcInitPixelsRGB buffer size (intFromColor color)
 
 -- | Set the color of a pixel.
 pixelBufferSetPixel :: PixelBuffer -> Point -> Color -> IO ()
-pixelBufferSetPixel (PixelBuffer owned size buffer) point color
+pixelBufferSetPixel (PixelBuffer _owned size buffer) poynt color
   = {-
     do let idx = 3*(y*w + x)
            r   = colorRed color
@@ -273,12 +273,12 @@ pixelBufferSetPixel (PixelBuffer owned size buffer) point color
        pokeByteOff buffer (idx+1) g
        pokeByteOff buffer (idx+2) b
     -}
-    wxcSetPixelRGB buffer (sizeW size) point (intFromColor color)
+    wxcSetPixelRGB buffer (sizeW size) poynt (intFromColor color)
     
 
 -- | Get the color of a pixel
 pixelBufferGetPixel :: PixelBuffer -> Point -> IO Color
-pixelBufferGetPixel (PixelBuffer owned size buffer) point
+pixelBufferGetPixel (PixelBuffer _owned size buffer) poynt
   = {-
     do let idx = 3*(y*w + x)
        r   <- peekByteOff buffer idx
@@ -286,14 +286,14 @@ pixelBufferGetPixel (PixelBuffer owned size buffer) point
        b   <- peekByteOff buffer (idx+2)
        return (colorRGB r g b)
     -}
-    do rgb <- wxcGetPixelRGB buffer (sizeW size) point
-       return (colorFromInt rgb)
+    do colr <- wxcGetPixelRGB buffer (sizeW size) poynt
+       return (colorFromInt colr)
       
   
 -- | Create an image from a pixel buffer. Note: the image will
 -- delete the pixelbuffer.
 imageCreateFromPixelBuffer :: PixelBuffer -> IO (Image ())
-imageCreateFromPixelBuffer (PixelBuffer owned size buffer) 
+imageCreateFromPixelBuffer (PixelBuffer _owned size buffer) 
   = imageCreateFromDataEx size buffer False
 
 -- | Do something with the pixels of an image
@@ -339,8 +339,8 @@ imageGetPixelArray image
   = do h  <- imageGetHeight image
        w  <- imageGetWidth image
        ps <- imageGetPixels image
-       let bounds = (pointZero, point (w-1) (h-1))
-       return (listArray bounds ps)        
+       let bounds' = (pointZero, point (w-1) (h-1))
+       return (listArray bounds' ps)        
 
 -- | Create an image from a pixel array
 imageCreateFromPixelArray :: (IArray a Color) => a Point Color -> IO (Image ())

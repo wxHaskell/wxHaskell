@@ -86,3 +86,5 @@ library
       array >= 0.1 && < 0.3,
       base >= 3 && < 4,
       containers >= 0.1 && < 0.3
+
+  ghc-options: -Wall
