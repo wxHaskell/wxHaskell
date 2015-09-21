@@ -6,6 +6,7 @@ import qualified Data.ByteString.Lazy as B
 import Data.Char     ( ord )
 import Data.Functor  ( (<$>) )
 import Data.List (foldl', foldr, intersperse, intercalate, nub, lookup, isPrefixOf, isInfixOf)
+import Data.List.Split (splitOn)
 import Data.Maybe (fromJust, isNothing, isJust, listToMaybe)
 import Distribution.PackageDescription
 import Distribution.Simple
@@ -111,13 +112,16 @@ myConfHook (pkg0, pbi) flags = do
     whenM bitnessMismatch
       exitFailure
 
+    wxVersion <- checkWxVersion
+    generateHeaders wxVersion
+
     lbi <- confHook simpleUserHooks (pkg0, pbi) flags
     let lpd       = localPkgDescr lbi
     let lib       = fromJust (library lpd)
     let libbi     = libBuildInfo lib
     let custom_bi = customFieldsBI libbi
 
-    wx <- fmap parseWxConfig readWxConfig >>= deMsysPaths
+    wx <- fmap parseWxConfig (readWxConfig wxVersion) >>= deMsysPaths
 
     let libbi' = libbi
           { extraLibDirs = extraLibDirs libbi ++ extraLibDirs wx
@@ -137,6 +141,26 @@ myConfHook (pkg0, pbi) flags = do
     let lpd' = lpd { library = Just lib' }
 
     return $ lbi { localPkgDescr = lpd' }
+
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+
+generateHeaders :: String -> IO ()
+generateHeaders wxVersion =
+  do
+    writeFile ("src" </> "include" </> "wxc_def.h")
+      $ cppDefinition "wxVERSION_NUMBER" (wxVERSION_NUMBER wxVersion)
+
+cppDefinition :: Show a => String -> a -> String
+cppDefinition name value =
+  "#define " ++ name ++ " " ++ show value ++ "\n"
+
+wxVERSION_NUMBER :: String -> Int
+wxVERSION_NUMBER wxVersion =
+  let (major : minor : remaining) = splitOn "." wxVersion in
+    read major * 1000 + read minor * 100 +
+      case remaining of
+        [] -> 0
+        [revision] -> read revision
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
@@ -299,12 +323,8 @@ bitnessMismatch =
 -- A list of wxWidgets versions that can be handled by this version of wxHaskell
 wxCompatibleVersions = ["3.0", "2.9"] -- Preferred version first
 
-
--- Get the preprocessor/compiler/linker options used for the most recent
--- compatible wxWidgets installed.
--- Abort the setup procedure when no proper version of wxWidgets is found
-readWxConfig :: IO String
-readWxConfig =
+checkWxVersion :: IO String
+checkWxVersion =
   do
     maybeWxVersion <- findWxVersion
 
@@ -314,16 +334,23 @@ readWxConfig =
                ++ show wxCompatibleVersions
               )
       Just wxVersion ->
-        do
-          putStrLn ("Configuring wxc to build against wxWidgets " ++ wxVersion)
+        return wxVersion
 
-          -- The Windows port of wx-config doesn't let you specify a version (yet)
-          isMsys <- isWindowsMsys
-          case (buildOS,isMsys) of
-            -- wx-config-win does not list all libraries if --cppflags comes after --libs :-(
-            (Windows,False) -> wx_config ["--cppflags", "--libs", "all"]
-            (Windows,True) -> wx_config ["--libs", "all", "--gl-libs", "--cppflags"]
-            _       -> wx_config ["--version=" ++ wxVersion, "--libs", "all", "--cppflags"]
+-- Get the preprocessor/compiler/linker options used for the most recent
+-- compatible wxWidgets installed.
+-- Abort the setup procedure when no proper version of wxWidgets is found
+readWxConfig :: String -> IO String
+readWxConfig wxVersion =
+  do
+    putStrLn ("Configuring wxc to build against wxWidgets " ++ wxVersion)
+
+    -- The Windows port of wx-config doesn't let you specify a version (yet)
+    isMsys <- isWindowsMsys
+    case (buildOS,isMsys) of
+      -- wx-config-win does not list all libraries if --cppflags comes after --libs :-(
+      (Windows,False) -> wx_config ["--cppflags", "--libs", "all"]
+      (Windows,True) -> wx_config ["--libs", "all", "--gl-libs", "--cppflags"]
+      _       -> wx_config ["--version=" ++ wxVersion, "--libs", "all", "--cppflags"]
 
 
 wx_config :: [String] -> IO String
@@ -434,7 +461,7 @@ myBuildHook pkg_descr local_bld_info user_hooks bld_flags =
     -- Link C/C++ sources as a DLL - output directory is dist/build
     if buildOS == Windows then do
         -- Since we removed wx libraries in myConfHook we need to add them here when linking wxc.dll
-        wx <- fmap parseWxConfig readWxConfig >>= deMsysPaths
+        wx <- fmap parseWxConfig (checkWxVersion >>= readWxConfig) >>= deMsysPaths
         linkSharedLib gcc ld_opts lib_dirs (libs ++ reverse (extraLibs wx) ++ dll_libs) objs ver bld_dir dll_name inst_lib_dir
     else
         linkSharedLib gcc ld_opts lib_dirs (libs ++ dll_libs) objs ver bld_dir dll_name inst_lib_dir

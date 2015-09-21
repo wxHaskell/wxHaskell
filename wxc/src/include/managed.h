@@ -50,9 +50,12 @@ void wxPen_SafeDelete( TSelf(Pen) self );
 TBool wxBitmap_IsStatic( TSelf(Bitmap) self );
 TBool wxIcon_IsStatic( TSelf(Icon) self );
 
+#if wxVERSION_NUMBER < 2800
 TBool wxBrush_IsStatic( TSelf(Brush) self );
 TBool wxColour_IsStatic( TSelf(Colour) self );
+
+TBool wxPen_IsStatic( TSelf(Pen) self );
+#endif
 TBool wxCursor_IsStatic( TSelf(Cursor) self );
 TBool wxFont_IsStatic( TSelf(Font) self );
-TBool wxPen_IsStatic( TSelf(Pen) self );
 
