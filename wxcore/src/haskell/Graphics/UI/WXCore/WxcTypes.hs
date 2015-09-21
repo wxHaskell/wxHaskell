@@ -119,6 +119,8 @@ module Graphics.UI.WXCore.WxcTypes(
             , Ptr(..), ptrNull, ptrIsNull, ptrCast, ForeignPtr, FunPtr, toCFunPtr
             ) where
 
+#include "wxc_def.h"
+
 import Control.Exception 
 import Data.Ix
 import Foreign.C
@@ -1060,13 +1062,20 @@ foreign import ccall wxIcon_IsStatic :: Ptr (TIcon a) -> Bool
 withManagedBrushResult :: IO (Ptr (TBrush a)) -> IO (Brush a)
 withManagedBrushResult io
   = do p      <- io
+#if wxVERSION_NUMBER < 2800
        if (wxBrush_IsStatic p) 
         then return (objectFromPtr p)
         else do mp <- wxManagedPtr_CreateFromBrush p
                 objectFromManagedPtr mp
+#else
+       mp <- wxManagedPtr_CreateFromBrush p
+       objectFromManagedPtr mp
+#endif
 
 foreign import ccall wxManagedPtr_CreateFromBrush :: Ptr (TBrush a) -> IO (ManagedPtr (TBrush a))
+#if wxVERSION_NUMBER < 2800
 foreign import ccall wxBrush_IsStatic :: Ptr (TBrush a) -> Bool
+#endif
 
 withManagedCursorResult :: IO (Ptr (TCursor a)) -> IO (Cursor a)
 withManagedCursorResult io
@@ -1093,13 +1102,20 @@ foreign import ccall wxFont_IsStatic :: Ptr (TFont a) -> Bool
 withManagedPenResult :: IO (Ptr (TPen a)) -> IO (Pen a)
 withManagedPenResult io
   = do p      <- io
+#if wxVERSION_NUMBER < 2800
        if (wxPen_IsStatic p) 
         then return (objectFromPtr p)
         else do mp <- wxManagedPtr_CreateFromPen p
                 objectFromManagedPtr mp
+#else
+       mp <- wxManagedPtr_CreateFromPen p
+       objectFromManagedPtr mp
+#endif
 
 foreign import ccall wxManagedPtr_CreateFromPen :: Ptr (TPen a) -> IO (ManagedPtr (TPen a))
+#if wxVERSION_NUMBER < 2800
 foreign import ccall wxPen_IsStatic :: Ptr (TPen a) -> Bool
+#endif
 
 
 
@@ -1441,10 +1457,15 @@ colourFromColor :: Color -> IO (Colour ())
 colourFromColor c
   = if (colorOk c)
      then do p <- colourCreateFromUnsignedInt (fromColor c)
+#if wxVERSION_NUMBER < 2800
              if (colourIsStatic p)
               then return (objectFromPtr p)
               else do mp <- wxManagedPtr_CreateFromColour p
                       objectFromManagedPtr mp
+#else
+             mp <- wxManagedPtr_CreateFromColour p
+             objectFromManagedPtr mp
+#endif
      else withObjectResult colourNull
           
 
@@ -1464,7 +1485,9 @@ foreign import ccall "wxColour_CreateEmpty" colourCreate    :: IO (Ptr (TColour 
 foreign import ccall "wxColour_CreateFromUnsignedInt" colourCreateFromUnsignedInt :: Word -> IO (Ptr (TColour a))
 foreign import ccall "wxColour_GetUnsignedInt" colourGetUnsignedInt       :: Ptr (TColour a) -> IO Word
 foreign import ccall "wxColour_SafeDelete" colourSafeDelete   :: Ptr (TColour a) -> IO ()
+#if wxVERSION_NUMBER < 2800
 foreign import ccall "wxColour_IsStatic" colourIsStatic   :: Ptr (TColour a) -> Bool
+#endif
 foreign import ccall "wxColour_IsOk"    colourIsOk   :: Ptr (TColour a) -> IO CInt
 foreign import ccall "Null_Colour"    colourNull :: IO (Ptr (TColour a))
 foreign import ccall wxManagedPtr_CreateFromColour :: Ptr (TColour a) -> IO (ManagedPtr (TColour a))
