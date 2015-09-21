@@ -134,6 +134,9 @@ extra-source-files:
     src/cpp/treectrl.cpp
     src/cpp/wrapper.cpp
 
+extra-tmp-files:
+    src/include/wxc_def.h
+
 
 library
 
@@ -158,6 +161,7 @@ library
     wxc.h
     wxc_glue.h
     wxc_types.h
+    wxc_def.h
 
   build-depends:
     base >= 4.6 && < 5,
