@@ -50,6 +50,22 @@ public:
   };
 };
 
+#if (wxVERSION_NUMBER > 2800)
+class wxStockGDIExtra : wxStockGDI {
+  public:
+    static bool IsInStock(wxObject *obj)
+    {
+      for (int i = 0; i != ITEMCOUNT; ++i) {
+        if (obj == ms_stockObject[i]) {
+          return true;
+        }
+      }
+
+      return false;
+    }
+};
+#endif
+
 extern "C" {
 /*-----------------------------------------------------------------------------
   Operations
@@ -237,59 +253,30 @@ static wxBrush** staticsBrush[] =
     ,&wxRED_BRUSH
     ,NULL
     };
-#else
-/* VS2005 doesn't allow taking the address of the returned value of 
-   a function call. The code below ensures that there's actually an
-   address assigned in each case.
-
-   Just to compilcate matters, all of the values are now const
-   pointers. This is correct, but implies lots of downstream changes
-   so (horrible hack) I get rid of the 'constness'...
- */
-static wxBrush* wxNULL_BRUSH         = const_cast<wxBrush*>(&wxNullBrush);
-static wxBrush* wxcBLUE_BRUSH        = const_cast<wxBrush*>(wxBLUE_BRUSH);
-static wxBrush* wxcGREEN_BRUSH       = const_cast<wxBrush*>(wxGREEN_BRUSH);
-static wxBrush* wxcWHITE_BRUSH       = const_cast<wxBrush*>(wxWHITE_BRUSH);
-static wxBrush* wxcBLACK_BRUSH       = const_cast<wxBrush*>(wxBLACK_BRUSH);
-static wxBrush* wxcGREY_BRUSH        = const_cast<wxBrush*>(wxGREY_BRUSH);
-static wxBrush* wxcMEDIUM_GREY_BRUSH = const_cast<wxBrush*>(wxMEDIUM_GREY_BRUSH);
-static wxBrush* wxcLIGHT_GREY_BRUSH  = const_cast<wxBrush*>(wxLIGHT_GREY_BRUSH);
-static wxBrush* wxcTRANSPARENT_BRUSH = const_cast<wxBrush*>(wxTRANSPARENT_BRUSH);
-static wxBrush* wxcCYAN_BRUSH        = const_cast<wxBrush*>(wxCYAN_BRUSH);
-static wxBrush* wxcRED_BRUSH         = const_cast<wxBrush*>(wxRED_BRUSH);
-
-static wxBrush** staticsBrush[] =
-    {&wxNULL_BRUSH
-    ,&wxcBLUE_BRUSH
-    ,&wxcGREEN_BRUSH
-    ,&wxcWHITE_BRUSH
-    ,&wxcBLACK_BRUSH
-    ,&wxcGREY_BRUSH
-    ,&wxcMEDIUM_GREY_BRUSH
-    ,&wxcLIGHT_GREY_BRUSH
-    ,&wxcTRANSPARENT_BRUSH
-    ,&wxcCYAN_BRUSH
-    ,&wxcRED_BRUSH
-    ,NULL
-    };
-
-#endif
 
 EWXWEXPORT(bool,wxBrush_IsStatic)(wxBrush* obj)
 {
   IsStatic(obj,staticsBrush);  
 }
 
+#else
+
+EWXWEXPORT(bool,wxBrush_IsStatic)(wxBrush* obj)
+{
+  return !obj || obj == &wxNullBrush || wxStockGDIExtra::IsInStock(obj);
+}
+#endif
+
 static void _cdecl deleteBrush( wxBrush* obj )
 {
-  if (!wxBrush_IsStatic(obj)) {
-    delete obj;
-  }
+  delete obj;
 }
 
 EWXWEXPORT(void,wxBrush_SafeDelete)(wxBrush* obj)
 {
-  deleteBrush(obj);
+  if (!wxBrush_IsStatic(obj)) {
+    deleteBrush(obj);
+  }
 }
 
 EWXWEXPORT(wxManagedPtr*,wxManagedPtr_CreateFromBrush)(wxBrush* ptr)
@@ -300,9 +287,9 @@ EWXWEXPORT(wxManagedPtr*,wxManagedPtr_CreateFromBrush)(wxBrush* ptr)
 /*-----------------------------------------------------------------------------
   Finalize wxColour
 -----------------------------------------------------------------------------*/
+#if (wxVERSION_NUMBER < 2800)
 static wxColour* wxNULL_COLOUR = &wxNullColour;
 
-#if (wxVERSION_NUMBER < 2800)
 static wxColour** staticsColour[] = 
     {&wxNULL_COLOUR
     ,&wxBLACK
@@ -314,43 +301,30 @@ static wxColour** staticsColour[] =
     ,&wxLIGHT_GREY
     ,NULL
     };
-#else
-static wxColour* wxcBLACK      = const_cast<wxColour *>(wxBLACK);
-static wxColour* wxcWHITE      = const_cast<wxColour *>(wxWHITE);
-static wxColour* wxcRED        = const_cast<wxColour *>(wxRED);
-static wxColour* wxcBLUE       = const_cast<wxColour *>(wxBLUE);
-static wxColour* wxcGREEN      = const_cast<wxColour *>(wxGREEN);
-static wxColour* wxcCYAN       = const_cast<wxColour *>(wxCYAN);
-static wxColour* wxcLIGHT_GREY = const_cast<wxColour *>(wxLIGHT_GREY);
-
-static wxColour** staticsColour[] = 
-    {&wxNULL_COLOUR
-    ,&wxcBLACK
-    ,&wxcWHITE
-    ,&wxcRED
-    ,&wxcBLUE
-    ,&wxcGREEN
-    ,&wxcCYAN
-    ,&wxcLIGHT_GREY
-    ,NULL
-    };
-#endif
 
 EWXWEXPORT(bool,wxColour_IsStatic)(wxColour* obj)
 {
   IsStatic(obj,staticsColour);  
 }
 
+#else
+
+EWXWEXPORT(bool,wxColour_IsStatic)(wxColour* obj)
+{
+  return !obj || obj == &wxNullColour || wxStockGDIExtra::IsInStock(obj);
+}
+#endif
+
 static void _cdecl deleteColour( wxColour* obj )
 {
-  if (!wxColour_IsStatic(obj)) {
-    delete obj;
-  }
+  delete obj;
 }
 
 EWXWEXPORT(void,wxColour_SafeDelete)(wxColour* obj)
 {
-  deleteColour(obj);
+  if (!wxColour_IsStatic(obj)) {
+    deleteColour(obj);
+  }
 }
 
 EWXWEXPORT(wxManagedPtr*,wxManagedPtr_CreateFromColour)(wxColour* ptr)
@@ -362,9 +336,9 @@ EWXWEXPORT(wxManagedPtr*,wxManagedPtr_CreateFromColour)(wxColour* ptr)
 /*-----------------------------------------------------------------------------
   Finalize wxCursor
 -----------------------------------------------------------------------------*/
+#if (wxVERSION_NUMBER < 2800)
 wxCursor*** staticsCursor(void)
 {
-#if (wxVERSION_NUMBER < 2800)
 static wxCursor* wxNULL_CURSOR = &wxNullCursor;
 
 static wxCursor** staticsCursor[] = 
@@ -374,20 +348,6 @@ static wxCursor** staticsCursor[] =
     ,&wxCROSS_CURSOR
     ,NULL
     };
-#else
-static wxCursor* wxNULL_CURSOR       = const_cast<wxCursor *>(&wxNullCursor);
-static wxCursor* wxcSTANDARD_CURSOR  = const_cast<wxCursor *>(wxSTANDARD_CURSOR);
-static wxCursor* wxcHOURGLASS_CURSOR = const_cast<wxCursor *>(wxHOURGLASS_CURSOR);
-//static wxCursor* wxcCROSS_CURSOR     = const_cast<wxCursor *>(wxCROSS_CURSOR);
-
-static wxCursor** staticsCursor[] = 
-    {&wxNULL_CURSOR
-    ,&wxcSTANDARD_CURSOR
-    ,&wxcHOURGLASS_CURSOR
-     //,&wxcCROSS_CURSOR
-    ,NULL
-    };
-#endif
   return staticsCursor;
 }
 
@@ -395,17 +355,24 @@ EWXWEXPORT(bool,wxCursor_IsStatic)(wxCursor* obj)
 {
   IsStatic(obj,staticsCursor());  
 }
+#else
+
+EWXWEXPORT(bool,wxCursor_IsStatic)(wxCursor* obj)
+{
+  return !obj || obj == &wxNullCursor || wxStockGDIExtra::IsInStock(obj);
+}
+#endif
 
 static void _cdecl deleteCursor( wxCursor* obj )
 {
-  if (!wxCursor_IsStatic(obj)) {
-    delete obj;
-  }
+  delete obj;
 }
 
 EWXWEXPORT(void,wxCursor_SafeDelete)(wxCursor* obj)
 {
-  deleteCursor(obj);
+  if (!wxCursor_IsStatic(obj)) {
+    deleteCursor(obj);
+  }
 }
 
 EWXWEXPORT(wxManagedPtr*,wxManagedPtr_CreateFromCursor)(wxCursor* ptr)
@@ -429,38 +396,29 @@ static wxFont** staticsFont[] =
     ,&wxSWISS_FONT
     ,NULL
     };
-#else
-static wxFont* wxNULL_FONT    = const_cast<wxFont *>(&wxNullFont);
-// static wxFont* wxcNORMAL_FONT = const_cast<wxFont *>(wxNORMAL_FONT);
-//static wxFont* wxcSMALL_FONT  = const_cast<wxFont *>(wxSMALL_FONT);
-//static wxFont* wxcITALIC_FONT = const_cast<wxFont *>(wxITALIC_FONT);
-//static wxFont* wxcSWISS_FONT  = const_cast<wxFont *>(wxSWISS_FONT);
-
-static wxFont** staticsFont[] = 
-    {&wxNULL_FONT
-     //    ,&wxcNORMAL_FONT
-     //,&wxcSMALL_FONT
-     //,&wxcITALIC_FONT
-     //,&wxcSWISS_FONT
-    ,NULL
-    };
-#endif
 
 EWXWEXPORT(bool,wxFont_IsStatic)(wxFont* obj)
 {
   IsStatic(obj,staticsFont);  
 }
+#else
+
+EWXWEXPORT(bool,wxFont_IsStatic)(wxFont* obj)
+{
+  return !obj || obj == &wxNullFont || wxStockGDIExtra::IsInStock(obj);
+}
+#endif
 
 static void _cdecl deleteFont( wxFont* obj )
 {
-  if (!wxFont_IsStatic(obj)) {
-    delete obj;
-  }
+  delete obj;
 }
 
 EWXWEXPORT(void,wxFont_SafeDelete)(wxFont* obj)
 {
-  deleteFont(obj);
+  if (!wxFont_IsStatic(obj)) {
+    deleteFont(obj);
+  }
 }
 
 EWXWEXPORT(wxManagedPtr*,wxManagedPtr_CreateFromFont)(wxFont* ptr)
@@ -472,9 +430,9 @@ EWXWEXPORT(wxManagedPtr*,wxManagedPtr_CreateFromFont)(wxFont* ptr)
 /*-----------------------------------------------------------------------------
   Finalize wxPen
 -----------------------------------------------------------------------------*/
+#if (wxVERSION_NUMBER < 2800)
 static wxPen* wxNULL_PEN = &wxNullPen;
 
-#if (wxVERSION_NUMBER < 2800)
 static wxPen** staticsPen[] = 
     {&wxNULL_PEN
     ,&wxRED_PEN
@@ -489,49 +447,29 @@ static wxPen** staticsPen[] =
     ,&wxLIGHT_GREY_PEN
     ,NULL
     };
-#else
-static wxPen* wxcRED_PEN          = const_cast<wxPen *>(wxRED_PEN);
-static wxPen* wxcCYAN_PEN         = const_cast<wxPen *>(wxCYAN_PEN);
-static wxPen* wxcGREEN_PEN        = const_cast<wxPen *>(wxGREEN_PEN);
-static wxPen* wxcBLACK_PEN        = const_cast<wxPen *>(wxBLACK_PEN);
-static wxPen* wxcWHITE_PEN        = const_cast<wxPen *>(wxWHITE_PEN);
-static wxPen* wxcTRANSPARENT_PEN  = const_cast<wxPen *>(wxTRANSPARENT_PEN);
-static wxPen* wxcBLACK_DASHED_PEN = const_cast<wxPen *>(wxBLACK_DASHED_PEN);
-static wxPen* wxcGREY_PEN         = const_cast<wxPen *>(wxGREY_PEN);
-static wxPen* wxcMEDIUM_GREY_PEN  = const_cast<wxPen *>(wxMEDIUM_GREY_PEN);
-static wxPen* wxcLIGHT_GREY_PEN   = const_cast<wxPen *>(wxLIGHT_GREY_PEN);
-
-static wxPen** staticsPen[] = 
-    {&wxNULL_PEN
-    ,&wxcRED_PEN
-    ,&wxcCYAN_PEN
-    ,&wxcGREEN_PEN
-    ,&wxcBLACK_PEN
-    ,&wxcWHITE_PEN
-    ,&wxcTRANSPARENT_PEN
-    ,&wxcBLACK_DASHED_PEN
-    ,&wxcGREY_PEN
-    ,&wxcMEDIUM_GREY_PEN
-    ,&wxcLIGHT_GREY_PEN
-    ,NULL
-    };
-#endif
 
 EWXWEXPORT(bool,wxPen_IsStatic)(wxPen* obj)
 {
   IsStatic(obj,staticsPen);  
 }
+#else
+
+EWXWEXPORT(bool,wxPen_IsStatic)(wxPen* obj)
+{
+  return !obj || obj == &wxNullPen || wxStockGDIExtra::IsInStock(obj);
+}
+#endif
 
 static void _cdecl deletePen( wxPen* obj )
 {
-  if (!wxPen_IsStatic(obj)) {
-    delete obj;
-  }
+  delete obj;
 }
 
 EWXWEXPORT(void,wxPen_SafeDelete)(wxPen* obj)
 {
-  deletePen(obj);
+  if (!wxPen_IsStatic(obj)) {
+    deletePen(obj);
+  }
 }
 
 EWXWEXPORT(wxManagedPtr*,wxManagedPtr_CreateFromPen)(wxPen* ptr)
