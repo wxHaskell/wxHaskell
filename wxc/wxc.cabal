@@ -16,7 +16,7 @@ description:
   exception allowing binary distribution of proprietary software.
   This is the same license as wxWidgets itself uses.
 
-homepage:     http://haskell.org/haskellwiki/WxHaskell
+homepage:     https://wiki.haskell.org/WxHaskell
 
 cabal-version: >= 1.2
 build-type:    Custom

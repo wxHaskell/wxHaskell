@@ -11,7 +11,7 @@ description:
   top of wxWidgets, a comprehensive C++ library that is portable across all
   major GUI platforms, including GTK, Windows, X11, and MacOS X. This version
   works with wxWidgets 2.9 and 3.0.
-homepage:     http://haskell.org/haskellwiki/WxHaskell
+homepage:     https://wiki.haskell.org/WxHaskell
 
 cabal-version: >= 1.2
 build-type:    Simple

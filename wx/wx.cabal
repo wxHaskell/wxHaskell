@@ -2,7 +2,7 @@ Name:           wx
 Version:        0.92.1.0
 License:        OtherLicense
 License-file:   license.txt
-Homepage:       http://haskell.org/haskellwiki/WxHaskell
+Homepage:       https://wiki.haskell.org/WxHaskell
 Author:         Daan Leijen
 Build-Type:     Simple
 Category:       GUI, User interfaces
