@@ -1,3 +1,4 @@
+{-# LANGUAGE CPP #-}
 -----------------------------------------------------------------------------------------
 {-| Module      :  ParseC
     Copyright   :  (c) Daan Leijen 2003
@@ -15,7 +16,9 @@ module ParseC( parseC, readHeaderFile ) where
 import Data.Char( isSpace )
 import Data.List( isPrefixOf )
 import Data.Maybe( isJust )
+#if __GLASGOW_HASKELL__ < 710
 import Data.Functor( (<$>) )
+#endif
 import System.Process( readProcess )
 import System.Environment (lookupEnv)
 import Text.ParserCombinators.Parsec
