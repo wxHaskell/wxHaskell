@@ -69,6 +69,11 @@ exportDefs classExports
     heading i name
       = exportSpaces ++ "-- " ++ replicate i '*' ++ " " ++ name
 
-    exportComma n m str = exportSpaces ++ (if n == 0 && m == 0 then " " else ",") ++ str
+    exportComma n m str = exportSpaces
+                          ++ (if n == 0 && m == 0 then " " else ",")
+                          ++ str
+-- To prevent messages like "Defined but not used: data constructor `CConfigBase'":
+                          ++ (if m == 2 then "(..)" else "") 
+    
     exportSpaces = "     "
 

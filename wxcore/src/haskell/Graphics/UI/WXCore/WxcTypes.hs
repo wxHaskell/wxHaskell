@@ -90,33 +90,38 @@ module Graphics.UI.WXCore.WxcTypes(
             , withRefGridCellCoordsArray, withManagedGridCellCoordsArrayResult
 
 
+#if __GLASGOW_HASKELL__ == 708
+#  define TYPE(x) x "(..)"
+#else
+#  define TYPE(x) x
+#endif
             -- ** Primitive types
             -- *** CString
-            , CString(..), withCString, withStringResult
-            , CWString(..), withCWString, withWStringResult
+            , TYPE(CString), withCString, withStringResult
+            , TYPE(CWString), withCWString, withWStringResult
             -- *** ByteString
             , withByteStringResult, withLazyByteStringResult
             -- *** CInt
             , CInt(..), toCInt, fromCInt, withIntResult
             -- *** IntPtr
-            , IntPtr(..)
+            , TYPE(IntPtr)
             -- *** CIntPtr
-            , CIntPtr(..), toCIntPtr, fromCIntPtr, withIntPtrResult
+            , TYPE(CIntPtr), toCIntPtr, fromCIntPtr, withIntPtrResult
             -- *** Word
-            , Word(..)
+            , TYPE(Word)
             -- *** 8 bit Word
-            , Word8(..)
+            , TYPE(Word8)
             -- *** 64 bit Integer
-            , Int64(..)
+            , TYPE(Int64)
             -- *** CDouble
             , CDouble(..), toCDouble, fromCDouble, withDoubleResult
             -- *** CChar
-            , CChar(..), toCChar, fromCChar, withCharResult
+            , TYPE(CChar), toCChar, fromCChar, withCharResult
             , CWchar(..), toCWchar
             -- *** CBool
-            , CBool(..), toCBool, fromCBool, withBoolResult
+            , TYPE(CBool), toCBool, fromCBool, withBoolResult
             -- ** Pointers
-            , Ptr(..), ptrNull, ptrIsNull, ptrCast, ForeignPtr, FunPtr, toCFunPtr
+            , TYPE(Ptr), ptrNull, ptrIsNull, ptrCast, ForeignPtr, FunPtr, toCFunPtr
             ) where
 
 #include "wxc_def.h"

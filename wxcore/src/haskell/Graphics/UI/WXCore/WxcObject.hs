@@ -19,7 +19,7 @@ module Graphics.UI.WXCore.WxcObject(
             , withObjectPtr
             , objectFinalize, objectNoFinalize
             -- * Managed objects
-            , ManagedPtr, TManagedPtr, CManagedPtr
+            , ManagedPtr, TManagedPtr, CManagedPtr(..)
             ) where
 
 import System.IO.Unsafe( unsafePerformIO )

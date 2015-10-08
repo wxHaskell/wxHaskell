@@ -168,6 +168,7 @@ module Graphics.UI.WXCore.Layout( -- * Types
                              , halignLeft, halignCentre, halignCenter, halignRight
                                -- ** Vertical alignment
                              , valignTop, valignCentre, valignCenter, valignBottom
+                             , nullLayouts -- This is just to remove "Defined but not used" warnings
                              ) where
 
 import Data.List( transpose )
@@ -753,6 +754,50 @@ data FillMode = FillNone | FillShaped | Fill
 data HAlign   = AlignLeft | AlignRight | AlignHCentre
 data VAlign   = AlignTop | AlignBottom | AlignVCentre
 data Margin   = MarginTop | MarginLeft | MarginRight | MarginBottom
+
+
+-- This is just to remove "Defined but not used" warnings:
+nullLayoutOptions :: LayoutOptions
+nullLayoutOptions = 
+  LayoutOptions
+    False False
+    [] 0
+    AlignHCentre AlignVCentre
+    FillNone
+    Nothing
+    False
+
+-- This is just to remove "Defined but not used" warnings:
+nullLayout :: Layout
+-- Grid      { options :: LayoutOptions, gap  :: Size, rows :: [[Layout]] }
+nullLayout = nullLayouts !! 0
+
+-- This is just to remove "Defined but not used" warnings:
+nullLayouts :: [Layout]
+nullLayouts = 
+  [ Grid            { options = nullLayoutOptions, gap = (Size 0 0)
+                    , rows = [[]]
+                    }
+  , Widget          { options = nullLayoutOptions, win = objectNull       }
+  , Spacer          { options = nullLayoutOptions, spacesize = (Size 0 0) }
+  , Label           { options = nullLayoutOptions, txt = ""               }
+  , TextBox         { options = nullLayoutOptions, txt = ""
+                    , content = nullLayout
+                    }
+  , Line            { options = nullLayoutOptions, linesize = (Size 0 0)  }
+  , XSizer          { options = nullLayoutOptions, xsizer = objectNull    }
+  , WidgetContainer { options = nullLayoutOptions, win = objectNull
+                    , content = nullLayout
+                    }
+  , XNotebook       { options = nullLayoutOptions, nbook = objectNull
+                    , pages = [("", objectNull, nullLayout)]
+                    }
+  , Splitter        { options = nullLayoutOptions, splitter = objectNull
+                    , pane1 = nullLayout, pane2 = nullLayout
+                    , splitHorizontal = False, sashWidth = 0, paneWidth = 0
+                    }
+  ]
+
 
 -- | Fits a widget properly by calling 'windowReLayout' on
 -- the parent frame or dialog ('windowGetFrameParent').
