@@ -269,6 +269,11 @@ module Graphics.UI.WXCore.WxcDefs
     , wxCONFIG_USE_RELATIVE_PATH
     , wxCOPY
     , wxCOSE_X
+    , wxPB_USE_TEXTCTRL
+    , wxPB_SMALL
+    , wxCLRP_USE_TEXTCTRL
+    , wxCLRP_DEFAULT_STYLE
+    , wxCLRP_SHOW_LABEL
     , wxCROSSDIAG_HATCH
     , wxCROSS_HATCH
     , wxCURSES
@@ -555,6 +560,11 @@ module Graphics.UI.WXCore.WxcDefs
     , wxHSCROLL
     , wxHW_SCROLLBAR_AUTO
     , wxHW_SCROLLBAR_NEVER
+    , wxHL_CONTEXTMENU
+    , wxHL_ALIGN_LEFT
+    , wxHL_ALIGN_RIGHT
+    , wxHL_ALIGN_CENTRE
+    , wxHL_DEFAULT_STYLE
     , wxICONIZE
     , wxICON_EXCLAMATION
     , wxICON_HAND
@@ -4303,6 +4313,32 @@ wxTEXT_ATTR_LINE_SPACING_TWICE          :: Int
 wxTEXT_ATTR_LINE_SPACING_TWICE          = 20
 
 --End wxTextCtrl style flags
+
+-- PickerBase style flags
+wxPB_USE_TEXTCTRL :: Int
+wxPB_USE_TEXTCTRL = 0x0002
+wxPB_SMALL        :: Int
+wxPB_SMALL        = 0x8000
+
+-- ColourPickerCtrl style flags
+wxCLRP_USE_TEXTCTRL  :: Int
+wxCLRP_USE_TEXTCTRL  = wxPB_USE_TEXTCTRL
+wxCLRP_DEFAULT_STYLE :: Int
+wxCLRP_DEFAULT_STYLE = 0
+wxCLRP_SHOW_LABEL    :: Int
+wxCLRP_SHOW_LABEL    = 0x0008
+
+-- HyperlinkCtrl style flags
+wxHL_CONTEXTMENU   :: Int
+wxHL_CONTEXTMENU   = 0x0001
+wxHL_ALIGN_LEFT    :: Int
+wxHL_ALIGN_LEFT    = 0x0002
+wxHL_ALIGN_RIGHT   :: Int
+wxHL_ALIGN_RIGHT   = 0x0004
+wxHL_ALIGN_CENTRE  :: Int
+wxHL_ALIGN_CENTRE  = 0x0008
+wxHL_DEFAULT_STYLE :: Int
+wxHL_DEFAULT_STYLE = wxHL_CONTEXTMENU.|.wxNO_BORDER.|.wxHL_ALIGN_CENTRE
 
 
 wxPROCESS_ENTER :: Int

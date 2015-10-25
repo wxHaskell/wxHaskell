@@ -116,11 +116,14 @@ extra-source-files:
     src/cpp/eljwizard.cpp
     src/cpp/ewxw_main.cpp
     src/cpp/extra.cpp
+    src/cpp/stream.cpp
     src/cpp/glcanvas.cpp
     src/cpp/graphicscontext.cpp
+    src/cpp/hyperlinkctrl.cpp
     src/cpp/image.cpp
     src/cpp/managed.cpp
     src/cpp/mediactrl.cpp
+    src/cpp/pickerctrl.cpp
     src/cpp/previewframe.cpp
     src/cpp/printout.cpp
     src/cpp/sckaddr.cpp
@@ -147,10 +150,13 @@ library
     dragimage.h
     eljgrid.h
     ewxw_def.h
+    stream.h
     graphicscontext.h
     glcanvas.h
+    hyperlinkctrl.h
     managed.h
     mediactrl.h
+    pickerctrl.h
     previewframe.h
     printout.h
     sound.h
@@ -263,11 +269,14 @@ library
     src/cpp/eljwizard.cpp
     src/cpp/ewxw_main.cpp
     src/cpp/extra.cpp
+    src/cpp/stream.cpp
     src/cpp/glcanvas.cpp
     src/cpp/graphicscontext.cpp
+    src/cpp/hyperlinkctrl.cpp
     src/cpp/image.cpp
     src/cpp/managed.cpp
     src/cpp/mediactrl.cpp
+    src/cpp/pickerctrl.cpp
     src/cpp/previewframe.cpp
     src/cpp/printout.cpp
     src/cpp/sckaddr.cpp
