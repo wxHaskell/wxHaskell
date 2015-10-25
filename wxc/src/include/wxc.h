@@ -39,6 +39,9 @@
 #include "previewframe.h"
 #include "printout.h"
 #include "textstream.h"
+#include "stream.h"
+#include "hyperlinkctrl.h"
+#include "pickerctrl.h"
 #include "stc.h"
 
 /*-----------------------------------------------------------------------------
