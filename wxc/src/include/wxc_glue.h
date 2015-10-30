@@ -1983,6 +1983,7 @@ int        wxComboBox_GetSelection( TSelf(wxComboBox) _obj );
 TClass(wxString) wxComboBox_GetString( TSelf(wxComboBox) _obj, int n );
 TClass(wxString) wxComboBox_GetStringSelection( TSelf(wxComboBox) _obj );
 TClass(wxString) wxComboBox_GetValue( TSelf(wxComboBox) _obj );
+void       wxComboBox_SetValue( TSelf(wxComboBox) _obj, TClass(wxString) value);
 void       wxComboBox_Paste( TSelf(wxComboBox) _obj );
 void       wxComboBox_Remove( TSelf(wxComboBox) _obj, int from, int to );
 void       wxComboBox_Replace( TSelf(wxComboBox) _obj, int from, int to, TClass(wxString) value );

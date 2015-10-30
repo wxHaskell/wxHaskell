@@ -91,6 +91,12 @@ EWXWEXPORT(wxString*,wxComboBox_GetValue)(wxComboBox* self)
 {
 	return new wxString(self->GetValue());
 }
+
+EWXWEXPORT(void,wxComboBox_SetValue)(wxComboBox* self,wxString* value)
+{
+	self->SetValue(*value);
+}
+
 	
 EWXWEXPORT(void,wxComboBox_Append)(wxComboBox* self,wxString* item)
 {
