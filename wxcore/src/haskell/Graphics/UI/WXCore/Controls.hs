@@ -22,6 +22,9 @@ module Graphics.UI.WXCore.Controls
       -- * Wrappers
     , listBoxGetSelectionList
     , execClipBoardData
+      -- * Font Enumerator
+    , enumerateFontsList
+    , enumerateFonts
       -- * Deprecated
     , wxcAppUSleep
     ) where
@@ -32,7 +35,7 @@ import Graphics.UI.WXCore.Types
 
 import Foreign.Marshal.Array
 import Foreign.Marshal.Utils
-
+import Foreign.C.String(peekCWString)
 
 -- | Get the selections of a tree control.
 treeCtrlGetSelections2 :: TreeCtrl a -> IO [TreeItem]
@@ -128,3 +131,37 @@ execClipBoardData cl event = bracket_ (clipboardOpen cl) (clipboardClose cl) (ev
 -- Update your code to use 'wxcAppMilliSleep' instead.
 wxcAppUSleep :: Int -> IO ()
 wxcAppUSleep = wxcAppMilliSleep
+
+
+-- | (@enumerateFontsList encoding fixedWidthOnly@) return the Names of the available fonts in a list. 
+-- To get all available fonts call @enumerateFontsList wxFONTENCODING_SYSTEM False@.
+-- See also @enumerateFonts@.
+enumerateFontsList :: Int -> Bool -> IO [String]
+enumerateFontsList encoding fixedWidthOnly = do
+  v <- varCreate []
+  enumerateFonts encoding fixedWidthOnly $ listFkt v
+  varGet v
+  where
+  listFkt :: Var [String] -> String -> IO Bool
+  listFkt v txt = do
+    varUpdate v (txt:)
+    return True
+
+-- | (@enumerateFonts encoding fixedWidthOnly f@ calls successive @f name@ for the fonts installed on the system.
+-- It stops if the function return False.
+-- See also @enumerateFontsList@.
+enumerateFonts :: Int -> Bool -> (String -> IO Bool) -> IO ()
+enumerateFonts encoding fixedWidthOnly f = do
+  fontEnumerator <- fontEnumeratorCreate ptrNull =<< fuc f
+  ok <- fontEnumeratorEnumerateFacenames fontEnumerator encoding (fromEnum fixedWidthOnly)
+  fontEnumeratorDelete fontEnumerator
+  where
+    foreign import ccall "wrapper" wrapEnumeratorFunc :: (Ptr () -> Ptr CWchar -> IO CInt) -> IO (FunPtr (Ptr () -> Ptr CWchar -> IO CInt))
+    fuc :: (String -> IO Bool) -> IO (Ptr (Ptr () -> Ptr CWchar -> IO CInt))
+    fuc f = fmap toCFunPtr $ wrapEnumeratorFunc $ fucH f
+    fucH :: (String -> IO Bool) -> Ptr () -> Ptr CWchar -> IO CInt
+    fucH f _ cwPtr = do
+      continue <- f =<< peekCWString cwPtr
+      return $ toCInt $ fromEnum $ continue
+
+
