@@ -17,7 +17,7 @@ import Distribution.Simple.Program (ConfiguredProgram (..), lookupProgram, runPr
 import Distribution.Simple.Setup ( BuildFlags, ConfigFlags
                                  , CopyDest(..), CopyFlags, copyVerbosity
                                  , InstallFlags, installVerbosity
-                                 , fromFlag
+                                 , fromFlag, fromFlagOrDefault, copyDest
                                  )
 import Distribution.Simple.Utils (installOrdinaryFile, rawSystemExitWithEnv, rawSystemStdInOut, die)
 import Distribution.System (OS (..), Arch (..), buildOS, buildArch)
@@ -624,16 +624,17 @@ ldconfig path = case buildOS of
                 otherwise -> error "Couldn't execute ldconfig, ensure it is on your path"
 
 myCopyHook :: PackageDescription -> LocalBuildInfo -> UserHooks -> CopyFlags -> IO ()
-myCopyHook = hookHelper (fromFlag . copyVerbosity) (copyHook simpleUserHooks)
+myCopyHook = hookHelper (fromFlag . copyVerbosity) (fromFlagOrDefault NoCopyDest . copyDest) (copyHook simpleUserHooks)
 
 myInstHook :: PackageDescription -> LocalBuildInfo -> UserHooks -> InstallFlags -> IO ()
-myInstHook = hookHelper (fromFlag . installVerbosity) (instHook simpleUserHooks)
+myInstHook = hookHelper (fromFlag . installVerbosity) (const NoCopyDest) (instHook simpleUserHooks)
 
 hookHelper ::
     (a -> Verbosity) ->
+    (a -> CopyDest) ->
     (PackageDescription -> LocalBuildInfo -> UserHooks -> a -> IO ()) ->
     PackageDescription -> LocalBuildInfo -> UserHooks -> a -> IO ()
-hookHelper verbosity origHook pkg_descr local_bld_info user_hooks flags =
+hookHelper verbosity copydest origHook pkg_descr local_bld_info user_hooks flags =
     do
     -- Perform simpleUserHooks (copyHook/instHook => to copy installIncludes)
     origHook pkg_descr local_bld_info user_hooks flags
@@ -648,7 +649,7 @@ hookHelper verbosity origHook pkg_descr local_bld_info user_hooks flags =
         dll_name = fromJust (lookup "x-dll-name" custom_bi)
         lib_name = sharedLibName ver dll_name
 
-        inst_lib_dir = libdir $ absoluteInstallDirs pkg_descr local_bld_info NoCopyDest
+        inst_lib_dir = libdir $ absoluteInstallDirs pkg_descr local_bld_info (copydest flags)
 
     installOrdinaryFile (verbosity flags) (bld_dir </> lib_name) (inst_lib_dir </> lib_name)
     ldconfig inst_lib_dir
