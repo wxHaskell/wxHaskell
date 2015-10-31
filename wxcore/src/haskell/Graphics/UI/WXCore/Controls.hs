@@ -1,3 +1,4 @@
+{-# LANGUAGE ForeignFunctionInterface #-}
 --------------------------------------------------------------------------------
 {-|
 Module      :  Controls
@@ -144,19 +145,20 @@ enumerateFontsList encoding fixedWidthOnly = do
   where
   listFkt :: Var [String] -> String -> IO Bool
   listFkt v txt = do
-    varUpdate v (txt:)
+    _ <- varUpdate v (txt:)
     return True
+
+foreign import ccall "wrapper" wrapEnumeratorFunc :: (Ptr () -> Ptr CWchar -> IO CInt) -> IO (FunPtr (Ptr () -> Ptr CWchar -> IO CInt))
 
 -- | (@enumerateFonts encoding fixedWidthOnly f@ calls successive @f name@ for the fonts installed on the system.
 -- It stops if the function return False.
 -- See also @enumerateFontsList@.
 enumerateFonts :: Int -> Bool -> (String -> IO Bool) -> IO ()
-enumerateFonts encoding fixedWidthOnly f = do
-  fontEnumerator <- fontEnumeratorCreate ptrNull =<< fuc f
-  ok <- fontEnumeratorEnumerateFacenames fontEnumerator encoding (fromEnum fixedWidthOnly)
+enumerateFonts encoding fixedWidthOnly fkt = do
+  fontEnumerator <- fontEnumeratorCreate ptrNull =<< fuc fkt
+  _ <- fontEnumeratorEnumerateFacenames fontEnumerator encoding (fromEnum fixedWidthOnly)
   fontEnumeratorDelete fontEnumerator
   where
-    foreign import ccall "wrapper" wrapEnumeratorFunc :: (Ptr () -> Ptr CWchar -> IO CInt) -> IO (FunPtr (Ptr () -> Ptr CWchar -> IO CInt))
     fuc :: (String -> IO Bool) -> IO (Ptr (Ptr () -> Ptr CWchar -> IO CInt))
     fuc f = fmap toCFunPtr $ wrapEnumeratorFunc $ fucH f
     fucH :: (String -> IO Bool) -> Ptr () -> Ptr CWchar -> IO CInt
