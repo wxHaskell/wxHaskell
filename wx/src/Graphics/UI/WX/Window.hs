@@ -133,7 +133,7 @@ instance Textual (Window a) where
 
       getset w
         = ifInstanceOf w classComboBox
-            (\cb -> (comboBoxGetValue cb, \s -> do comboBoxClear cb; comboBoxAppend cb s)) $
+            (\cb -> (comboBoxGetValue cb, comboBoxSetValue cb)) $
           ifInstanceOf w classTextCtrl
             (\tc -> (textCtrlGetValue tc, \s -> do textCtrlChangeValue tc s)) $
             (windowGetLabel w,windowSetLabel w)

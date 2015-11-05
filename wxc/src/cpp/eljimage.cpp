@@ -3,6 +3,11 @@
 extern "C"
 {
 
+EWXWEXPORT(void,wxImage_Copy)(wxImage *self, wxImage* image)
+{
+	*image = self->Copy();
+}
+
 EWXWEXPORT(wxImage*,wxImage_CreateDefault)()
 {
 	return new wxImage();
@@ -76,12 +81,22 @@ EWXWEXPORT(void,wxImage_Destroy)(wxImage* self)
 {
 	self->Destroy();
 }
-	
+
 EWXWEXPORT(void,wxImage_GetSubImage)(wxImage* self,int x,int y,int w,int h,wxImage* image)
 {
 	*image = self->GetSubImage(wxRect(x, y, w, h));
 }
-	
+
+EWXWEXPORT(int,wxImage_GetType)(wxImage* self)
+{
+	return self->GetType();
+}
+
+EWXWEXPORT(void,wxImage_SetType)(wxImage* self,int type)
+{
+	self->SetType((wxBitmapType) type);
+}
+
 EWXWEXPORT(void,wxImage_Paste)(wxImage* self,wxImage* image,int x,int y)
 {
 	self->Paste(*image, x, y);
@@ -91,10 +106,20 @@ EWXWEXPORT(void,wxImage_Scale)(wxImage* self,int width,int height,wxImage* image
 {
 	*image = self->Scale(width, height);
 }
+
+EWXWEXPORT(void,wxImage_ScaleEx)(wxImage* self,int width,int height,int quality,wxImage* image)
+{
+	*image = self->Scale(width, height,(wxImageResizeQuality) quality);
+}
 	
 EWXWEXPORT(void,wxImage_Rescale)(wxImage* self,int width,int height)
 {
 	self->Rescale(width, height);
+}
+
+EWXWEXPORT(void,wxImage_RescaleEx)(wxImage* self,int width,int height,int quality)
+{
+	self->Rescale(width, height,(wxImageResizeQuality) quality);
 }
 	
 EWXWEXPORT(void,wxImage_Rotate)(wxImage* self,double angle,int c_x,int c_y,bool interpolating,void* offset_after_rotation,wxImage* image)
@@ -146,10 +171,20 @@ EWXWEXPORT(bool, wxImage_LoadFile)(wxImage *self, wxString *name, wxBitmapType t
 {
 	return self->LoadFile(*name, type);
 }
+
+EWXWEXPORT(bool, wxImage_LoadStream)(wxImage *self, wxInputStream *stream, wxBitmapType type, int index)
+{
+	return self->LoadFile(*stream, type, index);
+}
 	
 EWXWEXPORT(bool, wxImage_SaveFile)(wxImage *self, wxString *name, wxBitmapType type)
 {
 	return self->SaveFile(*name, type);
+}
+
+EWXWEXPORT(bool, wxImage_SaveStream)(wxImage *self, wxOutputStream *stream, wxBitmapType type)
+{
+	return self->SaveFile(*stream, type);
 }
 	
 EWXWEXPORT(bool,wxImage_IsOk)(wxImage* self)
