@@ -1,4 +1,0 @@
-As of 20130917 the following examples do not or do partially work (on MacOSX 10.8, wxWidgets 2.9.5)
-- ListCtrl: crashes when closing the window
-- Print: crashes when using a menu entry (e.g. print...)
-- TestTaskBarIcon: seems not to work?
