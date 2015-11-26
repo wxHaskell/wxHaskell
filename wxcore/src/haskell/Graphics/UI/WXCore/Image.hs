@@ -207,6 +207,7 @@ imageTypeFromExtension ext
       "pnm"   -> wxBITMAP_TYPE_PNM
       "pict"  -> wxBITMAP_TYPE_PICT
       "icon"  -> wxBITMAP_TYPE_ICON
+      "ani"   -> wxBITMAP_TYPE_ANI
       _other  -> wxBITMAP_TYPE_ANY
 
 {-----------------------------------------------------------------------------------------
