@@ -151,6 +151,8 @@ module Graphics.UI.WXCore.WxcDefs
     , wxBDIAGONAL_HATCH
     , wxBEOS
     , wxBIG_ENDIAN
+    
+    -- From enum wxBitmapType in wxWidgets/include/wx/gdicmn.h
     , wxBITMAP_TYPE_INVALID
     , wxBITMAP_TYPE_BMP
     , wxBITMAP_TYPE_BMP_RESOURCE
@@ -188,6 +190,7 @@ module Graphics.UI.WXCore.WxcDefs
     , wxBITMAP_TYPE_MACCURSOR_RESOURCE
     , wxBITMAP_TYPE_MAX
     , wxBITMAP_TYPE_ANY
+    
     , wxBLACK
     , wxBLACK_BRUSH
     , wxBLACK_DASHED_PEN

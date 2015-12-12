@@ -16,7 +16,8 @@ description:
   exception allowing binary distribution of proprietary software.
   This is the same license as wxWidgets itself uses.
 
-homepage:     https://wiki.haskell.org/WxHaskell
+homepage:      https://wiki.haskell.org/WxHaskell
+bug-reports:   http://sourceforge.net/p/wxhaskell/bugs/
 
 cabal-version: >= 1.2
 build-type:    Custom
@@ -289,6 +290,7 @@ library
     src/cpp/treectrl.cpp
     src/cpp/wrapper.cpp
 
+  cc-options: "-std=c++11"
   x-dll-name: wxc
 
   x-dll-extra-libraries:
