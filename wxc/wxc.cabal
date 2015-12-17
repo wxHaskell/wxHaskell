@@ -290,7 +290,7 @@ library
     src/cpp/treectrl.cpp
     src/cpp/wrapper.cpp
 
-  cc-options: "-std=c++11"
+  cc-options: "-std=c++11" -Wno-deprecated-declarations
   x-dll-name: wxc
 
   x-dll-extra-libraries:
