@@ -1,5 +1,5 @@
 name:         wxc
-version:      0.92.1.1
+version:      0.92.2.0
 license:      OtherLicense
 license-file: LICENSE
 maintainer:   wxhaskell-devel@lists.sourceforge.net
@@ -290,7 +290,9 @@ library
     src/cpp/treectrl.cpp
     src/cpp/wrapper.cpp
 
-  cc-options: "-std=gnu++11" -Wno-deprecated-declarations
+  if impl(ghc > 7.10.2)
+    cc-options: "-std=gnu++11" -Wno-deprecated-declarations
+    
   x-dll-name: wxc
 
   x-dll-extra-libraries:
