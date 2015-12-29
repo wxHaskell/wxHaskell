@@ -1,7 +1,7 @@
 
 {-# LANGUAGE CPP #-}
 
-import Control.Monad (filterM, join, mapM_, when)
+import Control.Monad (filterM, join, mapM_, when, liftM2)
 import qualified Data.ByteString.Lazy as B
 import Data.Char     ( ord )
 import Data.Functor  ( (<$>) )
