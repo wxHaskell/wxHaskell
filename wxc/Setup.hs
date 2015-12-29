@@ -335,14 +335,17 @@ readWxConfig :: String -> IO String
 readWxConfig wxVersion =
   do
     putStrLn ("Configuring wxc to build against wxWidgets " ++ wxVersion)
-
+    
+    -- find GL/glx.h on non-Linux systems
+      let glIncludeDirs = readProcess "pkg-config" ["--cflags", "gl"] "" `E.onException` return ""
+    
     -- The Windows port of wx-config doesn't let you specify a version (yet)
     isMsys <- isWindowsMsys
     case (buildOS,isMsys) of
       -- wx-config-win does not list all libraries if --cppflags comes after --libs :-(
-      (Windows,False) -> wx_config ["--cppflags", "--libs", "all"]
+      (Windows,False) -> liftM2 (++) glIncludeDirs (wx_config ["--cppflags", "--libs", "all"])
       (Windows,True) -> wx_config ["--libs", "all", "--gl-libs", "--cppflags"]
-      _       -> wx_config ["--version=" ++ wxVersion, "--libs", "all", "--cppflags"]
+      _       -> liftM2 (++) glIncludeDirs (wx_config ["--version=" ++ wxVersion, "--libs", "all", "--cppflags"])
 
 
 wx_config :: [String] -> IO String
