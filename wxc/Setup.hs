@@ -337,7 +337,7 @@ readWxConfig wxVersion =
     putStrLn ("Configuring wxc to build against wxWidgets " ++ wxVersion)
     
     -- find GL/glx.h on non-Linux systems
-      let glIncludeDirs = readProcess "pkg-config" ["--cflags", "gl"] "" `E.onException` return ""
+    let glIncludeDirs = readProcess "pkg-config" ["--cflags", "gl"] "" `E.onException` return ""
     
     -- The Windows port of wx-config doesn't let you specify a version (yet)
     isMsys <- isWindowsMsys
