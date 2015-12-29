@@ -3,7 +3,7 @@ import Control.Monad (when, filterM)
 import Data.List (foldl', intersperse, intercalate, nub, lookup, isPrefixOf, isInfixOf, find)
 import Data.Maybe (fromJust)
 import Distribution.PackageDescription hiding (includeDirs)
-import Distribution.PackageDescription as PD (includeDirs)
+import qualified Distribution.PackageDescription as PD (includeDirs)
 import Distribution.InstalledPackageInfo(installedPackageId, sourcePackageId, includeDirs)
 import Distribution.Simple
 import Distribution.Simple.LocalBuildInfo (LocalBuildInfo, localPkgDescr, installedPkgs, withPrograms, buildDir)
