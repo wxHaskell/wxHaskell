@@ -23,7 +23,7 @@ import Distribution.Simple.Utils (installOrdinaryFile, rawSystemExitWithEnv, raw
 import Distribution.System (OS (..), Arch (..), buildOS, buildArch)
 import Distribution.Verbosity (Verbosity, normal, verbose)
 import Distribution.Compat.Exception (catchIO)
-import System.Process (system)
+import System.Process (system, readProcess)
 import System.Directory ( createDirectoryIfMissing, doesFileExist
                         , findExecutable,           getCurrentDirectory
                         , getDirectoryContents,     getModificationTime
@@ -41,14 +41,6 @@ import Control.Monad (unless)
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
 -- Some utility functions
-
-readProcess :: FilePath -> [String] -> String -> IO String
-readProcess cmd args stdin =
-  Process.readProcess cmd args stdin
-  `E.catch` \(E.SomeException err) -> do
-    hPutStrLn stderr $ "readProcess failed: " ++ show err
-    E.throwIO err
-
 
 whenM :: Monad m => m Bool -> m () -> m ()
 whenM mp e = mp >>= \p -> when p e
