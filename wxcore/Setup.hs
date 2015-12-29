@@ -1,7 +1,9 @@
+import qualified Control.Exception as E
 import Control.Monad (when, filterM)
 import Data.List (foldl', intersperse, intercalate, nub, lookup, isPrefixOf, isInfixOf, find)
 import Data.Maybe (fromJust)
 import Distribution.PackageDescription hiding (includeDirs)
+import Distribution.PackageDescription as PD (includeDirs)
 import Distribution.InstalledPackageInfo(installedPackageId, sourcePackageId, includeDirs)
 import Distribution.Simple
 import Distribution.Simple.LocalBuildInfo (LocalBuildInfo, localPkgDescr, installedPkgs, withPrograms, buildDir)
@@ -55,7 +57,10 @@ wxcInstallDir lbi =
 -- Comment out type signature because of a Cabal API change from 1.6 to 1.7
 myConfHook (pkg0, pbi) flags = do
     createDirectoryIfMissing True wxcoreDirectory
-
+    
+    -- Find GL/glx.h include path using pkg-config
+    glIncludeDirs <- readProcess "pkg-config" ["--cflags", "gl"] "" `E.onException` return ""
+    
     lbi <- confHook simpleUserHooks (pkg0, pbi) flags
     wxcDirectory <- wxcInstallDir lbi
     let wxcoreIncludeFile  = "\"" ++ wxcDirectory </> "include" </> "wxc.h\""
@@ -77,9 +82,12 @@ myConfHook (pkg0, pbi) flags = do
     let custom_bi = customFieldsBI libbi
 
     let libbi' = libbi
-          { extraLibDirs = extraLibDirs libbi ++ [wxcDirectory]
-          , extraLibs    = extraLibs    libbi ++ ["wxc"]
-          , ldOptions    = ldOptions    libbi ++ ["-Wl,-rpath," ++ wxcDirectory]  }
+          { extraLibDirs   = extraLibDirs   libbi ++ [wxcDirectory]
+          , extraLibs      = extraLibs      libbi ++ ["wxc"]
+          , PD.includeDirs = PD.includeDirs libbi ++ case glIncludeDirs of
+                                                         ('-':'I':v) -> [v];
+                                                         _           -> []
+          , ldOptions      = ldOptions      libbi ++ ["-Wl,-rpath," ++ wxcDirectory]  }
 
     let lib' = lib { libBuildInfo = libbi' }
     let lpd' = lpd { library = Just lib' }
