@@ -151,6 +151,8 @@ class ELJApp: public wxApp
     void HandleEvent(wxEvent& _evt);
     void InitZipFileSystem();
     void InitImageHandlers();
+    void OnInitCmdLine(wxCmdLineParser& parser);
+    bool OnCmdLineParsed(wxCmdLineParser& parser);
 };
 
 
