@@ -25,7 +25,7 @@ EWXWEXPORT(bool,ELJConnection_Execute)(ELJConnection* self,wxString* data,int si
 	
 EWXWEXPORT(void*,ELJConnection_Request)(void* self,wxString* item,void* size,int format)
 {
-	return (void*)((ELJConnection*)self)->Request(*item, (int*)size, (wxIPCFormat)format);
+	return (void*)((ELJConnection*)self)->Request(*item, (size_t*)size, (wxIPCFormat)format);
 }
 	
 EWXWEXPORT(bool,ELJConnection_Poke)(ELJConnection* self,wxString* item,wxChar* data,int size,int format)
