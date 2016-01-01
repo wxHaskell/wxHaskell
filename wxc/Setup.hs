@@ -1,7 +1,7 @@
 
 {-# LANGUAGE CPP #-}
 
-import Control.Monad (filterM, join, mapM_, when)
+import Control.Monad (filterM, join, mapM_, when, liftM2)
 import qualified Data.ByteString.Lazy as B
 import Data.Char     ( ord )
 import Data.Functor  ( (<$>) )
@@ -23,7 +23,7 @@ import Distribution.Simple.Utils (installOrdinaryFile, rawSystemExitWithEnv, raw
 import Distribution.System (OS (..), Arch (..), buildOS, buildArch)
 import Distribution.Verbosity (Verbosity, normal, verbose)
 import Distribution.Compat.Exception (catchIO)
-import System.Process (system)
+import System.Process (system, readProcess)
 import System.Directory ( createDirectoryIfMissing, doesFileExist
                         , findExecutable,           getCurrentDirectory
                         , getDirectoryContents,     getModificationTime
@@ -41,14 +41,6 @@ import Control.Monad (unless)
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
 -- Some utility functions
-
-readProcess :: FilePath -> [String] -> String -> IO String
-readProcess cmd args stdin =
-  Process.readProcess cmd args stdin
-  `E.catch` \(E.SomeException err) -> do
-    hPutStrLn stderr $ "readProcess failed: " ++ show err
-    E.throwIO err
-
 
 whenM :: Monad m => m Bool -> m () -> m ()
 whenM mp e = mp >>= \p -> when p e
@@ -343,14 +335,17 @@ readWxConfig :: String -> IO String
 readWxConfig wxVersion =
   do
     putStrLn ("Configuring wxc to build against wxWidgets " ++ wxVersion)
-
+    
+    -- find GL/glx.h on non-Linux systems
+    let glIncludeDirs = readProcess "pkg-config" ["--cflags", "gl"] "" `E.onException` return ""
+    
     -- The Windows port of wx-config doesn't let you specify a version (yet)
     isMsys <- isWindowsMsys
     case (buildOS,isMsys) of
       -- wx-config-win does not list all libraries if --cppflags comes after --libs :-(
-      (Windows,False) -> wx_config ["--cppflags", "--libs", "all"]
+      (Windows,False) -> liftM2 (++) glIncludeDirs (wx_config ["--cppflags", "--libs", "all"])
       (Windows,True) -> wx_config ["--libs", "all", "--gl-libs", "--cppflags"]
-      _       -> wx_config ["--version=" ++ wxVersion, "--libs", "all", "--cppflags"]
+      _       -> liftM2 (++) glIncludeDirs (wx_config ["--version=" ++ wxVersion, "--libs", "all", "--cppflags"])
 
 
 wx_config :: [String] -> IO String
