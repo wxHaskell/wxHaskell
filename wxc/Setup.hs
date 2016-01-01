@@ -336,8 +336,13 @@ readWxConfig wxVersion =
   do
     putStrLn ("Configuring wxc to build against wxWidgets " ++ wxVersion)
     
+#if defined(freebsd_HOST_OS) || defined (netbsd_HOST_OS)
+    putStrLn "defined(freebsd_HOST_OS) || defined (netbsd_HOST_OS)"
     -- find GL/glx.h on non-Linux systems
     let glIncludeDirs = readProcess "pkg-config" ["--cflags", "gl"] "" `E.onException` return ""
+#else
+    let glIncludeDirs = return ""
+#endif
     
     -- The Windows port of wx-config doesn't let you specify a version (yet)
     isMsys <- isWindowsMsys

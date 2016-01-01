@@ -1,3 +1,6 @@
+
+{-# LANGUAGE CPP #-}
+
 import qualified Control.Exception as E
 import Control.Monad (when, filterM)
 import Data.List (foldl', intersperse, intercalate, nub, lookup, isPrefixOf, isInfixOf, find)
@@ -58,9 +61,13 @@ wxcInstallDir lbi =
 myConfHook (pkg0, pbi) flags = do
     createDirectoryIfMissing True wxcoreDirectory
     
+#if defined(freebsd_HOST_OS) || defined (netbsd_HOST_OS)
     -- Find GL/glx.h include path using pkg-config
     glIncludeDirs <- readProcess "pkg-config" ["--cflags", "gl"] "" `E.onException` return ""
-    
+#else
+    let glIncludeDirs = ""
+#endif
+
     lbi <- confHook simpleUserHooks (pkg0, pbi) flags
     wxcDirectory <- wxcInstallDir lbi
     let wxcoreIncludeFile  = "\"" ++ wxcDirectory </> "include" </> "wxc.h\""
