@@ -63,5 +63,9 @@ onListEvent list eventList
   = case eventList of
       ListItemSelected idx    -> listCtrlGetItemText list idx >>= logMessage . (++) "item selected: " 
       ListItemDeselected idx  -> logMessage ("item de-selected: " ++ show idx)
-      other                   -> logMessage ("list control event.")
+      -- The following line of code is replaced, because this causes a crash on Ubuntu
+      -- with the message "pure virtual method called"
+      -- See bug ticket 106, http://sourceforge.net/p/wxhaskell/bugs/106/
+      -- other                   -> logMessage ("list control event.")
+      other                   -> return ()
 
