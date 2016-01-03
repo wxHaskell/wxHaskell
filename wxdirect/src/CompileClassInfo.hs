@@ -105,9 +105,10 @@ compileClassInfo _verbose moduleRoot moduleClassesName moduleClassTypesName modu
                               ]
            prologue = getPrologue moduleName "class info"
                                         (show defCount ++ " class info definitions.") []
+           haddockPrune = ["{-# OPTIONS_HADDOCK prune #-}"]
 
        putStrLn ("generating: " ++ outputFile)
-       writeFileLazy outputFile (unlines (prologue ++ export ++ classDefs ++ downcDefs))
+       writeFileLazy outputFile (unlines (haddockPrune ++ prologue ++ export ++ classDefs ++ downcDefs))
        putStrLn ("generated " ++ show defCount ++ " class info definitions")
        putStrLn "ok."
 

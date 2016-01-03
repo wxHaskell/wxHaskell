@@ -1,5 +1,6 @@
 {-# LANGUAGE CPP, ForeignFunctionInterface, DeriveDataTypeable, FlexibleInstances #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# OPTIONS_HADDOCK prune #-}
 -----------------------------------------------------------------------------------------
 {-|
 Module      :  WxcTypes

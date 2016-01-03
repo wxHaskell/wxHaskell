@@ -125,7 +125,8 @@ compileClassesFile _showIgnore moduleRoot moduleClassTypesName moduleName output
            prologue = getPrologue moduleName "class"
                                    (show methodCount ++ " methods for " ++ show classCount ++ " classes.")
                                    inputFiles
-           output  = unlines (ghcoptions ++ prologue ++ export ++ marshalDecls)
+           haddockPrune = ["{-# OPTIONS_HADDOCK prune #-}"]
+           output  = unlines (haddockPrune ++ ghcoptions ++ prologue ++ export ++ marshalDecls)
 
        putStrLn ("generating: " ++ outputFile ++ ".hs")
        writeFileLazy (outputFile ++ ".hs") output
