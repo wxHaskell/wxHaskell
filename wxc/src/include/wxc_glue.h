@@ -4834,7 +4834,7 @@ TBool      wxSingleInstanceChecker_IsAnotherRunning( TSelf(wxSingleInstanceCheck
 /* wxSize */
 TClassDef(wxSize)
 TClass(wxSize) wxSize_Create( TSize(w,h) );
-void       wxSize_Destroy( TSelf(wxSize) _obj );
+void       wxSize_Delete( TSelf(wxSize) _obj );
 int        wxSize_GetHeight( TSelf(wxSize) _obj );
 int        wxSize_GetWidth( TSelf(wxSize) _obj );
 void       wxSize_SetHeight( TSelf(wxSize) _obj, int h );
