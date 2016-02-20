@@ -487,7 +487,7 @@ instance IsDate Day where
   -- time zone??
   toWXDate utc = do
     wxd <- dateTimeCreate
-    dateTimeSet wxd (fromInteger y) (m - 1) d 0 0 0 0
+    dateTimeSet wxd d (m - 1) (fromInteger y) 0 0 0 0
     return wxd
     where (y,m,d) = toGregorian utc
   fromWXDate wxd = fromGregorian
