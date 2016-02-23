@@ -161,7 +161,18 @@ EWXWEXPORT(bool,wxTextCtrl_CanRedo)(wxTextCtrl* self)
 {
 	return self->CanRedo();
 }
-	
+
+EWXWEXPORT(wxString*,wxTextCtrl_GetHint)(wxTextCtrl* self)
+{
+  wxString *result = new wxString();
+  *result = self->GetHint();
+  return result;
+}
+EWXWEXPORT(bool,wxTextCtrl_SetHint)(wxTextCtrl* self,wxString *hint)
+{
+  self->SetHint(*hint);
+}
+
 EWXWEXPORT(void,wxTextCtrl_SetInsertionPoint)(wxTextCtrl* self,long pos)
 {
 	self->SetInsertionPoint(pos);

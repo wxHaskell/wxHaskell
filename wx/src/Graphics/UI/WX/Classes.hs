@@ -29,6 +29,7 @@ module Graphics.UI.WX.Classes
 
       -- * Text
     , Textual(text,appendText)
+    , Hints(hint)
     , Literate(font ,fontFamily, fontFace, fontSize, fontWeight, fontUnderline, fontShape
               ,textColor,textBgcolor)
       -- * Rendering
@@ -78,6 +79,10 @@ class Textual w where
   appendText w s
     = set w [text :~ (++s)]
 
+-- | Widgets that can display a hint
+class Hinted w where
+  -- | The hint displayed by a widget
+  hint       :: Attr w String
 
 -- | Widgets with a picture.
 class Pictured w where
