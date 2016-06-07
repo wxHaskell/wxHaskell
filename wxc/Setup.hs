@@ -52,11 +52,11 @@ findM _  []       = return Nothing
 findM mp (x : xs) =
   do
     r <- mp x
-    if r 
+    if r
       then return $ Just x
       else findM mp xs
 
-    
+
 main :: IO ()
 main = defaultMainWithHooks simpleUserHooks
      { confHook = myConfHook
@@ -87,16 +87,20 @@ isWindowsMsys = (buildOS == Windows&&) . isJust <$> lookupEnv "MSYSTEM"
 
 -- Comment out type signature because of a Cabal API change from 1.6 to 1.7
 myConfHook (pkg0, pbi) flags = do
-    mswMsys <- isWindowsMsys 
+    let whenExecutableNotFound = whenM (isNothing <$> findExecutable "wx-config")
+    mswMsys <- isWindowsMsys
     if mswMsys then do
-        (r, e, c) <- rawShellSystemStdInOut normal "wx-config" ["--release"] 
-        unless (c == ExitSuccess) $ do
-            putStrLn ("Error: MSYS environment wx-config script not found, please install wx-config before installing wxc" ++ "\n" 
-                      ++ e ++ "\n"
-                      ++ show c)
-            exitFailure
+        (r, e, c) <- rawShellSystemStdInOut normal "wx-config" ["--release"]
+        unless (c == ExitSuccess) $
+            -- In case you use Stack on Windows which internally use MSYS.
+            -- From Windows Console rawShellSystemStdInOut doesn't work
+            whenExecutableNotFound $ do
+              putStrLn ("Error: MSYS environment wx-config script not found, please install wx-config before installing wxc" ++ "\n"
+                        ++ e ++ "\n"
+                        ++ show c)
+              exitFailure
     else
-        whenM (isNothing <$> findExecutable "wx-config") $
+        whenExecutableNotFound $
         do
             putStrLn "Error: wx-config not found, please install wx-config before installing wxc"
             exitFailure
@@ -208,7 +212,7 @@ checkBitness file =
               -- N.B. Might need an update when Windows runs on ARM
               let machineOffsetList = reverse $ take 4 $ drop 0x3C $ contents
               let machineOffset = listToInt machineOffsetList + 4
-              return $ 
+              return $
                 case contents !! machineOffset of
                   0x4C -> Bits32   -- "The file is 32 bit"
                   0x64 -> Bits64   -- "The file is 64 bit"
@@ -217,7 +221,7 @@ checkBitness file =
           listToInt :: Integral a => [a] -> Int
           listToInt xs = foldl1 (\x y -> 256 * x + y) (map fromIntegral xs)
 
-    
+
     compareBitness :: Bitness -> CheckResult
     compareBitness thatBitness =
       if thatBitness == Unknown
@@ -322,7 +326,7 @@ checkWxVersion =
 
     case maybeWxVersion of
       Nothing ->
-        error ("This version of wxc requires one of the following wxWidgets versions to be available: " 
+        error ("This version of wxc requires one of the following wxWidgets versions to be available: "
                ++ show wxCompatibleVersions
               )
       Just wxVersion ->
@@ -335,7 +339,7 @@ readWxConfig :: String -> IO String
 readWxConfig wxVersion =
   do
     putStrLn ("Configuring wxc to build against wxWidgets " ++ wxVersion)
-    
+
 #if defined(freebsd_HOST_OS) || defined (netbsd_HOST_OS)
     putStrLn "defined(freebsd_HOST_OS) || defined (netbsd_HOST_OS)"
     -- find GL/glx.h on non-Linux systems
@@ -343,7 +347,7 @@ readWxConfig wxVersion =
 #else
     let glIncludeDirs = return ""
 #endif
-    
+
     -- The Windows port of wx-config doesn't let you specify a version (yet)
     isMsys <- isWindowsMsys
     case (buildOS,isMsys) of
@@ -355,17 +359,20 @@ readWxConfig wxVersion =
 
 wx_config :: [String] -> IO String
 wx_config parms = do
+  let runExecutable failureAction =
+        readProcess "wx-config" parms "" `E.onException` failureAction
+
   b <- isWindowsMsys
-  if b 
+  if b
     then do
         (r, e, c) <- rawShellSystemStdInOut normal "wx-config" parms
-        unless (c == ExitSuccess) $ do
-            putStrLn $ "Error: Failed to execute wx-config command \n" ++ e
-            exitFailure
-        return r
-    else 
-        readProcess "wx-config" parms ""
-            `E.onException` return ""
+        if c == ExitSuccess then
+          return r
+        else runExecutable $ do
+              putStrLn $ "Error: Failed to execute wx-config\n" ++ e
+              exitFailure
+    else
+        runExecutable $ return ""
 
 
  -- Try to find a compatible version of wxWidgets
@@ -375,7 +382,7 @@ findWxVersion =
   if buildOS == Windows
     -- The Windows port of wx-config doesn't let you specify a version, nor query the full version,
     -- accordingly we just check what version is installed (which is returned with --release)
-    then checkCompatibility <$> readVersionWindows 
+    then checkCompatibility <$> readVersionWindows
     else findM (fmap isCompatible . readVersion) wxCompatibleVersions
       where
         readVersionWindows :: IO String
@@ -393,7 +400,7 @@ findWxVersion =
         checkCompatibility :: String -> Maybe String
         checkCompatibility version =
           if isCompatible version
-            then Just version 
+            then Just version
             else Nothing
 
 
@@ -415,10 +422,10 @@ parseWxConfig s =
 deMsysPaths :: BuildInfo -> IO BuildInfo
 deMsysPaths bi = do
     b <- isWindowsMsys
-    if b 
+    if b
     then do
         let cor ph = do
-            (r, e, c ) <- rawSystemStdInOut normal "sh" ["-c", "cd " ++ ph ++ "; pwd -W"] Nothing Nothing Nothing False  
+            (r, e, c ) <- rawSystemStdInOut normal "sh" ["-c", "cd " ++ ph ++ "; pwd -W"] Nothing Nothing Nothing False
             unless (c == ExitSuccess) (putStrLn ("Error: failed to convert MSYS path to native path \n" ++ e) >> exitFailure)
             return . head . lines $ r
         elds <- mapM cor (extraLibDirs bi)
@@ -457,7 +464,7 @@ myBuildHook pkg_descr local_bld_info user_hooks bld_flags =
     -- Compile C/C++ sources - output directory is dist/build/src/cpp
     putStrLn "Building wxc"
     objs <- mapM (compileCxx gcc cc_opts inc_dirs bld_dir) dll_srcs
-    
+
     -- Link C/C++ sources as a DLL - output directory is dist/build
     if buildOS == Windows then do
         -- Since we removed wx libraries in myConfHook we need to add them here when linking wxc.dll
@@ -496,7 +503,7 @@ linkCxxOpts ver out_dir basename basepath =
     -- let dll_pathname = normalisePath (out_dir </> addExtension basename ".dll")
     --     implib_ pathname = normalisePath (out_dir </> "lib" ++ addExtension basename ".a") in
     case buildOS of
-      Windows -> ["-Wl,--dll", "-shared", 
+      Windows -> ["-Wl,--dll", "-shared",
                   "-o", out_dir </> sharedLibName ver basename,
                   "-Wl,--out-implib," ++ "lib" ++ addExtension basename ".a",
                   "-Wl,--export-all-symbols", "-Wl,--enable-auto-import",
@@ -566,7 +573,7 @@ linkSharedLib gcc opts lib_dirs libs objs ver out_dir dll_name dll_path =
         objs'     = map normalisePath objs
         libs'     = ["-lstdc++"] ++ map ("-l" ++) libs
         target    = out_dir' </> sharedLibName ver dll_name
-    link <- linkingNeeded target objs' 
+    link <- linkingNeeded target objs'
     when link $
       do
         putStrLn "Linking wxc"
@@ -574,14 +581,14 @@ linkSharedLib gcc opts lib_dirs libs objs ver out_dir dll_name dll_path =
       --system $ (unwords ([show . locationPath . programLocation $ gcc] ++ opts' ++ objs' ++ lib_dirs' ++ libs'))
 
 
--- | Check if one of the input files is more recent then the output file 
+-- | Check if one of the input files is more recent then the output file
 linkingNeeded :: FilePath -> [FilePath] -> IO Bool
-linkingNeeded output input = 
+linkingNeeded output input =
   do
     fileExists <- doesFileExist output
-    if not fileExists 
+    if not fileExists
       then return True
-      else 
+      else
         do
           mostRecentModificationTime <- maximum <$> mapM getModificationTime input
           outputModificationTime     <- getModificationTime output
@@ -618,7 +625,7 @@ ldconfig path = case buildOS of
     Windows -> return ()
     OSX -> return ()
     _ -> do
-            ld_exit_code <- system ("/sbin/ldconfig -n " ++ path) 
+            ld_exit_code <- system ("/sbin/ldconfig -n " ++ path)
             case ld_exit_code of
                 ExitSuccess -> return ()
                 otherwise -> error "Couldn't execute ldconfig, ensure it is on your path"
