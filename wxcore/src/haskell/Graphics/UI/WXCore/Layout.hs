@@ -650,6 +650,8 @@ space w h
   = Spacer optionsDefault (Size w h)
 
 -- | (primitive) A line with a given width and height
+-- Not all ports (notably not wxGTK) support specifying the transversal
+-- direction of the line (e.g. height for a horizontal line)
 rule :: Int -> Int -> Layout
 rule w h
   = Line optionsDefault (Size w h)
