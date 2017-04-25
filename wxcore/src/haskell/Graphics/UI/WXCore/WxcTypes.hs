@@ -915,7 +915,7 @@ toCChar :: Char -> CChar
 toCChar = castCharToCChar
 
 -- generalised to work with Char and CChar
-withCharResult :: (Num a, Integral a, Show a) => IO a -> IO Char
+withCharResult :: (Integral a, Show a) => IO a -> IO Char
 withCharResult io
   = do x <- io
        if (x < 0)
@@ -947,7 +947,7 @@ toCWchar :: (Num a) => Char -> a
 toCWchar = fromIntegral . fromEnum
 
 
-fromCWchar :: (Num a, Integral a) => a -> Char
+fromCWchar :: Integral a => a -> Char
 fromCWchar = toEnum . fromIntegral
 
 
