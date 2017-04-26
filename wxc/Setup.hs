@@ -87,16 +87,20 @@ isWindowsMsys = (buildOS == Windows&&) . isJust <$> lookupEnv "MSYSTEM"
 
 -- Comment out type signature because of a Cabal API change from 1.6 to 1.7
 myConfHook (pkg0, pbi) flags = do
+    let whenExecutableNotFound = whenM (isNothing <$> findExecutable "wx-config")
     mswMsys <- isWindowsMsys
     if mswMsys then do
         (r, e, c) <- rawShellSystemStdInOut normal "wx-config" ["--release"]
-        unless (c == ExitSuccess) $ do
-            putStrLn ("Error: MSYS environment wx-config script not found, please install wx-config before installing wxc" ++ "\n"
-                      ++ e ++ "\n"
-                      ++ show c)
-            exitFailure
+        unless (c == ExitSuccess) $
+            -- In case you use Stack on Windows which internally use MSYS.
+            -- From Windows Console rawShellSystemStdInOut doesn't work
+            whenExecutableNotFound $ do
+              putStrLn ("Error: MSYS environment wx-config script not found, please install wx-config before installing wxc" ++ "\n"
+                        ++ e ++ "\n"
+                        ++ show c)
+              exitFailure
     else
-        whenM (isNothing <$> findExecutable "wx-config") $
+        whenExecutableNotFound $
         do
             putStrLn "Error: wx-config not found, please install wx-config before installing wxc"
             exitFailure
@@ -359,17 +363,20 @@ readWxConfig wxVersion =
 
 wx_config :: [String] -> IO String
 wx_config parms = do
+  let runExecutable failureAction =
+        readProcess "wx-config" parms "" `E.onException` failureAction
+
   b <- isWindowsMsys
   if b
     then do
         (r, e, c) <- rawShellSystemStdInOut normal "wx-config" parms
-        unless (c == ExitSuccess) $ do
-            putStrLn $ "Error: Failed to execute wx-config command \n" ++ e
-            exitFailure
-        return r
+        if c == ExitSuccess then
+          return r
+        else runExecutable $ do
+              putStrLn $ "Error: Failed to execute wx-config\n" ++ e
+              exitFailure
     else
-        readProcess "wx-config" parms ""
-            `E.onException` return ""
+        runExecutable $ return ""
 
 
  -- Try to find a compatible version of wxWidgets
