@@ -70,11 +70,13 @@ dcDraw dc io
              io
 
 -- | Use a 'PaintDC'.
+-- Draw on a window within an 'on paint' event.
 withPaintDC :: Window a -> (PaintDC () -> IO b) -> IO b
 withPaintDC window draw
   = bracket (paintDCCreate window) (paintDCDelete) (\dc -> dcDraw dc (draw dc))
 
 -- | Use a 'ClientDC'.
+-- Draw on a window from outside an 'on paint' event.
 withClientDC :: Window a -> (ClientDC () -> IO b) -> IO b
 withClientDC window draw
   = bracket (clientDCCreate window) (clientDCDelete) (\dc -> dcDraw dc (draw dc))
