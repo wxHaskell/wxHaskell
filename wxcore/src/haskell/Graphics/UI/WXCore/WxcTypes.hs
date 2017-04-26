@@ -1301,19 +1301,6 @@ foreign import ccall wxString_Length    :: Ptr (TWxString a) -> IO CInt
   Color
 -----------------------------------------------------------------------------------------}
 -- | An abstract data type to define colors.
---
---   Note: Haddock 0.8 and 0.9 doesn't support GeneralizedNewtypeDeriving. So, This class
---   doesn't have 'IArray' class's unboxed array instance now. If you want to use this type
---   with unboxed array, you must write code like this.
---
--- > {-# LANGUAGE GeneralizedNewtypeDeriving, StandaloneDeriving, MultiParamTypeClasses #-}
--- > import Graphics.UI.WXCore.WxcTypes
--- > ...
--- > deriving instance IArray UArray Color
---
---   We can't derive 'MArray' class's unboxed array instance this way. This is a bad point
---   of current 'MArray' class definition.
---
 newtype Color = Color Word 
               deriving (Eq, Typeable) -- , IArray UArray) 
 
