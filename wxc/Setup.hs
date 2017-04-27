@@ -350,7 +350,7 @@ readWxConfig wxVersion =
 
     -- Additional libraries that are needed for wxc
     -- Note: "all" option doesn't bring them on the popular wx-config-win (https://github.com/kowey/wx-config-win)
-    let neededLibs = [intercalate "," ["xrc", "qa", "html", "adv", "core", "xml", "net", "base", "aui", "propgrid", "ribbon", "gl", "stc", "richtext"]]
+    let neededLibs = [intercalate "," ["richtext", "xrc", "qa", "html", "adv", "core", "xml", "net", "base", "aui", "propgrid", "ribbon", "gl", "stc"]]
 
     -- The Windows port of wx-config doesn't let you specify a version (yet)
     isMsys <- isWindowsMsys
