@@ -59,10 +59,10 @@ findM mp (x : xs) =
 
 main :: IO ()
 main = defaultMainWithHooks simpleUserHooks
-     { confHook = myConfHook
+     { confHook  = myConfHook
      , buildHook = myBuildHook
-     , copyHook = myCopyHook
-     , instHook = myInstHook
+     , copyHook  = myCopyHook
+     , instHook  = myInstHook
      }
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
@@ -133,8 +133,8 @@ myConfHook (pkg0, pbi) flags = do
           , ccOptions    = ccOptions    libbi ++ ccOptions    wx ++ ["-DwxcREFUSE_MEDIACTRL"]
           }
 
-    let lib' = lib { libBuildInfo = libbi' }
-    let lpd' = lpd { library = Just lib' }
+    let lib' = lib { libBuildInfo = libbi'    }
+    let lpd' = lpd { library      = Just lib' }
 
     return $ lbi { localPkgDescr = lpd' }
 
@@ -159,6 +159,10 @@ wxVERSION_NUMBER wxVersion =
         [revision] -> read revision
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+
+{-
+   Bitness check
+-}
 
 data Bitness
   = Bits32
@@ -349,16 +353,19 @@ readWxConfig wxVersion =
 #endif
 
     -- Additional libraries that are needed for wxc
-    -- Note: "all" option doesn't bring them on the popular wx-config-win (https://github.com/kowey/wx-config-win)
+    -- Note: "all" option doesn't bring them on the popular wx-config-win
+    -- (https://github.com/wxHaskell/wxHaskell/tree/master/wx-config-win,
+    -- other versions can be found at https://github.com/kowey/wx-config-win
+    -- and branches of it)
     let neededLibs = [intercalate "," ["richtext", "xrc", "qa", "html", "adv", "core", "xml", "net", "base", "aui", "propgrid", "ribbon", "gl", "stc"]]
 
     -- The Windows port of wx-config doesn't let you specify a version (yet)
     isMsys <- isWindowsMsys
-    case (buildOS,isMsys) of
+    case (buildOS, isMsys) of
       -- wx-config-win does not list all libraries if --cppflags comes after --libs :-(
-      (Windows,False) -> liftM2 (++) glIncludeDirs (wx_config $ ["--cppflags", "--libs"] ++ neededLibs)
-      (Windows,True) -> wx_config (["--gl-libs", "--cppflags", "--libs"] ++ neededLibs)
-      _       -> liftM2 (++) glIncludeDirs (wx_config ["--version=" ++ wxVersion, "--libs", "all", "--cppflags"])
+      (Windows, False) -> liftM2 (++) glIncludeDirs (wx_config $ ["--cppflags", "--libs"] ++ neededLibs)
+      (Windows, True)  -> wx_config (["--gl-libs", "--cppflags", "--libs"] ++ neededLibs)
+      _                -> liftM2 (++) glIncludeDirs (wx_config ["--version=" ++ wxVersion, "--libs", "all", "--cppflags"])
 
 
 wx_config :: [String] -> IO String
@@ -432,7 +439,7 @@ deMsysPaths bi = do
             (r, e, c ) <- rawSystemStdInOut normal "sh" ["-c", "cd " ++ ph ++ "; pwd -W"] Nothing Nothing Nothing False
             unless (c == ExitSuccess) (putStrLn ("Error: failed to convert MSYS path to native path \n" ++ e) >> exitFailure)
             return . head . lines $ r
-        elds <- mapM cor (extraLibDirs bi)
+        elds  <- mapM cor (extraLibDirs bi)
         incds <- mapM cor (includeDirs bi)
         return $ bi {extraLibDirs = elds, includeDirs = incds}
     else
@@ -483,40 +490,38 @@ osCompileOpts :: [String] -- ^ Platform-specific compile options
 osCompileOpts =
     case buildOS of
       Windows -> ["-DBUILD_DLL"]
-      OSX -> ["-fPIC"]
-      _ -> ["-fPIC"]
+      OSX     -> ["-fPIC"]
+      _       -> ["-fPIC"]
 
 sharedLibName :: Version -- ^ Version information to be used for Unix shared libraries
-              -> String -- ^ Name of the shared library
+              -> String  -- ^ Name of the shared library
               -> String
 sharedLibName ver basename =
     case buildOS of
       Windows -> addExtension basename ".dll"
-      OSX -> "lib" ++ addExtension basename ".dylib"
-      _ -> "lib" ++ basename ++ ".so." ++ full_ver
+      OSX     -> "lib" ++ addExtension basename ".dylib"
+      _       -> "lib" ++ basename ++ ".so." ++ full_ver
         where
           full_ver = (concat . intersperse "." . map show . versionBranch) ver
 
 -- | Return any linker options required to support shared library creation
-linkCxxOpts :: Version -- ^ Version information to be used for Unix shared libraries
+linkCxxOpts :: Version  -- ^ Version information to be used for Unix shared libraries
             -> FilePath -- ^ Directory in which library will be built
-            -> String -- ^ Name of the shared library
-            -> String -- ^ Absolute path of the shared library
+            -> String   -- ^ Name of the shared library
+            -> String   -- ^ Absolute path of the shared library
             -> [String] -- ^ List of options which can be applied to 'runProgram'
 linkCxxOpts ver out_dir basename basepath =
-    -- let dll_pathname = normalisePath (out_dir </> addExtension basename ".dll")
-    --     implib_ pathname = normalisePath (out_dir </> "lib" ++ addExtension basename ".a") in
     case buildOS of
       Windows -> ["-Wl,--dll", "-shared",
                   "-o", out_dir </> sharedLibName ver basename,
                   "-Wl,--out-implib," ++ "lib" ++ addExtension basename ".a",
                   "-Wl,--export-all-symbols", "-Wl,--enable-auto-import",
                   "-Wl,-no-undefined,--enable-runtime-pseudo-reloc"]
-      OSX -> ["-dynamiclib",
+      OSX     -> ["-dynamiclib",
                   "-o", out_dir </> sharedLibName ver basename,
                   "-install_name", basepath </> sharedLibName ver basename,
                   "-Wl,-undefined,dynamic_lookup"]
-      _ -> ["-shared",
+      _       -> ["-shared",
                   "-Wl,-soname,lib" ++ basename ++ ".so",
                   "-o", out_dir </> sharedLibName ver basename]
 
@@ -524,19 +529,19 @@ linkCxxOpts ver out_dir basename basepath =
 -- exist, or is older than the source file.
 -- TODO: Does not do dependency resolution properly
 compileCxx :: ConfiguredProgram -- ^ Program used to perform C/C++ compilation (gcc)
-           -> [String] -- ^ Compile options provided by Cabal and wx-config
-           -> [String] -- ^ Include paths provided by Cabal and wx-config
-           -> FilePath -- ^ Base output directory
-           -> FilePath -- ^ Path to source file
-           -> IO FilePath -- ^ Path to generated object code
+           -> [String]          -- ^ Compile options provided by Cabal and wx-config
+           -> [String]          -- ^ Include paths provided by Cabal and wx-config
+           -> FilePath          -- ^ Base output directory
+           -> FilePath          -- ^ Path to source file
+           -> IO FilePath       -- ^ Path to generated object code
 compileCxx gcc opts incls out_path cxx_src =
     do
-    let includes = map ("-I" ++) incls
+    let includes  = map ("-I" ++) incls
         out_path' = normalisePath out_path
-        cxx_src' = normalisePath cxx_src
-        out_file = out_path' </> dropFileName cxx_src </> replaceExtension (takeFileName cxx_src) ".o"
-        out = ["-c", cxx_src', "-o", out_file]
-        opts' = opts ++ osCompileOpts
+        cxx_src'  = normalisePath cxx_src
+        out_file  = out_path' </> dropFileName cxx_src </> replaceExtension (takeFileName cxx_src) ".o"
+        out       = ["-c", cxx_src', "-o", out_file]
+        opts'     = opts ++ osCompileOpts
     do_it <- needsCompiling cxx_src out_file
     when do_it $ createDirectoryIfMissing True (dropFileName out_file) >>
                  runProgram verbose gcc (includes ++ opts' ++ out)
@@ -546,7 +551,7 @@ compileCxx gcc opts incls out_path cxx_src =
 -- Real dependency checking would be nice here...
 needsCompiling :: FilePath -- ^ Path to source file
                -> FilePath -- ^ Path to object file
-               -> IO Bool -- ^ True if compilation required
+               -> IO Bool  -- ^ True if compilation required
 needsCompiling src obj =
     do
     has_obj <- doesFileExist obj
@@ -582,7 +587,6 @@ linkSharedLib gcc opts lib_dirs libs objs ver out_dir dll_name dll_path =
       do
         putStrLn "Linking wxc"
         runProgram verbose gcc (opts' ++ objs' ++ lib_dirs' ++ libs')
-      --system $ (unwords ([show . locationPath . programLocation $ gcc] ++ opts' ++ objs' ++ lib_dirs' ++ libs'))
 
 
 -- | Check if one of the input files is more recent then the output file
@@ -607,11 +611,11 @@ linkingNeeded output input =
 normalisePath :: FilePath -> FilePath
 normalisePath = case buildOS of
                   Windows -> dosifyFilePath
-                  _ -> unixifyFilePath
+                  _       -> unixifyFilePath
 
 -- | Replace a character in a String with some other character
-replace :: Char -- ^ Character to replace
-        -> Char -- ^ Character with which to replace
+replace :: Char   -- ^ Character to replace
+        -> Char   -- ^ Character with which to replace
         -> String -- ^ String in which to replace
         -> String -- ^ Transformed string
 replace old new = map replace'
@@ -627,8 +631,9 @@ dosifyFilePath = replace '/' '\\'
 ldconfig :: FilePath -> IO ()
 ldconfig path = case buildOS of
     Windows -> return ()
-    OSX -> return ()
-    _ -> do
+    OSX     -> return ()
+    _       ->
+          do
             ld_exit_code <- system ("/sbin/ldconfig -n " ++ path)
             case ld_exit_code of
                 ExitSuccess -> return ()
@@ -642,7 +647,7 @@ myInstHook = hookHelper (fromFlag . installVerbosity) (const NoCopyDest) (instHo
 
 hookHelper ::
     (a -> Verbosity) ->
-    (a -> CopyDest) ->
+    (a -> CopyDest)  ->
     (PackageDescription -> LocalBuildInfo -> UserHooks -> a -> IO ()) ->
     PackageDescription -> LocalBuildInfo -> UserHooks -> a -> IO ()
 hookHelper verbosity copydest origHook pkg_descr local_bld_info user_hooks flags =
@@ -651,14 +656,14 @@ hookHelper verbosity copydest origHook pkg_descr local_bld_info user_hooks flags
     origHook pkg_descr local_bld_info user_hooks flags
 
     -- Copy shared library
-    let bld_dir = buildDir local_bld_info
+    let bld_dir      = buildDir local_bld_info
 
-        ver = (pkgVersion . package) pkg_descr
-        lib = fromJust (library pkg_descr)
-        lib_bi = libBuildInfo lib
-        custom_bi = customFieldsBI lib_bi
-        dll_name = fromJust (lookup "x-dll-name" custom_bi)
-        lib_name = sharedLibName ver dll_name
+        ver          = (pkgVersion . package) pkg_descr
+        lib          = fromJust (library pkg_descr)
+        lib_bi       = libBuildInfo lib
+        custom_bi    = customFieldsBI lib_bi
+        dll_name     = fromJust (lookup "x-dll-name" custom_bi)
+        lib_name     = sharedLibName ver dll_name
 
         inst_lib_dir = libdir $ absoluteInstallDirs pkg_descr local_bld_info (copydest flags)
 
