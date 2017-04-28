@@ -15,6 +15,7 @@ homepage:      https://wiki.haskell.org/WxHaskell
 bug-reports:   http://sourceforge.net/p/wxhaskell/bugs/
 
 cabal-version: >= 1.2
+
 build-type:    Simple
 
 flag splitBase

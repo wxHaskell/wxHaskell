@@ -19,7 +19,7 @@ description:
 homepage:      https://wiki.haskell.org/WxHaskell
 bug-reports:   http://sourceforge.net/p/wxhaskell/bugs/
 
-cabal-version: >= 1.2
+cabal-version: >= 1.23
 build-type:    Custom
 
 extra-source-files:
@@ -143,6 +143,9 @@ extra-tmp-files:
 
 
 library
+  -- Just to suppress warnings
+  default-language:
+    Haskell2010
 
   include-dirs:
     src/include
@@ -296,4 +299,8 @@ library
   x-dll-name: wxc
 
   x-dll-extra-libraries:
+
+
+custom-setup
+  setup-depends: base, Cabal
 
