@@ -302,5 +302,11 @@ library
 
 
 custom-setup
-  setup-depends: base, Cabal
-
+  setup-depends: 
+    base, 
+    Cabal,
+    bytestring,
+    split,
+    process,
+    directory,
+    filepath
