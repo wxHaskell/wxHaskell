@@ -238,11 +238,16 @@ EWXWEXPORT(wxClosure*,wxEvtHandler_GetClosure)(wxEvtHandler* evtHandler,int id,i
   //knows we just want to know the closure. Unfortunately, this
   //seems the cleanest way to retrieve the callback in wxWidgets.
   getCallback = &callback;
+
+#if wxCHECK_VERSION(3, 1, 0)
+  #pragma GCC warning "wxEvtHandler_GetClosure must be studied carefully for wxWidgets >= 3.1.0, 'class wxEvtHandler' has no member named 'GetDynamicEventTable' anymore"
+#else
   // Bugfix: see www.mail-archive.com/wxhaskell-devel@lists.sourceforge.net/msg00577.html
   // On entry, Dynamic event table may have no bound events
   // Bug reproduces only on Debug builds, and seems to be ignorable
   if (evtHandler->GetDynamicEventTable() != NULL)
     found = evtHandler->SearchDynamicEventTable( event );
+#endif
   getCallback = NULL;
 
   if (found && callback)

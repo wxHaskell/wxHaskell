@@ -3,7 +3,11 @@
 extern "C"
 {
 
+#if wxCHECK_VERSION(3, 1, 0)
+EWXWEXPORT(wxCursor*,Cursor_CreateFromStock)(wxStockCursor _id)
+#else
 EWXWEXPORT(wxCursor*,Cursor_CreateFromStock)(int _id)
+#endif
 {
 	return  new wxCursor(_id);
 }

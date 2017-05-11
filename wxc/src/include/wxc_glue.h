@@ -638,7 +638,9 @@ void       ELJLog_Flush( TSelf(ELJLog) _obj );
 void       ELJLog_FlushActive( TSelf(ELJLog) _obj );
 void*      ELJLog_GetActiveTarget(  );
 void*      ELJLog_GetTimestamp( TSelf(ELJLog) _obj );
+#if !wxCHECK_VERSION(3, 1, 0)
 int        ELJLog_GetTraceMask( TSelf(ELJLog) _obj );
+#endif
 int        ELJLog_GetVerbose( TSelf(ELJLog) _obj );
 TBool      ELJLog_HasPendingMessages( TSelf(ELJLog) _obj );
 TBool      ELJLog_IsAllowedTraceMask( TSelf(ELJLog) _obj, TClass(wxMask) mask );
