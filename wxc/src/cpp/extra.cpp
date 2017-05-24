@@ -2345,7 +2345,7 @@ EWXWEXPORT(bool,wxLog_GetVerbose)(wxLog* self)
 }
 
 #if !wxCHECK_VERSION(3, 1, 0)
-EWXWEXPORT(int,wxLog_Get Trace Mask)(wxLog* self)
+EWXWEXPORT(int,wxLog_GetTraceMask)(wxLog* self)
 {
 	return (int)self->GetTraceMask();
 }
