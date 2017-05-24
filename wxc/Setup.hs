@@ -9,6 +9,7 @@ import Data.Functor  ( (<$>) )
 import Data.List (foldl', foldr, intersperse, intercalate, nub, lookup, isPrefixOf, isInfixOf)
 import Data.List.Split (splitOn)
 import Data.Maybe (fromJust, isNothing, isJust, listToMaybe)
+import Distribution.Compat.Exception (catchIO)
 import Distribution.PackageDescription
 import Distribution.Simple
 import Distribution.Simple.InstallDirs (InstallDirs(..))
@@ -23,8 +24,7 @@ import Distribution.Simple.Setup ( BuildFlags, ConfigFlags
 import Distribution.Simple.Utils (installOrdinaryFile, rawSystemExitWithEnv, rawSystemStdInOut, die)
 import Distribution.System (OS (..), Arch (..), buildOS, buildArch)
 import Distribution.Verbosity (Verbosity, normal, verbose)
-import Distribution.Compat.Exception (catchIO)
-import System.Process (system, readProcess)
+import Distribution.Version(Version(..))
 import System.Directory ( createDirectoryIfMissing, doesFileExist
                         , findExecutable,           getCurrentDirectory
                         , getDirectoryContents,     getModificationTime
@@ -36,6 +36,7 @@ import System.IO (hPutStrLn, readFile, stderr)
 import System.IO.Error (isDoesNotExistError)
 import System.IO.Unsafe (unsafePerformIO)
 import qualified System.Process as Process
+import System.Process (system, readProcess)
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
