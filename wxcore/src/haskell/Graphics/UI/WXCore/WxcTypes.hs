@@ -114,7 +114,7 @@ module Graphics.UI.WXCore.WxcTypes(
             , CChar, toCChar, fromCChar, withCharResult
             , CWchar(..), toCWchar
             -- *** CBool
-            , CBool, toCBool, fromCBool, withBoolResult
+            , CBool(..), toCBool, fromCBool, withBoolResult
             -- ** Pointers
             , Ptr, ptrNull, ptrIsNull, ptrCast, ForeignPtr, FunPtr, toCFunPtr
             ) where
@@ -747,7 +747,9 @@ fromCDouble cd
 {-----------------------------------------------------------------------------------------
   CBool
 -----------------------------------------------------------------------------------------}
+#if __GLASGOW_HASKELL__ < 802
 type CBool  = CInt
+#endif
 
 toCBool :: Bool -> CBool
 toCBool = intToCBool . fromBool
@@ -1379,7 +1381,7 @@ colorAlpha  (Color colr) = fromIntegral (colr .&. 0xFF)
 -- | This is an illegal color, corresponding to @nullColour@.
 colorNull :: Color
 colorNull
-  = Color (-1)
+  = Color (maxBound)
 
 {-# DEPRECATED colorOk "Use colorIsOk instead" #-}
 -- | deprecated: use 'colorIsOk' instead.
