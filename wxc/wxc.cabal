@@ -19,7 +19,7 @@ description:
 homepage:      https://wiki.haskell.org/WxHaskell
 bug-reports:   http://sourceforge.net/p/wxhaskell/bugs/
 
-cabal-version: >= 1.23
+cabal-version: >= 1.24
 build-type:    Custom
 
 extra-source-files:
