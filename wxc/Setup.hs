@@ -1,7 +1,8 @@
 
 {-# LANGUAGE CPP #-}
 
-import Control.Monad (filterM, join, mapM_, when, liftM2)
+import qualified Control.Exception as E
+import Control.Monad (filterM, join, liftM2, mapM_, unless, when)
 import qualified Data.ByteString.Lazy as B
 import Data.Char     ( ord )
 import Data.Functor  ( (<$>) )
@@ -35,8 +36,6 @@ import System.IO (hPutStrLn, readFile, stderr)
 import System.IO.Error (isDoesNotExistError)
 import System.IO.Unsafe (unsafePerformIO)
 import qualified System.Process as Process
-import qualified Control.Exception as E
-import Control.Monad (unless)
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
