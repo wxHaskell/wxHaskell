@@ -18,7 +18,7 @@ extern "C"
 // Event Handlers
 ////////////////////////////////////////////////////////////////////////////////
 
-#pragma message "wxWidgets find/replace dialog event wrappers generated"
+/* #pragma message "wxWidgets find/replace dialog event wrappers generated" */
 MAKE_EVENT_WRAPPER(EVT_COMMAND_FIND)
 MAKE_EVENT_WRAPPER(EVT_COMMAND_FIND_NEXT)
 MAKE_EVENT_WRAPPER(EVT_COMMAND_FIND_REPLACE)
