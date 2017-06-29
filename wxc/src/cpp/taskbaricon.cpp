@@ -18,7 +18,7 @@ extern "C" {
 // Event Handlers
 ////////////////////////////////////////////////////////////////////////////////
 
-#pragma message "wxWidgets taskbar event wrappers generated"
+// #pragma message "wxWidgets taskbar event wrappers generated"
 MAKE_EVENT_WRAPPER(EVT_TASKBAR_MOVE)
 MAKE_EVENT_WRAPPER(EVT_TASKBAR_LEFT_DOWN)
 MAKE_EVENT_WRAPPER(EVT_TASKBAR_LEFT_UP)
