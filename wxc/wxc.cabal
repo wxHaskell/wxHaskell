@@ -293,8 +293,11 @@ library
     src/cpp/treectrl.cpp
     src/cpp/wrapper.cpp
 
-  if impl(ghc > 7.10.2)
+  if impl(ghc > 7.10.2 && < 8)
     cc-options: "-std=gnu++11" -Wno-deprecated-declarations
+    
+  if impl(ghc >= 8)
+    cc-options: "-std=gnu++14" -Wno-deprecated-declarations
     
   x-dll-name: wxc
 
