@@ -17,6 +17,8 @@ import Graphics.UI.WX
 import Graphics.UI.WXCore
 import Control.Exception
 
+import Paths_samplesWx
+
 main :: IO ()
 main 
   = start gui
@@ -37,7 +39,7 @@ imageNames
 
 -- file names of the images
 imageFiles
-  = map (\name -> "../bitmaps/" ++ name ++ ".ico") imageNames
+  = map (\name -> "bitmaps/" ++ name ++ ".ico") imageNames
 
 -- get the index of an image
 imageIndex :: String -> Int
@@ -78,7 +80,7 @@ gui
        p <- panel f []
       
        -- image list
-       imagePaths <- mapM getAbsoluteFilePath imageFiles  -- make relative to application
+       imagePaths <- mapM getDataFileName imageFiles  -- make relative to application
        images     <- imageListFromFiles (sz 16 16) imagePaths
 
        -- splitter window between directory tree and file view.

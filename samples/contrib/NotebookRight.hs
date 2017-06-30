@@ -12,6 +12,8 @@ module Main where
  
 import Graphics.UI.WX
 import Graphics.UI.WXCore
+
+import Paths_samplesContrib
  
 main :: IO ()
 main
@@ -35,7 +37,8 @@ gui
        -- button page
        nb   <- notebookRight p []
        p1   <- panel  nb []
-       ok   <- bitmapButton p1 [picture := "../bitmaps/wxwin16.png",
+       img  <- getDataFileName "bitmaps/wxwin16.png"
+       ok   <- bitmapButton p1 [picture := img,
                                 text := "Ok", on command := logMessage "bitmap button pressed", 
                                 tooltip := "tooltip",
                                 on clickRight := (\pt -> menuPopup file pt p)]

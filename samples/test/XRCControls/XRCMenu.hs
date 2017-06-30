@@ -4,12 +4,16 @@ module Main where
 import Graphics.UI.WXCore
 import Graphics.UI.WX
 
+import Paths_samplesTest
+
+
 main = start gui
 
 gui :: IO ()
 gui = 
     do
-      f <- frameLoadRes "xrcmenu.xrc" "menuTest" []
+      xrcmenu <- getDataFileName "xrcmenu.xrc"
+      f <- frameLoadRes xrcmenu "menuTest" []
            
       -- Attach event handlers to the menu items loaded above.
       menuItemOnCommandRes f "new" (onFileNew f)

@@ -3,6 +3,8 @@ module Main where
 import Graphics.UI.WX
 import Graphics.UI.WXCore
 
+import Paths_samplesTest
+
 colorscheme = [ ( wxSTC_HA_DEFAULT,       rgb 0   0   0   )
               , ( wxSTC_HA_IDENTIFIER,    rgb 0   0   0   )
               , ( wxSTC_HA_KEYWORD,       rgb 0   0   255 )
@@ -30,7 +32,8 @@ main = start $ do
     f <- frame [text := "Scintilla Test", visible := False]
     p <- panel f []
     s <- styledTextCtrl p [ clientSize := sz 500 500]
-    styledTextCtrlLoadFile s "STCLexer.hs"
+    filePath <- getDataFileName "STCLexer.hs"
+    styledTextCtrlLoadFile s filePath
     styledTextCtrlStyleClearAll s
     styledTextCtrlSetLexer s wxSTC_LEX_HASKELL
     styledTextCtrlSetKeyWords s 0 keywords

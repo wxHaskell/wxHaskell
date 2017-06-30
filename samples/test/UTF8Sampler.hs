@@ -8,6 +8,7 @@
 module Main where
 
 import UTF8
+import Paths_samplesTest
 
 import Graphics.UI.WX
 import Graphics.UI.WXCore
@@ -81,7 +82,9 @@ hGetBytes h c = allocaArray c $ \p ->
 
 readTestFile :: IO String
 readTestFile =
- do h  <- openBinaryFile testFile ReadMode
+ do
+    testFilePath <- getDataFileName testFile
+    h  <- openBinaryFile testFilePath ReadMode
     hsize <- hFileSize h
     ws <- hGetBytes h $ fromIntegral hsize
     return . fst . decode $ ws

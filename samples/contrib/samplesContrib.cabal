@@ -1,0 +1,60 @@
+
+name:                samplesContrib
+version:             0.93.0.0
+synopsis:            Sample programs for wxHaskell
+homepage:            https://wiki.haskell.org/WxHaskell
+license:             BSD3
+license-file:        LICENSE.txt
+author:              <Several authors>
+maintainer:          -
+category:            Graphics
+build-type:          Simple
+extra-source-files:  ChangeLog.md
+cabal-version:       >=1.10
+
+
+data-files:
+  bitmaps/desert.bmp
+  bitmaps/wxwin16.png
+
+
+executable Camels
+  main-is:             Camels.hs
+  build-depends:       base,
+                       wxcore,
+                       wx
+  default-language:    Haskell2010
+
+
+executable GLCanvas
+  main-is:             GLCanvas.hs
+  build-depends:       base,
+                       wxcore,
+                       wx,
+                       OpenGL 
+  default-language:    Haskell2010
+
+
+executable GLMultiCanvas
+  main-is:             GLMultiCanvas.hs
+  build-depends:       base,
+                       wxcore,
+                       wx,
+                       OpenGL 
+  default-language:    Haskell2010
+
+
+executable NotebookRight
+  main-is:             NotebookRight.hs
+  build-depends:       base,
+                       wxcore,
+                       wx
+  default-language:    Haskell2010
+
+
+executable PaintDirect
+  main-is:             PaintDirect.hs
+  build-depends:       base,
+                       wxcore,
+                       wx
+  default-language:    Haskell2010

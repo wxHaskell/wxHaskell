@@ -1,0 +1,106 @@
+
+name:                samplesTest
+version:             0.93.0.0
+synopsis:            Sample programs for wxHaskell
+homepage:            https://wiki.haskell.org/WxHaskell
+license:             BSD3
+license-file:        LICENSE.txt
+author:              <Several authors>
+maintainer:          -
+category:            Graphics
+build-type:          Simple
+extra-source-files:  ChangeLog.md
+cabal-version:       >=1.10
+
+data-files:
+  STCLexer.hs
+  utf-tests
+  XRCControls/xrcmenu.xrc
+
+executable BoxedCombinator
+  main-is:             BoxedCombinator.hs
+  build-depends:       base,
+                       wxcore,
+                       wx
+  default-language:    Haskell2010
+
+
+executable CheckBoxWidth
+  main-is:             CheckBoxWidth.hs
+  build-depends:       base,
+                       wxcore,
+                       wx
+  default-language:    Haskell2010
+
+
+executable Resize
+  main-is:             Resize.hs
+  build-depends:       base,
+                       wxcore,
+                       wx
+  default-language:    Haskell2010
+
+
+executable STC
+  main-is:             STC.hs
+  build-depends:       base,
+                       wxcore,
+                       wx
+  default-language:    Haskell2010
+
+
+executable STC2
+  main-is:             STC2.hs
+  build-depends:       base,
+                       wxcore,
+                       wx
+  default-language:    Haskell2010
+
+
+executable STCEvent
+  main-is:             STCEvent.hs
+  build-depends:       base,
+                       wxcore,
+                       wx
+  default-language:    Haskell2010
+
+
+executable STCLexer
+  main-is:             STCLexer.hs
+  build-depends:       base,
+                       wxcore,
+                       wx
+  default-language:    Haskell2010
+
+
+executable TreeCtrlTest
+  main-is:             TreeCtrlTest.hs
+  build-depends:       base,
+                       wxcore,
+                       wx,
+                       HUnit
+  default-language:    Haskell2010
+
+
+executable UTF8Sampler
+  main-is:             UTF8Sampler.hs
+  build-depends:       base,
+                       wxcore,
+                       wx
+  default-language:    Haskell2010
+
+
+executable XRCMenu
+  main-is:             XRCControls\XRCMenu.hs
+  build-depends:       base,
+                       wxcore,
+                       wx
+  default-language:    Haskell2010
+
+
+executable XRCControls
+  main-is:             XRCControls\XRCControls_Wx.hs
+  build-depends:       base,
+                       wxcore,
+                       wx
+  default-language:    Haskell2010

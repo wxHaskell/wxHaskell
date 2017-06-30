@@ -7,10 +7,14 @@
  - many different kind of controls
  - message logging.
 --------------------------------------------------------------------------------}
+{-# LANGUAGE FlexibleContexts #-}
 module Main where
 
 import Graphics.UI.WX
 import Graphics.UI.WXCore 
+
+import Paths_samplesTest
+
 
 main :: IO ()
 main
@@ -19,7 +23,8 @@ main
 gui :: IO ()
 gui =
     do -- main gui elements: frame, panel, text control, and the notebook
-      f    <- frameLoadRes "controls.xrc" "f" []
+      controls <- getDataFileName "controls.xrc"
+      f        <- frameLoadRes controls "f" []
 
       -- use text control as logger
       textlog <- textCtrlRes f "textlog" []

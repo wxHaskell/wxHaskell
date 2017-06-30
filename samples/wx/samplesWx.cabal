@@ -1,0 +1,182 @@
+
+name:                samplesWx
+version:             0.93.0.0
+synopsis:            Sample programs for wxHaskell
+homepage:            https://wiki.haskell.org/WxHaskell
+license:             BSD3
+license-file:        LICENSE.txt
+author:              <Several authors>
+maintainer:          -
+category:            Graphics
+build-type:          Simple
+extra-source-files:  ChangeLog.md
+cabal-version:       >=1.10
+
+
+data-files:
+  bitmaps/computer.ico
+  bitmaps/disk.ico
+  bitmaps/eye.ico
+  bitmaps/file.ico
+  bitmaps/fileopen16.png
+  bitmaps/f_closed.ico
+  bitmaps/f_open.ico
+  bitmaps/hsicon.ico
+  bitmaps/wxwin.ico
+  bitmaps/wxwin16.png
+
+
+executable BouncingBalls
+  main-is:             BouncingBalls.hs
+  build-depends:       base,
+                       wx,
+                       wxcore
+  default-language:    Haskell2010
+
+
+executable ByeDemo
+  main-is:             ByeDemo.hs
+  build-depends:       base,
+                       wx,
+                       wxcore
+  default-language:    Haskell2010
+
+
+executable Controls
+  main-is:             Controls.hs
+  build-depends:       base,
+                       wx,
+                       wxcore
+  default-language:    Haskell2010
+
+
+executable CustomControl
+  main-is:             CustomControl.hs
+  build-depends:       base,
+                       wx,
+                       wxcore
+  default-language:    Haskell2010
+
+
+executable FileBrowse
+  main-is:             FileBrowse.hs
+  build-depends:       base,
+                       directory,
+                       filepath,
+                       wx,
+                       wxcore
+  default-language:    Haskell2010
+  other-modules:       Paths_samplesWx
+
+
+executable Grid
+  main-is:             Grid.hs
+  build-depends:       base,
+                       wx,
+                       wxcore
+  default-language:    Haskell2010
+
+
+executable HelloWorld
+  main-is:             HelloWorld.hs
+  build-depends:       base,
+                       wx,
+                       wxcore
+  default-language:    Haskell2010
+
+
+executable ImageViewer
+  main-is:             ImageViewer.hs
+  build-depends:       base,
+                       wx,
+                       wxcore
+  default-language:    Haskell2010
+
+
+executable Layout
+  main-is:             Layout.hs
+  build-depends:       base,
+                       wx,
+                       wxcore
+  default-language:    Haskell2010
+
+
+executable ListCtrl
+  main-is:             ListCtrl.hs
+  build-depends:       base,
+                       wx,
+                       wxcore
+  default-language:    Haskell2010
+
+
+executable ListView
+  main-is:             ListView.hs
+  build-depends:       base,
+                       wx,
+                       wxcore
+  default-language:    Haskell2010
+
+
+executable Minimal
+  main-is:             Minimal.hs
+  build-depends:       base,
+                       wx,
+                       wxcore
+  default-language:    Haskell2010
+
+
+executable Paint
+  main-is:             Paint.hs
+  build-depends:       base,
+                       wx,
+                       wxcore
+  default-language:    Haskell2010
+
+
+executable Print
+  main-is:             Print.hs
+  build-depends:       base,
+                       wx,
+                       wxcore
+  default-language:    Haskell2010
+
+
+executable Process
+  main-is:             Process.hs
+  build-depends:       base,
+                       wx,
+                       wxcore
+  default-language:    Haskell2010
+
+
+executable PropertyGrid
+  main-is:             PropertyGrid.hs
+  build-depends:       base,
+                       wx,
+                       wxcore
+  default-language:    Haskell2010
+
+
+executable TestTaskBarIcon
+  main-is:             TestTaskBarIcon.hs
+  build-depends:       base,
+                       process,
+                       wx,
+                       wxcore
+  default-language:    Haskell2010
+
+
+executable TimeFlows
+  main-is:             TimeFlows.hs
+  build-depends:       base,
+                       wx,
+                       wxcore
+  default-language:    Haskell2010
+
+
+executable TimeFlowsEx
+  main-is:             TimeFlowsEx.hs
+  build-depends:       base,
+                       wx,
+                       wxcore
+  default-language:    Haskell2010

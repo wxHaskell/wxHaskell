@@ -15,6 +15,9 @@ module Main where
 import Control.Exception (onException)
 import Graphics.UI.WX 
 
+import Paths_samplesWx
+
+
 main :: IO ()
 main
   = start imageViewer
@@ -33,7 +36,8 @@ imageFiles
 imageViewer :: IO ()
 imageViewer
   = do -- the main frame, we use 'fullRepaintOnResize' to prevent flicker on resize
-       f      <- frame [text := "ImageViewer", picture := "../bitmaps/eye.ico", fullRepaintOnResize := False]
+       image  <- getDataFileName "bitmaps/eye.ico"
+       f      <- frame [text := "ImageViewer", picture := image, fullRepaintOnResize := False]
 
        -- use a mutable variable to hold the image
        vbitmap <- variable [value := Nothing]
@@ -55,8 +59,10 @@ imageViewer
 
        -- create Toolbar
        tbar   <- toolBar f []
-       toolMenu tbar open  "Open"  "../bitmaps/fileopen16.png" []
-       toolMenu tbar about "About" "../bitmaps/wxwin16.png"    []
+       foimg  <- getDataFileName "bitmaps/fileopen16.png"
+       abimg  <- getDataFileName "bitmaps/wxwin16.png"
+       toolMenu tbar open  "Open"  foimg []
+       toolMenu tbar about "About" abimg []
 
        -- create statusbar field
        status <- statusField   [text := "Welcome to the wxHaskell ImageViewer"]

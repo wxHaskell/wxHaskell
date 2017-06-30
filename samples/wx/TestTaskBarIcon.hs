@@ -6,11 +6,14 @@ import Graphics.UI.WX
 import Graphics.UI.WXCore
 import System.Process
 
+import Paths_samplesWx
+
+
 main = start gui
 
 gui = do f <- frame [text := "Main Window"]
-         icn <- iconCreateFromFile "../bitmaps/wxwin.ico" (Size 16 16)
-         
+         icf <- getDataFileName "bitmaps/wxwin.ico"
+         icn <- iconCreateFromFile icf (Size 16 16)
          
          tbi <- taskBarIconCreate
          taskBarIconSetIcon tbi icn "Application Icon"

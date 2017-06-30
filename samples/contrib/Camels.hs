@@ -6,6 +6,8 @@ module Main where
 import Graphics.UI.WX
 import Graphics.UI.WXCore
 
+import Paths_samplesContrib
+
 {--------------------------------------------------------------------------------
    The game
 --------------------------------------------------------------------------------}
@@ -63,7 +65,8 @@ main = start gui
 gui :: IO ()
 gui
   = do desert <- varCreate (newBoard 3)
-       b <- bitmapCreateLoad "../bitmaps/desert.bmp" wxBITMAP_TYPE_BMP
+       imagePath <- getDataFileName "bitmaps/desert.bmp"
+       b <- bitmapCreateLoad imagePath wxBITMAP_TYPE_BMP
        f <- frame    [ text := "Camels", on closing := do bitmapDelete b; propagateEvent ]
        q <- button f [ text := "quit" , on command := close f ]
        h <- button f [ text := "help" , on command := chelp f ]

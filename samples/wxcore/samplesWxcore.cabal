@@ -1,0 +1,66 @@
+
+name:                samplesWxcore
+version:             0.93.0.0
+synopsis:            Sample programs for wxHaskell
+homepage:            https://wiki.haskell.org/WxHaskell
+license:             BSD3
+license-file:        LICENSE.txt
+author:              <Several authors>
+maintainer:          -
+category:            Graphics
+build-type:          Simple
+extra-source-files:  ChangeLog.md
+cabal-version:       >=1.10
+
+
+data-files:
+  bitmaps/eye.ico
+
+
+executable BouncingBalls
+  main-is:             BouncingBalls.hs
+  build-depends:       base,
+                       wxcore
+  default-language:    Haskell2010
+
+
+executable ByeDemo
+  main-is:             ByeDemo.hs
+  build-depends:       base,
+                       wxcore
+  default-language:    Haskell2010
+
+
+executable HelloWorld
+  main-is:             HelloWorld.hs
+  build-depends:       base,
+                       wxcore
+  default-language:    Haskell2010
+
+
+executable ImageViewer
+  main-is:             ImageViewer.hs
+  build-depends:       base,
+                       wxcore
+  default-language:    Haskell2010
+
+
+executable Minimal
+  main-is:             Minimal.hs
+  build-depends:       base,
+                       wxcore
+  default-language:    Haskell2010
+
+
+executable Paint
+  main-is:             Paint.hs
+  build-depends:       base,
+                       wxcore
+  default-language:    Haskell2010
+
+
+executable PaintGC
+  main-is:             PaintGC.hs
+  build-depends:       base,
+                       wxcore
+  default-language:    Haskell2010

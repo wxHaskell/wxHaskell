@@ -6,6 +6,9 @@ module Main where
 import Control.Exception( onException )
 import Graphics.UI.WXCore
 
+import Paths_samplesWxcore
+
+
 defaultWidth,defaultHeight :: Int
 defaultWidth  = 300
 defaultHeight = 300
@@ -37,7 +40,8 @@ imageViewer
        windowSetClientSize f (sz defaultWidth defaultHeight)
 
        -- coolness: set a custom icon
-       topLevelWindowSetIconFromFile f "../bitmaps/eye.ico"
+       eyecon <- getDataFileName "bitmaps/eye.ico"
+       topLevelWindowSetIconFromFile f eyecon
 
        -- put a scrolled window inside the frame to paint the image on
        -- note that 'wxNO_FULL_REPAINT_ON_RESIZE'  is needed to prevent flicker on resize.

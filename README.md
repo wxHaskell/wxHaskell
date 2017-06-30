@@ -9,7 +9,7 @@ Status
 ======
 
 Builds & compiles
-- against: wxWidgets (http://www.wxwidgets.org/) 2.9.3 up to and including 3.1.0
+- against: wxWidgets (http://www.wxwidgets.org/) 2.9.3 up to and including 3.0.3
 - with: Haskell platform (http://www.haskell.org/platform/) 7.10.2-a, 7.10.3, 8.0.1 and 8.0.2
 - on: MacOSX 10.8.4, 64 bits Haskell platform; Windows 8.1 (32 and 64 bit)
 
