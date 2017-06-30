@@ -12,34 +12,34 @@ Set WXCFG=gcc_dll\mswu
 Set PATH=%CD%;%PATH%
 
 cabal unpack wxdirect
+If ERRORLEVEL 1 (
+    Echo Could not install wxHaskell
+    Pause
+    Exit /b 1
+  )
 For /d %%a In (wxdirect-*) Do (
     cabal install .\%%a
     Copy /y %%a\dist\build\wxdirect\wxdirect.exe .
     Rd /s/q %%a
   )
+
+cabal unpack wxc
 If ERRORLEVEL 1 (
     Echo Could not install wxHaskell
     Pause
-    Exit /b 1
+    Exit /b 2
   )
-
-cabal unpack wxc
 For /d %%a In (wxc-*) Do (
     cabal install .\%%a
     Copy /y %%a\dist\build\wxc.dll DLLs
     Rd /s/q %%a
-  )
-If ERRORLEVEL 1 (
-    Echo Could not install wxHaskell
-    Pause
-    Exit /b 1
   )
 
 cabal install wx
 If ERRORLEVEL 1 (
     Echo Could not install wxHaskell
     Pause
-    Exit /b 2
+    Exit /b 3
   ) Else (
     Echo Ready; now add
     Echo   %CD%\DLLs
