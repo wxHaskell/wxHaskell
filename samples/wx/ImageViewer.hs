@@ -23,6 +23,7 @@ main
   = start imageViewer
 
 -- Specify image files for the file open dialog.
+imageFiles :: [(String, [String])]
 imageFiles
    = [("Image files",["*.bmp","*.jpg","*.gif","*.png"])
      ,("Portable Network Graphics (*.png)",["*.png"])
@@ -61,8 +62,8 @@ imageViewer
        tbar   <- toolBar f []
        foimg  <- getDataFileName "bitmaps/fileopen16.png"
        abimg  <- getDataFileName "bitmaps/wxwin16.png"
-       toolMenu tbar open  "Open"  foimg []
-       toolMenu tbar about "About" abimg []
+       _      <- toolMenu tbar open  "Open"  foimg []
+       _      <- toolMenu tbar about "About" abimg []
 
        -- create statusbar field
        status <- statusField   [text := "Welcome to the wxHaskell ImageViewer"]

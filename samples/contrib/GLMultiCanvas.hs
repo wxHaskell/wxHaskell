@@ -18,9 +18,12 @@ main :: IO()
 main = start gui
 
 
+defaultWidth  :: Int
 defaultWidth  = 320
+defaultHeight :: Int
 defaultHeight = 200
 
+gui :: IO ()
 gui = do
    f <- frame [ text := "Simple OpenGL" ]
 
@@ -40,32 +43,35 @@ gui = do
             ]
 
 
+convWG :: Size2D Int -> GL.Size
 convWG (WX.Size w h) = (GL.Size (convInt32  w) (convInt32  h))
+
+convInt32 :: Int -> GLsizei
 convInt32 = fromInteger . toInteger
 
 paintGL :: GLCanvas a -> GLCanvas a -> DC b -> WX.Rect -> [WX.Rect]-> IO ()
-paintGL gl1 gl2 dc myrect _ = do
+paintGL gl1 gl2 _dc myrect _ = do
 
 -- Now we switch to the first one
 -- and do all init and painting stuff
 -- Hint: I changed the backgroundcolor for clearance
 
    glContext1 <- glContextCreateFromNull gl1
-   glCanvasSetCurrent gl1 glContext1
+   _ <- glCanvasSetCurrent gl1 glContext1
    myInit
    reshape $ convWG $ rectSize myrect
    GL.clearColor GL.$= GL.Color4 1 0 0 0
    display
-   glCanvasSwapBuffers gl1
+   _ <- glCanvasSwapBuffers gl1
 
 -- All the same for the second one
    glContext2 <- glContextCreateFromNull gl2
-   glCanvasSetCurrent gl2 glContext2
+   _ <- glCanvasSetCurrent gl2 glContext2
    myInit
    reshape $ convWG $ rectSize myrect
    GL.clearColor GL.$= GL.Color4 0 2 0 0
    display
-   glCanvasSwapBuffers gl2
+   _ <- glCanvasSwapBuffers gl2
    return ()
 
 
@@ -102,6 +108,7 @@ myInit = do
    mapGrid2 GL.$= ((20, (0, 1)), (20, (0, 1 :: GL.GLfloat)))
    initlights  -- for lighted version only
 
+display :: IO ()
 display = do
    GL.clear [ GL.ColorBuffer, GL.DepthBuffer ]
    GL.preservingMatrix $ do
@@ -109,6 +116,7 @@ display = do
      evalMesh2 Fill (0, 20) (0, 20)
    GL.flush
 
+reshape :: GL.Size -> IO ()
 reshape mysize@(GL.Size w h) = do
    GL.viewport GL.$= (GL.Position 0 0, mysize)
    GL.matrixMode GL.$= GL.Projection

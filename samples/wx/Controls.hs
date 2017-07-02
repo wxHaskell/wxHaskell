@@ -111,12 +111,12 @@ gui
            enable <- get w enabled
            set b [text := (if enable then "disable" else "enable")]
 
--- kindof :: Object a -> String -> IO ()
+kindof :: WxObject a -> String -> IO ()
 kindof obj className
-  = do classInfo <- classInfoFindClass className
-       if (objectIsNull classInfo)
+  = do classInfo_ <- classInfoFindClass className
+       if (objectIsNull classInfo_)
         then logMessage ("kindof " ++ className ++ ": no such class")
         else if (objectIsNull obj)
               then logMessage ("kindof " ++ className ++ ": null object")
-              else do haskind <- objectIsKindOf obj classInfo
+              else do haskind <- objectIsKindOf obj classInfo_
                       logMessage ("kindof " ++ className ++ ": " ++ show haskind)

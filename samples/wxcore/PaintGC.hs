@@ -44,7 +44,7 @@ gui
 
     -- do some painting.
     onPaint :: Var Point -> WindowDC a -> t -> IO ()
-    onPaint mouseXY dc_ view
+    onPaint mouseXY dc_ _view
       = -- first create some brushes and pens.
         withBrushStyle (BrushStyle (BrushHatch HatchCross) red) $ \brushRedHatch ->
         withBrushStyle (BrushStyle BrushSolid red)  $ \brushRed ->

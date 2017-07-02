@@ -5,9 +5,11 @@ module Main where
 
 import Graphics.UI.WXCore
 
+main :: IO ()
 main
   = run helloWorld
 
+helloWorld :: IO ()
 helloWorld
   = do -- create file menu
        fm <- menuCreate "" 0
@@ -17,15 +19,15 @@ helloWorld
 
        -- create menu bar
        m  <- menuBarCreate 0
-       menuBarAppend m fm "&File"
+       _  <- menuBarAppend m fm "&File"
 
        -- create top frame
        f  <- frameCreate objectNull idAny "Hello world" rectZero frameDefaultStyle
-       windowSetBackgroundColour f white
+       _  <- windowSetBackgroundColour f white
        windowSetClientSize f (sz 600 250)
 
        -- set status bar with 1 field
-       frameCreateStatusBar f 1 0
+       _  <- frameCreateStatusBar f 1 0
        frameSetStatusText f "Welcome to wxHaskell" 0
 
        -- connect menu
@@ -34,15 +36,15 @@ helloWorld
        evtHandlerOnMenuCommand f wxID_EXIT  (onQuit f)
 
        -- show it
-       windowShow f
+       _  <- windowShow f
        windowRaise f
        return ()
   where
     onAbout f
       = do version <- versionNumber
-           messageDialog f "About 'Hello World'" ("This is a wxHaskell " ++ show version ++ " sample") (wxOK + wxICON_INFORMATION)
+           _ <- messageDialog f "About 'Hello World'" ("This is a wxHaskell " ++ show version ++ " sample") (wxOK + wxICON_INFORMATION)
            return ()
 
     onQuit f
-      = do windowClose f True {- force close -}
+      = do _ <- windowClose f True {- force close -}
            return ()

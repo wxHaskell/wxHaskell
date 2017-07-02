@@ -7,6 +7,7 @@ import Graphics.UI.WX
 import Graphics.UI.WXCore 
 
 
+entries :: [(String, String, String)]
 entries 
   = [("BouncingBalls.hs"           ,"2402"  ,"Jul 19 16:50")
     ,("ByeDemo.hs"                 ,"1414"  ,"Jul 13 23:18")
@@ -44,7 +45,7 @@ gui
        l  <- listCtrl p [columns := [("Name", AlignLeft, 120)
                                     ,("Size", AlignRight, -1)
                                     ,("Date", AlignRight, -1)]
-                        ,items := [[name,size,date] | (name,size,date) <- entries]
+                        , items := [[name, size_, date_] | (name, size_, date_) <- entries]
                         ]
 
 
@@ -59,6 +60,7 @@ gui
              ]
        return ()
 
+onListEvent :: ListCtrl a -> EventList -> IO ()
 onListEvent list eventList
   = case eventList of
       ListItemSelected idx    -> listCtrlGetItemText list idx >>= logMessage . (++) "item selected: " 
@@ -67,5 +69,5 @@ onListEvent list eventList
       -- with the message "pure virtual method called"
       -- See bug ticket 106, http://sourceforge.net/p/wxhaskell/bugs/106/
       -- other                   -> logMessage ("list control event.")
-      other                   -> return ()
+      _other                  -> return ()
 

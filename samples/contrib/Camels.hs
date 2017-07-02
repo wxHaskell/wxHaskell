@@ -103,8 +103,8 @@ for :: Int -> Int -> (Int -> IO ()) -> IO ()
 for x y f = sequence_ $ map f [x..y]
 
 drawField :: DC () -> Field -> Rect -> IO ()
-drawField dc f r@(Rect x y w h) =
-  do set dc [brushKind := BrushSolid, brushColor := rgb 0x80 0x80 0x00] 
+drawField dc f r@(Rect _x _y _w _h) =
+  do set dc [brushKind := BrushSolid, brushColor := rgb 0x80 0x80 (0x00 :: Int)] 
      case f of Full East -> do polygon dc (map (lin r) camel) []
                                polygon dc (map (lin r) saddle) [brushColor := red] 
                Full West -> do polygon dc (map (lin r . mirror) camel) []
@@ -126,15 +126,15 @@ lin (Rect x y w h) (px, py) = let nx = floor $ (fromInteger . toInteger) w * px
                               in Point (x + nx) (y + ny)
 
 klik :: Panel () -> Var Board -> Point -> IO ()
-klik pan desert (Point x y) =
+klik pan desert (Point x _y) =
   do board <- varGet desert
      (Size w h) <- get pan clientSize
      let l = length board
          s = min h $ w `div` l
          xd = (w - l * s) `div` 2
-         yd = (h -     s) `div` 2
+         _yd = (h -     s) `div` 2
          i = (x - xd) `div` s
-     varUpdate desert (if moveAllowed i board then move i else id)
+     _ <- varUpdate desert (if moveAllowed i board then move i else id)
      newboard <- varGet desert
      repaint pan
      eind pan desert newboard
@@ -144,10 +144,10 @@ eind :: Panel () -> Var Board -> Board -> IO ()
 eind pan desert board
   | any (flip moveAllowed board) [0 .. length board - 1] = return ()
   | correct board = do infoDialog pan "Level up" "Congratulations! You succeeded."
-                       varUpdate desert (const $ newBoard $ length board + 2)
+                       _ <- varUpdate desert (const $ newBoard $ length board + 2)
                        repaint pan
   | otherwise     = do infoDialog pan "Level restart" "There are no more possible moves..."
-                       varUpdate desert (const $ newBoard $ max 3 $ length board)
+                       _ <- varUpdate desert (const $ newBoard $ max 3 $ length board)
                        repaint pan
 
 about :: Window a -> IO ()

@@ -59,3 +59,5 @@ Library
   Graphics.UI.WX
 
  Hs-Source-Dirs: src
+
+ ghc-options: -Wall

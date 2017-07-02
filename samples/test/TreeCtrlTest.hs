@@ -9,9 +9,9 @@ main = start $ do
   t <- treeCtrl f []
 
   root <- treeCtrlAddRoot t "root" (-1) (-1) objectNull
-  treeCtrlAppendItem t root "item1" (-1) (-1) objectNull
-  treeCtrlAppendItem t root "item2" (-1) (-1) objectNull
-  treeCtrlAppendItem t root "item3" (-1) (-1) objectNull
+  _    <- treeCtrlAppendItem t root "item1" (-1) (-1) objectNull
+  _    <- treeCtrlAppendItem t root "item2" (-1) (-1) objectNull
+  _    <- treeCtrlAppendItem t root "item3" (-1) (-1) objectNull
   treeCtrlExpand t root
 
   cs <- treeCtrlGetChildren t root

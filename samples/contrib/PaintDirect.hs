@@ -9,6 +9,7 @@ module Main where
 import Graphics.UI.WXCore
 import Graphics.UI.WX
 
+rgbSize :: Size2D Int
 rgbSize = sz 256 256
 
 main :: IO ()
@@ -33,14 +34,14 @@ gui
        return ()
   where
     onpaint :: Bitmap () -> DC b -> Rect -> [Rect] -> IO ()
-    onpaint bm dc viewArea dirtyAreas
+    onpaint bm dc _viewArea _dirtyAreas
       = do drawBitmap dc bm pointZero True []
 
     fillGreenBlue pb
       = mapM_ (drawGreenBlue pb) [Point x y  | x <- [0..255], y <- [0..255]]
 
-    drawGreenBlue pb point
-      = pixelBufferSetPixel pb point (colorRGB 0 (pointX point) (pointY point))
+    drawGreenBlue pb point_
+      = pixelBufferSetPixel pb point_ (colorRGB 0 (pointX point_) (pointY point_))
 
 
            

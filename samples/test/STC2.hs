@@ -2,6 +2,7 @@
 import Graphics.UI.WX
 import Graphics.UI.WXCore
 
+main :: IO ()
 main = start $ do
     f <- frame [text := "Scintilla Test"]
     p <- panel f []

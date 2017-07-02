@@ -5,9 +5,11 @@ module Main where
 
 import Graphics.UI.WX
 
+main :: IO ()
 main
   = start ballsFrame
 
+ballsFrame :: IO ()
 ballsFrame
   = do -- a list of balls, where each ball is represented by a list of all future Y positions.
        vballs <- varCreate []
@@ -23,7 +25,7 @@ ballsFrame
 
        -- react on user input
        set p [on click         := dropBall vballs p             -- drop ball
-             ,on clickRight    := (\pt -> ballsFrame)           -- new window
+             ,on clickRight    := (\_pt -> ballsFrame)          -- new window
              ,on (charKey 'p') := set t [enabled :~ not]        -- pause
              ,on (charKey '-') := set t [interval :~ \i -> i*2] -- increase interval
              ,on (charKey '+') := set t [interval :~ \i -> max 1 (i `div` 2)]  -- decrease interval
@@ -39,8 +41,8 @@ ballsFrame
        return ()
   where
     -- drop a new ball
-    dropBall vballs p pt
-      = do varUpdate vballs (bouncing pt:)
+    dropBall vballs p pt_
+      = do _ <- varUpdate vballs (bouncing pt_:)
            repaint p
 
     -- calculate all future positions
@@ -55,17 +57,17 @@ ballsFrame
 
     -- advance all the balls to their next position
     nextBalls vballs p
-      = do varUpdate vballs (filter (not.null) . map (drop 1))
+      = do _ <- varUpdate vballs (filter (not.null) . map (drop 1))
            repaint p
 
     -- paint the balls
-    paintBalls vballs dc view
+    paintBalls vballs dc _view
       = do balls <- varGet vballs
            set dc [brushColor := red, brushKind := BrushSolid] 
            mapM_ (drawBall dc) (map head (filter (not.null) balls))
 
-    drawBall dc pt
-      = circle dc pt radius []
+    drawBall dc pt_
+      = circle dc pt_ radius []
 
 
 -- radius the ball, and the maximal x and y coordinates

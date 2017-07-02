@@ -46,15 +46,15 @@ module Graphics.UI.WX.Menu
     , menuList, menubar, statusbar
     ) where
 
-import Data.Char( toUpper )
-import Data.List( partition, intersperse )
+-- import Data.Char( toUpper )
+-- import Data.List( partition, intersperse )
 import System.IO.Unsafe (unsafePerformIO)
-import Foreign.Ptr( nullPtr )
+-- import Foreign.Ptr( nullPtr )
 import Graphics.UI.WXCore hiding (Event)
 
-import Graphics.UI.WX.Types
+-- import Graphics.UI.WX.Types
 import Graphics.UI.WX.Attributes
-import Graphics.UI.WX.Layout
+-- import Graphics.UI.WX.Layout
 import Graphics.UI.WX.Classes
 import Graphics.UI.WX.Events
 
@@ -82,29 +82,30 @@ menuBar
            -- work around menu bug in wxMac 2.5.1
            vis <- windowIsShown frame
            if (vis && wxToolkit == WxMac && (div wxVersion 100) >= 25)
-            then do windowHide frame
-                    windowShow frame
+            then do _ <- windowHide frame
+                    _ <- windowShow frame
                     return ()
             else return ()
 
-    append mb menu
-      = do title <- menuGetTitle menu
-           menuSetTitle menu ""
-           menuBarAppend mb menu title
+    append mb menu_
+      = do title <- menuGetTitle menu_
+           menuSetTitle menu_ ""
+           _ <- menuBarAppend mb menu_ title
+           return ()
 
 -- | Retrieve a menu bar instance which has been constructed by loading
 --   a resource file for a given top level window.
 menuBarLoadRes :: Window a -> FilePath -> String -> IO (MenuBar ())
-menuBarLoadRes parent rc name =
+menuBarLoadRes parent_ rc name =
     do
       res <- xmlResourceCreateFromFile rc wxXRC_USE_LOCALE
-      m   <- xmlResourceLoadMenuBar res parent name
+      m   <- xmlResourceLoadMenuBar res parent_ name
       return m
 
 -- | Show a popup menu for a certain window.
 menuPopup :: Menu b -> Point -> Window a -> IO ()
-menuPopup menu pt parent
-  = do windowPopupMenu parent menu pt
+menuPopup menu_ pt_ parent_
+  = do _ <- windowPopupMenu parent_ menu_ pt_
        return ()
 
 {--------------------------------------------------------------------------------
@@ -137,11 +138,11 @@ menuHelp props
 --   can directly set properties on the item as part of the call, which
 --   enables simple connection of event handlers (e.g. on command).
 menuRes :: Window a -> String -> [Prop (Menu ())] -> IO (Menu ())
-menuRes parent menu_name props =
+menuRes parent_ menu_name props =
     do
-      menu <- xmlResourceGetMenu parent menu_name
-      set menu props
-      return menu
+      menu_ <- xmlResourceGetMenu parent_ menu_name
+      set menu_ props
+      return menu_
 
 instance Textual (Menu a) where
   text
@@ -152,25 +153,25 @@ instance Textual (Menu a) where
 --------------------------------------------------------------------------------}
 -- | Create a submenu item.
 menuSub :: Menu b -> Menu a -> [Prop (MenuItem ())] -> IO (MenuItem ())
-menuSub parent menu props
-  = do id <- idCreate
-       label <- case (findProperty text "" props) of 
+menuSub parent_ menu_ props
+  = do id_    <- idCreate
+       label_ <- case (findProperty text "" props) of 
                   Just (txt,_) -> return txt
-                  Nothing      -> do title <- menuGetTitle menu
+                  Nothing      -> do title <- menuGetTitle menu_
                                      if (null title) 
                                       then return "<empty>"
                                       else return title                  
-       menuSetTitle menu ""           -- remove title on submenus
-       menuAppendSub parent id label menu ""
-       menuPropagateEvtHandlers menu  -- move the evtHandlers to the parent
-       item <- menuFindItem parent id
-       set item props
-       return item
+       menuSetTitle menu_ ""           -- remove title on submenus
+       menuAppendSub parent_ id_ label_ menu_ ""
+       menuPropagateEvtHandlers menu_  -- move the evtHandlers to the parent
+       item_ <- menuFindItem parent_ id_
+       set item_ props
+       return item_
 
 -- | Add a menu seperator.
 menuLine :: Menu a -> IO ()
-menuLine menu
-  = menuAppendSeparator menu
+menuLine menu_
+  = menuAppendSeparator menu_
 
 
 -- | Append a menu item. The label can contain
@@ -189,11 +190,11 @@ menuLine menu
 -- * Instances: 'Textual', 'Able', 'Help', 'Checkable', 'Identity', 'Commanding'.
 --
 menuItem :: Menu a -> [Prop (MenuItem ())] -> IO (MenuItem ())
-menuItem menu props
+menuItem menu_ props
   = do let kind = case (findProperty checkable False props) of
                     Just (True,_) -> wxITEM_CHECK
                     _             -> wxITEM_NORMAL
-       menuItemKind menu kind props                     
+       menuItemKind menu_ kind props                     
 
 -- | Append a radio menu item. These items are 'checkable' by default.
 -- A sequence of radio menu items form automatically a group. 
@@ -203,15 +204,16 @@ menuItem menu props
 -- radio item bullet is not displayed on windows.
 -- See 'menuItem' for other properties of menu radio items.
 menuRadioItem :: Menu a -> [Prop (MenuItem ())] -> IO (MenuItem ())
-menuRadioItem menu props
-  = menuItemKind menu wxITEM_RADIO ([checked := True] ++ props)
+menuRadioItem menu_ props
+  = menuItemKind menu_ wxITEM_RADIO ([checked := True] ++ props)
 
-menuItemKind menu kind props
-  = do id <- idCreate
-       let label = case (findProperty text "" props) of 
+menuItemKind :: Menu a -> Int -> [Prop (MenuItem ())] -> IO (MenuItem ())
+menuItemKind menu_ kind props
+  = do id_ <- idCreate
+       let label_ = case (findProperty text "" props) of 
                      Nothing      -> "<empty>"
                      Just (txt,_) -> txt
-       menuItemEx menu id label kind props
+       menuItemEx menu_ id_ label_ kind props
        
 
 
@@ -223,8 +225,8 @@ menuItemKind menu kind props
 -- * Instances: 'Textual', 'Able', 'Help', 'Checkable', 'Identity', 'Commanding'.
 --
 menuAbout :: Menu a -> [Prop (MenuItem ())] -> IO (MenuItem ())
-menuAbout menu props
-  = menuItemId menu wxID_ABOUT "&About..." props
+menuAbout menu_ props
+  = menuItemId menu_ wxID_ABOUT "&About..." props
 
 -- | Append an /quit/ menu item (@"&Quit\tCtrl+Q"@). On some platforms,
 -- the /quit/ menu is handled specially
@@ -234,8 +236,8 @@ menuAbout menu props
 -- * Instances: 'Textual', 'Able', 'Help', 'Checkable', 'Identity', 'Commanding'.
 --
 menuQuit :: Menu a -> [Prop (MenuItem ())] -> IO (MenuItem ())
-menuQuit menu props
-  = menuItemId menu wxID_EXIT "&Quit\tCtrl+Q" props
+menuQuit menu_ props
+  = menuItemId menu_ wxID_EXIT "&Quit\tCtrl+Q" props
 
 -- | Append a menu item with a specific id and label.
 --
@@ -244,8 +246,8 @@ menuQuit menu props
 -- * Instances: 'Textual', 'Able', 'Help', 'Checkable', 'Identity', 'Commanding'.
 --
 menuItemId :: Menu a -> Id -> String -> [Prop (MenuItem ())] -> IO (MenuItem ())
-menuItemId menu id label props
-  = menuItemEx menu id label wxITEM_NORMAL props
+menuItemId menu_ id_ label_ props
+  = menuItemEx menu_ id_ label_ wxITEM_NORMAL props
 
 -- | Append a menu item with a specific id, label, and kind (like 'wxITEM_CHECK').
 --
@@ -254,13 +256,13 @@ menuItemId menu id label props
 -- * Instances: 'Textual', 'Able', 'Help', 'Checkable', 'Identity', 'Commanding'.
 --
 menuItemEx :: Menu a -> Id -> String -> Int -> [Prop (MenuItem ())] -> IO (MenuItem ())
-menuItemEx menu id label kind props
+menuItemEx menu_ id_ label_ kind props
   = do if (kind == wxITEM_RADIO)
-        then menuAppendRadioItem menu id label ""
-        else menuAppend menu id label "" (kind == wxITEM_CHECK)
-       item <- menuFindItem menu id
-       set item props
-       return item
+        then menuAppendRadioItem menu_ id_ label_ ""
+        else menuAppend menu_ id_ label_ "" (kind == wxITEM_CHECK)
+       item_ <- menuFindItem menu_ id_
+       set item_ props
+       return item_
 
 instance Able (MenuItem a) where
   enabled = newAttr "enabled" menuItemIsEnabled menuItemEnable
@@ -284,14 +286,14 @@ instance Identity (MenuItem a) where
 --------------------------------------------------------------------------------}
 -- | React to menu events.
 menu :: MenuItem a -> Event (Window w) (IO ())
-menu item
-  = let id = unsafePerformIO (get item identity)
-    in  menuId id
+menu item_
+  = let id_ = unsafePerformIO (get item_ identity)
+    in  menuId id_
 
 -- | React to a menu event based on identity.
 menuId :: Id -> Event (Window w) (IO ())
-menuId id
-  = newEvent "menu" (\w -> evtHandlerGetOnMenuCommand w id) (\w h -> evtHandlerOnMenuCommand w id h)
+menuId id_
+  = newEvent "menu" (\w -> evtHandlerGetOnMenuCommand w id_) (\w h -> evtHandlerOnMenuCommand w id_ h)
               
 {--------------------------------------------------------------------------------
   Menu commands:
@@ -314,26 +316,26 @@ instance Commanding (MenuItem a) where
     = newEvent "command" menuItemGetOnCommand menuItemOnCommand
 
 menuItemGetOnCommand :: MenuItem a -> IO (IO ())
-menuItemGetOnCommand item 
-  = do id      <- get item identity
-       topmenu <- menuItemGetTopMenu item
-       evtHandlerGetOnMenuCommand topmenu id
+menuItemGetOnCommand item_ 
+  = do id_      <- get item_ identity
+       topmenu <- menuItemGetTopMenu item_
+       evtHandlerGetOnMenuCommand topmenu id_
 
 menuItemOnCommand :: MenuItem a -> IO () -> IO ()
-menuItemOnCommand item io
-  = do id      <- get item identity
-       topmenu <- menuItemGetTopMenu item
+menuItemOnCommand item_ io
+  = do id_      <- get item_ identity
+       topmenu <- menuItemGetTopMenu item_
        -- always set it on the menu itself (has only effect on popup menus)
-       evtHandlerOnMenuCommand topmenu id io
+       evtHandlerOnMenuCommand topmenu id_ io
        -- update the Haskell event handler list for delayed frame installation
-       menuUpdateEvtHandlers topmenu (insert id io)
+       menuUpdateEvtHandlers topmenu (insert id_ io)
        -- and set it directly on the frame if already instantiated. 
        frame   <- menuGetFrame topmenu
-       when (not (objectIsNull frame)) (evtHandlerOnMenuCommand frame id io)
+       when (not (objectIsNull frame)) (evtHandlerOnMenuCommand frame id_ io)
   where
-    insert key val []         = [(key,val)]
-    insert key val ((k,v):xs) | key == k  = (key,val):xs
-                              | otherwise = (k,v):insert key val xs
+    insert key_ val []         = [(key_,val)]
+    insert key_ val ((k,v):xs) | key_ == k  = (key_,val):xs
+                               | otherwise = (k,v):insert key_ val xs
 
 -- | When setting event handlers on menu items which have been loaded from
 --   XRC resource files, properties cannot be used as the menu item
@@ -344,66 +346,69 @@ menuItemOnCommand item io
 --   the menu item, and the name of the menu item
 
 menuItemOnCommandRes :: Window a -> String -> IO () -> IO ()
-menuItemOnCommandRes win item_name handler =
+menuItemOnCommandRes win_ item_name handler =
     do
       res     <- xmlResourceGet
       item_id <- xmlResourceGetXRCID res item_name
-      evtHandlerOnMenuCommand win item_id handler
+      evtHandlerOnMenuCommand win_ item_id handler
 
 -- Propagate the (delayed) event handlers of a submenu to the parent menu.
 -- This is necessary for event handlers set on menu items in a submenu that
 -- was not yet assigned to a parent menu.
 menuPropagateEvtHandlers :: Menu a -> IO ()
-menuPropagateEvtHandlers menu
-  = do parent   <- menuGetTopMenu menu
-       handlers <- menuGetEvtHandlers menu
-       menuSetEvtHandlers menu []
-       menuSetEvtHandlers parent handlers
+menuPropagateEvtHandlers menu_
+  = do parent_  <- menuGetTopMenu menu_
+       handlers <- menuGetEvtHandlers menu_
+       menuSetEvtHandlers menu_ []
+       menuSetEvtHandlers parent_ handlers
 
 -- Get associated frame of a menu in a menubar. Returns NULL for popup and sub menus.
 menuGetFrame :: Menu a -> IO (Frame ())
-menuGetFrame menu
-  = do menubar <- menuGetMenuBar menu
-       if (objectIsNull menubar) 
+menuGetFrame menu_
+  = do menubar_ <- menuGetMenuBar menu_
+       if (objectIsNull menubar_) 
         then return objectNull
-        else menuBarGetFrame menubar
+        else menuBarGetFrame menubar_
 
 -- Get top level menu of a menu item (never null)
 menuItemGetTopMenu :: MenuItem a -> IO (Menu ())
-menuItemGetTopMenu item
-  = do menu <- menuItemGetMenu item
-       menuGetTopMenu menu
+menuItemGetTopMenu item_
+  = do menu_ <- menuItemGetMenu item_
+       menuGetTopMenu menu_
 
 -- Get the top level menu of a possible sub menu 
 menuGetTopMenu :: Menu a -> IO (Menu ())
-menuGetTopMenu menu
-  = do parent <- menuGetParent menu
-       if (objectIsNull parent)
-        then return (downcastMenu menu)
-        else menuGetTopMenu parent
+menuGetTopMenu menu_
+  = do parent_ <- menuGetParent menu_
+       if (objectIsNull parent_)
+        then return (downcastMenu menu_)
+        else menuGetTopMenu parent_
 
 -- Set all menu event handlers on a certain window (EvtHandler)
 evtHandlerSetAndResetMenuCommands :: EvtHandler a -> Menu b -> IO ()
-evtHandlerSetAndResetMenuCommands evtHandler menu
-  = do handlers <- menuGetEvtHandlers menu
-       menuSetEvtHandlers menu []
-       mapM_ (\(id,io) -> evtHandlerOnMenuCommand evtHandler id io) handlers
+evtHandlerSetAndResetMenuCommands evtHandler menu_
+  = do handlers <- menuGetEvtHandlers menu_
+       menuSetEvtHandlers menu_ []
+       mapM_ (\(id_,io) -> evtHandlerOnMenuCommand evtHandler id_ io) handlers
 
 -- Update the menu event handler list.
-menuUpdateEvtHandlers menu f
-  = do hs <- menuGetEvtHandlers menu
-       menuSetEvtHandlers menu (f hs)
+menuUpdateEvtHandlers :: Menu a ->
+                         ([(Id, IO ())] -> [(Id, IO ())]) ->
+                         IO ()
+menuUpdateEvtHandlers menu_ f
+  = do hs <- menuGetEvtHandlers menu_
+       menuSetEvtHandlers menu_ (f hs)
 
 menuGetEvtHandlers :: Menu a -> IO [(Id,IO ())]
-menuGetEvtHandlers menu 
-  = do mbHandlers <- unsafeEvtHandlerGetClientData menu
+menuGetEvtHandlers menu_ 
+  = do mbHandlers <- unsafeEvtHandlerGetClientData menu_
        case mbHandlers of
          Nothing -> return []
          Just hs -> return hs
 
 menuSetEvtHandlers :: Menu a -> [(Id,IO ())] -> IO ()
-menuSetEvtHandlers menu hs
-  = evtHandlerSetClientData menu (return ()) hs 
+menuSetEvtHandlers menu_ hs
+  = evtHandlerSetClientData menu_ (return ()) hs 
 
 
 {--------------------------------------------------------------------------------
@@ -418,20 +423,20 @@ menuSetEvtHandlers menu hs
 -- >  toolMenu tbar about "About" "about.png" []
 --
 toolBar :: Frame a -> [Prop (ToolBar ())] -> IO (ToolBar ())
-toolBar parent props
-  = toolBarEx parent True True props
+toolBar parent_ props
+  = toolBarEx parent_ True True props
 
 -- | Create a toolbar window. The second argument specifies whether text labels
 -- should be shown, and the third argument whether a divider line is present
 -- above the toolbar.
 toolBarEx :: Frame a -> Bool -> Bool -> [Prop (ToolBar ())] -> IO (ToolBar ())
-toolBarEx parent showText showDivider props
-  = do let style = ( wxTB_DOCKABLE .+. wxTB_FLAT
-                   .+. (if showText then wxTB_TEXT else 0)
-                   .+. (if showDivider then 0 else wxTB_NODIVIDER)
-                   )
-       t <- toolBarCreate parent idAny rectNull style
-       frameSetToolBar parent t
+toolBarEx parent_ showText showDivider props
+  = do let style_ = ( wxTB_DOCKABLE .+. wxTB_FLAT
+                    .+. (if showText then wxTB_TEXT else 0)
+                    .+. (if showDivider then 0 else wxTB_NODIVIDER)
+                    )
+       t <- toolBarCreate parent_ idAny rectNull style_
+       frameSetToolBar parent_ t
        {-
        t <- frameCreateToolBar parent style 
        -}
@@ -450,79 +455,79 @@ instance Able ToolBarItem  where
   enabled 
     = newAttr "enabled" getter setter
     where
-      getter (ToolBarItem toolbar id isToggle)
-        = toolBarGetToolEnabled toolbar id
+      getter (ToolBarItem toolbar id_ _isToggle)
+        = toolBarGetToolEnabled toolbar id_
 
-      setter (ToolBarItem toolbar id isToggle) enable
-        = toolBarEnableTool toolbar id enable
+      setter (ToolBarItem toolbar id_ _isToggle) enable
+        = toolBarEnableTool toolbar id_ enable
          
 
 instance Tipped ToolBarItem where
   tooltip 
     = newAttr "tooltip" getter setter
     where
-      getter (ToolBarItem toolbar id isToggle)
-        = toolBarGetToolShortHelp toolbar id
+      getter (ToolBarItem toolbar id_ _isToggle)
+        = toolBarGetToolShortHelp toolbar id_
 
-      setter (ToolBarItem toolbar id isToggle) txt
-        = toolBarSetToolShortHelp toolbar id txt
+      setter (ToolBarItem toolbar id_ _isToggle) txt
+        = toolBarSetToolShortHelp toolbar id_ txt
          
 instance Help ToolBarItem  where
   help  
     = newAttr "help" getter setter
     where
-      getter (ToolBarItem toolbar id isToggle)
-        = toolBarGetToolLongHelp toolbar id
+      getter (ToolBarItem toolbar id_ _isToggle)
+        = toolBarGetToolLongHelp toolbar id_
 
-      setter (ToolBarItem toolbar id isToggle) txt
-        = toolBarSetToolLongHelp toolbar id txt
+      setter (ToolBarItem toolbar id_ _isToggle) txt
+        = toolBarSetToolLongHelp toolbar id_ txt
          
 
 instance Checkable ToolBarItem where
   checkable 
     = readAttr "checkable" getter
     where
-      getter (ToolBarItem toolbar id isToggle)
+      getter (ToolBarItem _toolbar _id isToggle)
         = return isToggle
 
   checked   
     = newAttr "checked"  getter setter
     where
-      getter (ToolBarItem toolbar id isToggle)
-        = toolBarGetToolState toolbar id
+      getter (ToolBarItem toolbar id_ _isToggle)
+        = toolBarGetToolState toolbar id_
 
-      setter (ToolBarItem toolbar id isToggle) toggle
-        = toolBarToggleTool toolbar id toggle
+      setter (ToolBarItem toolbar id_ _isToggle) toggle
+        = toolBarToggleTool toolbar id_ toggle
          
 
 instance Identity ToolBarItem where
   identity  
     = readAttr "identity" getter
     where
-      getter (ToolBarItem toolbar id isToggle)
-        = return id
+      getter (ToolBarItem _toolbar id_ _isToggle)
+        = return id_
 
 
 instance Commanding ToolBarItem where
   command
     = newEvent "command" getter setter
     where
-      getter (ToolBarItem toolbar id isToggle)
-        = evtHandlerGetOnMenuCommand toolbar id
+      getter (ToolBarItem toolbar id_ _isToggle)
+        = evtHandlerGetOnMenuCommand toolbar id_
 
-      setter (ToolBarItem toolbar id isToggle) io
-        = evtHandlerOnMenuCommand toolbar id io
+      setter (ToolBarItem toolbar id_ _isToggle) io
+        = evtHandlerOnMenuCommand toolbar id_ io
 
 -- | React on tool event (normally handled by 'menu' though, so only use this
 -- for orphan toolbar items).
 tool :: ToolBarItem -> Event (Window w) (IO ())
-tool (ToolBarItem toolbar id isToggle)
+tool (ToolBarItem _toolbar id_ _isToggle)
   = newEvent "tool" getter setter
   where
     getter w
-      = evtHandlerGetOnMenuCommand w id
+      = evtHandlerGetOnMenuCommand w id_
     setter w io
-      = evtHandlerOnMenuCommand w id io
+      = evtHandlerOnMenuCommand w id_ io
 
 -- | Create a tool bar item based on a menu. Takes a relevant menu
 -- item, a label and an image file (bmp, png, gif, ico, etc.) as arguments. The image from the
@@ -532,46 +537,46 @@ tool (ToolBarItem toolbar id isToggle)
 -- normally require a specific @on command@ handler to keep them synchronised with the 
 -- corresponding menu item.
 toolMenu :: ToolBar a -> MenuItem a -> String -> FilePath -> [Prop ToolBarItem] -> IO ToolBarItem
-toolMenu toolbar menuitem label bitmapPath props
+toolMenu toolbar menuitem label_ bitmapPath props
   = withBitmapFromFile bitmapPath $ \bitmap ->
-      toolMenuFromBitmap toolbar menuitem label bitmap props
+      toolMenuFromBitmap toolbar menuitem label_ bitmap props
 
 -- | This is a generalized version of 'toolMenu' function. You can specify 'Bitmap' that is
 -- loaded from any other place instead of using 'FilePath' directly.
 toolMenuFromBitmap :: ToolBar a -> MenuItem a -> String -> Bitmap b -> [Prop ToolBarItem] -> IO ToolBarItem
-toolMenuFromBitmap toolbar menuitem label bitmap props
+toolMenuFromBitmap toolbar menuitem label_ bitmap props
   = do isToggle <- get menuitem checkable
-       id       <- get menuitem identity
+       id_      <- get menuitem identity
        lhelp    <- get menuitem help
        shelp    <- get menuitem help
-       toolBarAddTool2 toolbar id label bitmap nullBitmap 
+       toolBarAddTool2 toolbar id_ label_ bitmap nullBitmap 
                        (if isToggle then wxITEM_CHECK else wxITEM_NORMAL)
                        shelp lhelp
-       let t = ToolBarItem (downcastToolBar toolbar) id isToggle
+       let t = ToolBarItem (downcastToolBar toolbar) id_ isToggle
        set t props
-       toolBarRealize toolbar
+       _ <- toolBarRealize toolbar
        return t
 
 -- | Create an /orphan/ toolbar item that is unassociated with a menu. Takes a 
 -- label, a flag that is 'True' when the item is 'checkable' and a path to an image
 -- (bmp, png, gif, ico, etc.) as arguments.
 toolItem :: ToolBar a -> String -> Bool -> FilePath -> [Prop ToolBarItem] -> IO ToolBarItem
-toolItem toolbar label isCheckable bitmapPath props
+toolItem toolbar label_ isCheckable bitmapPath props
   = withBitmapFromFile bitmapPath $ \bitmap ->
-    do id <- idCreate
-       toolBarAddTool2 toolbar id label bitmap nullBitmap 
+    do id_ <- idCreate
+       toolBarAddTool2 toolbar id_ label_ bitmap nullBitmap 
                             (if isCheckable then wxITEM_CHECK else wxITEM_NORMAL)
                             "" ""
-       let t = ToolBarItem (downcastToolBar toolbar) id isCheckable
+       let t = ToolBarItem (downcastToolBar toolbar) id_ isCheckable
        set t props
-       toolBarRealize toolbar
+       _ <- toolBarRealize toolbar
        return t
 
 -- | Add an arbitrary control to a toolbar (typically a 'ComboBox'). The control
 -- must be created with the toolbar as the parent.
 toolControl :: ToolBar a -> Control b -> IO ()
 toolControl toolbar control
-  = do toolBarAddControl toolbar control
+  = do _ <- toolBarAddControl toolbar control
        return ()
    
 
@@ -622,17 +627,17 @@ statusField props
 
 instance Textual StatusField where
   text
-    = newAttr "text" get set
+    = newAttr "text" get_ set_
     where
-      get (SF _ vsbar vidx vtext)
+      get_ (SF _ _vsbar _vidx vtext)
         = varGet vtext
 
-      set (SF _ vsbar vidx vtext)  text
-        = do varSet vtext text
+      set_ (SF _ vsbar vidx vtext)  text_
+        = do varSet vtext text_
              idx <- varGet vidx
              if (idx >= 0)
               then do sbar <- varGet vsbar
-                      statusBarSetStatusText sbar text idx
+                      statusBarSetStatusText sbar text_ idx
               else return ()
 
 
@@ -646,9 +651,9 @@ statusbar
 -- | Specify the statusbar of a frame.
 statusBar :: WriteAttr (Frame a) [StatusField]
 statusBar
-  = writeAttr "statusbar" set
+  = writeAttr "statusbar" set_
   where
-    set f fields
+    set_ f fields
       = do ws <- mapM (\field -> get field statusWidth) fields
            sb <- statusBarCreateFields f ws
            mapM_ (setsb sb) (zip [0..] fields )
@@ -656,5 +661,5 @@ statusBar
     setsb sb (idx,SF _ vsbar vidx vtext)
       = do varSet vsbar sb
            varSet vidx idx
-           text <- varGet vtext
-           statusBarSetStatusText sb text idx -- initialize
+           text_ <- varGet vtext
+           statusBarSetStatusText sb text_ idx -- initialize

@@ -14,7 +14,7 @@ hello
 
        -- create file menu  
        file   <- menuPane      [text := "&File"]
-       quit   <- menuQuit file [help := "Quit the demo", on command := close f]
+       _quit  <- menuQuit file [help := "Quit the demo", on command := close f]
 
        -- create Help menu
        hlp    <- menuHelp      []

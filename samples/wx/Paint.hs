@@ -16,7 +16,7 @@ gui
        set f [clientSize := sz 150 150, layout := fill $ widget sw]
        return ()
   where
-    onpaint dc viewArea
+    onpaint dc _viewArea
       = do circle dc (pt 200 200) 20 [penKind := PenDash DashDot]
            arc dc (pt 100 100) 20 90 230 [color := red, penWidth :~ (+1), penKind := PenSolid]
            ellipticArc dc (rect  (pt 20  20) (sz 60 30)) 90 230 [color := blue, penWidth :~ (*2)]

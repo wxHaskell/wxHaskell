@@ -33,7 +33,7 @@ import Graphics.UI.WXCore
 
 import Graphics.UI.WX.Types
 import Graphics.UI.WX.Attributes
-import Graphics.UI.WX.Layout
+-- import Graphics.UI.WX.Layout
 import Graphics.UI.WX.Classes
 import Graphics.UI.WX.Events
 
@@ -50,11 +50,11 @@ import Graphics.UI.WX.Events
 --             'Able', 'Tipped', 'Identity', 'Styled', 'Reactive', 'Paint'.
 --
 scrolledWindow :: Window a -> [Prop (ScrolledWindow ())] -> IO (ScrolledWindow ())
-scrolledWindow parent props
-  = feed2 props 0 $
-    initialContainer $ \id rect -> \props style ->
-    do sw <- scrolledWindowCreate parent id rect style
-       set sw props
+scrolledWindow parent_ props_
+  = feed2 props_ 0 $
+    initialContainer $ \id_ rect_ -> \props_' style_ ->
+    do sw <- scrolledWindowCreate parent_ id_ rect_ style_
+       set sw props_'
        return sw
 
 
@@ -68,8 +68,8 @@ scrollRate
       = do p <- scrolledWindowGetScrollPixelsPerUnit sw
            return (sizeFromPoint p)
      
-    setter sw size
-      = scrolledWindowSetScrollRate sw (sizeW size) (sizeH size)
+    setter sw size_
+      = scrolledWindowSetScrollRate sw (sizeW size_) (sizeH size_)
 
 
 {--------------------------------------------------------------------------------
@@ -82,11 +82,11 @@ scrollRate
 -- * Instances: 'Textual', 'Literate', 'Dimensions', 'Colored', 'Visible', 'Child', 
 --             'Able', 'Tipped', 'Identity', 'Styled', 'Reactive', 'Paint'.
 window :: Window a -> [Prop (Window ())] -> IO (Window ())
-window parent props
-  = feed2 props 0 $
-    initialWindow $ \id rect -> \props flags ->
-    do w <- windowCreate parent id rect flags
-       set w props
+window parent_ props_
+  = feed2 props_ 0 $
+    initialWindow $ \id_ rect_ -> \props_' flags ->
+    do w <- windowCreate parent_ id_ rect_ flags
+       set w props_'
        return w
 
 
@@ -97,20 +97,20 @@ window parent props
 -- |identity|, |style|, and |area| (or |position| and |outerSize|).
 initialWindow :: (Id -> Rect -> [Prop (Window w)] -> Style -> a) -> [Prop (Window w)] -> Style -> a
 initialWindow cont 
-  = initialIdentity $ \id ->
-    initialArea     $ \rect ->
+  = initialIdentity $ \id_ ->
+    initialArea     $ \rect_ ->
     initialStyle    $ 
     initialBorder   $
-    cont id rect 
+    cont id_ rect_ 
 
 -- | Helper function that retrieves initial window settings, including |clipChildren|
 -- and |fullRepaintOnResize|.
 initialContainer :: (Id -> Rect -> [Prop (Window w)] -> Style -> a) -> [Prop (Window w)] -> Style -> a
 initialContainer cont
-  = initialWindow $ \id rect ->
+  = initialWindow $ \id_ rect_ ->
     initialFullRepaintOnResize $ 
     initialClipChildren        $ 
-    cont id rect 
+    cont id_ rect_ 
 
 
 instance Able (Window a) where
@@ -148,22 +148,22 @@ instance Textual (Window a) where
 
 -- | Retrieve the initial title from the |text| attribute.
 initialText :: Textual w => (String -> [Prop w] -> a) -> [Prop w] -> a
-initialText cont props 
-  = withProperty text "" cont props
+initialText cont props_ 
+  = withProperty text "" cont props_
 
 
 instance Dimensions (Window a) where
   outerSize
     = newAttr "size" windowGetSize setSize
     where
-      setSize w sz
-        = windowSetSize w (rect (pt (-1) (-1)) sz) wxSIZE_USE_EXISTING
+      setSize w sz_
+        = windowSetSize w (rect (pt (-1) (-1)) sz_) wxSIZE_USE_EXISTING
 
   area
     = newAttr "area" windowGetRect setArea
     where
-      setArea w rect
-        = windowSetSize w rect wxSIZE_USE_EXISTING
+      setArea w rect_
+        = windowSetSize w rect_ wxSIZE_USE_EXISTING
 
   bestSize
     = readAttr "bestSize" windowGetEffectiveMinSize
@@ -184,17 +184,17 @@ instance Sized (Window a) where
 -- | Retrieve the initial creation area from the |area|, or the |position| and
 -- |outerSize| properties.
 initialArea :: Dimensions w => (Rect -> [Prop w] -> a) -> [Prop w] -> a
-initialArea cont props
-  = case findProperty area rectNull props of
-      Just (rect,props') -> cont rect props'
+initialArea cont props_
+  = case findProperty area rectNull props_ of
+      Just (rect_,props') -> cont rect_ props'
       Nothing 
-        -> case findProperty position pointNull props of
-             Just (p,props') -> case findProperty outerSize sizeNull props of
+        -> case findProperty position pointNull props_ of
+             Just (p,props') -> case findProperty outerSize sizeNull props_ of
                                   Just (sz,props'') -> cont (rect p sz) props''
                                   Nothing           -> cont (rect p sizeNull) props'
-             Nothing         -> case findProperty outerSize sizeNull props of
+             Nothing         -> case findProperty outerSize sizeNull props_ of
                                   Just (sz,props')  -> cont (rect pointNull sz) props'
-                                  Nothing           -> cont rectNull props
+                                  Nothing           -> cont rectNull props_
 
 
 
@@ -285,7 +285,7 @@ instance Visible (Window a) where
     where
       setVisible w vis
         = if vis
-           then do{ windowShow w; windowRaise w }
+           then do{ _ <- windowShow w; windowRaise w }
            else unitIO (windowHide w)
 
   refresh w
@@ -392,8 +392,8 @@ instance Styled (Window a) where
 
 -- | Helper function that retrieves the initial |style|.
 initialStyle :: Styled w => ([Prop w] -> Style -> a) -> [Prop w] -> Style -> a
-initialStyle cont props stl
-  = withProperty style stl (\stl' props' -> cont props' stl') props
+initialStyle cont props_ stl
+  = withProperty style stl (\stl' props' -> cont props' stl') props_
 
 instance Tipped (Window a) where
   tooltip
@@ -418,11 +418,11 @@ instance Bordered (Window a) where
       setter w b
         = set w [style :~ \stl -> setBitMask b stl]
 
-initialBorder cont props style
-  = case filterProperty border props of
-      (PropValue x, ps)  -> cont ps (setBitMask x style) 
-      (PropModify f, ps) -> cont ps (setBitMask (f (fromBitMask style)) style)
-      (PropNone, ps)     -> cont ps style
+initialBorder cont props_ style_
+  = case filterProperty border props_ of
+      (PropValue x, ps)  -> cont ps (setBitMask x style_) 
+      (PropModify f, ps) -> cont ps (setBitMask (f (fromBitMask style_)) style_)
+      (PropNone, ps)     -> cont ps style_
 
 {--------------------------------------------------------------------------------
   Events

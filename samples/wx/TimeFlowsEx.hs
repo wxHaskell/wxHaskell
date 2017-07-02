@@ -28,9 +28,11 @@ type History = [(Time,Point)]
 {-------------------------------------------------------------------------
   The gui
 -------------------------------------------------------------------------}
+main :: IO ()
 main
   = start timeFlows
 
+timeFlows :: IO ()
 timeFlows
   = do -- mouse history as list of time/position pairs: is never null!
        vmouseHistory <- varCreate [(0,pt 0 0)]
@@ -49,7 +51,7 @@ timeFlows
 
        -- create menus & status fields       
        mfile    <- menuPane       [text := "&File"]
-       mquit    <- menuQuit mfile [help := "Exit the demo", on command := close f]
+       _mquit   <- menuQuit mfile [help := "Exit the demo", on command := close f]
 
        medit    <- menuPane       [text := "&Edit"]
        mshowline<- menuItem medit [text := "&Show mouse track\tCtrl+S", checkable := True, checked := True]
@@ -74,9 +76,9 @@ timeFlows
              , on (menu mshowline) := do showit <- get mshowline checked                                 
                                          varSet vflowLine showit
              , on (menu moptions)  := showOptionDialog f vtimeSpan vflowText status
-             , on (menu mfont)     := showFontDialog f vflowFont
-             , on (charKey '+')    := do varUpdate vtimeSpan (\n -> min 10 (n+1)); return ()
-             , on (charKey '-')    := do varUpdate vtimeSpan (\n -> max  1 (n-1)); return ()
+             , on (menu mfont)     := do _ <- showFontDialog f vflowFont; return ()
+             , on (charKey '+')    := do _ <- varUpdate vtimeSpan (\n -> min 10 (n+1)); return ()
+             , on (charKey '-')    := do _ <- varUpdate vtimeSpan (\n -> max  1 (n-1)); return ()
              ]
       
        -- set event handlers
@@ -94,8 +96,8 @@ showFontDialog frame vflowFont
   = do flowFont <- varGet vflowFont
        mbfont   <- fontDialog frame flowFont
        case mbfont of
-         Nothing   -> return ()
-         Just font -> varSet vflowFont font
+         Nothing    -> return ()
+         Just font_ -> varSet vflowFont font_
 
 showOptionDialog frame vtimeSpan vflowText status
   = do flowText <- varGet vflowText
@@ -104,7 +106,7 @@ showOptionDialog frame vtimeSpan vflowText status
        -- create dialog
        d     <- dialog frame [text := "Options", resizeable := True]
        p     <- panel d []
-       entry <- textEntry p [text := flowText]
+       ntry  <- textEntry  p [text := flowText]
        delay <- spinCtrl  p 1 10 [selection := round timeSpan]
        ok    <- button p [text := "Ok"] 
        can   <- button p [text := "Cancel"]           
@@ -112,7 +114,7 @@ showOptionDialog frame vtimeSpan vflowText status
        -- layout
        set d [defaultButton := ok
              ,layout := container p $ margin 10 $ 
-                        column 10 [ boxed "" $ grid 5 5 [[label "text:",  hfill $ widget entry]
+                        column 10 [ boxed "" $ grid 5 5 [[label "text:",  hfill $ widget ntry]
                                                         ,[label "delay:", floatRight $ widget delay]
                                                         ]
                                   , floatBottomRight $ row 5 [widget ok, widget can]
@@ -120,58 +122,66 @@ showOptionDialog frame vtimeSpan vflowText status
              ]
 
        -- show modal 
-       ret   <- showModal d $ \stop -> 
-                do set ok  [on command := do flowText <- get entry text 
-                                             timeSpan <- get delay selection
-                                             stop (Just (flowText,fromIntegral timeSpan))]
-                   set can [on command := stop Nothing]
+       ret   <- showModal d $ \stop_ -> 
+                do set ok  [on command := do flowText_ <- get ntry  text 
+                                             timeSpan_ <- get delay selection
+                                             stop_ (Just (flowText_, fromIntegral timeSpan_))]
+                   set can [on command := stop_ Nothing]
                    
        -- set results
        case ret of
          Nothing -> return ()
-         Just (flowText,timeSpan)
-                 -> do varSet vflowText flowText
-                       set status [text := flowText]
-                       varSet vtimeSpan timeSpan
+         Just (flowText_, timeSpan_)
+                 -> do varSet vflowText flowText_
+                       set status [text := flowText_]
+                       varSet vtimeSpan timeSpan_
 
 
 {-------------------------------------------------------------------------
   Event handlers
 -------------------------------------------------------------------------}
 -- repaint handler
-onPaint vmouseHistory vtimeSpan vflowLine vflowText vflowFont  dc viewArea
-  = do time     <- getTime
-       history  <- varGet vmouseHistory
-       timeSpan <- varGet vtimeSpan
-       flowFont <- varGet vflowFont
-       flowText <- varGet vflowText
-       flowLine <- varGet vflowLine
+onPaint :: Var [(Time, Point)]
+           -> Var Time
+           -> Var Bool
+           -> Var String
+           -> Var FontStyle
+           -> DC a
+           -> p
+           -> IO ()
+onPaint vmouseHistory vtimeSpan vflowLine vflowText vflowFont  dc _viewArea
+  = do time      <- getTime
+       history   <- varGet vmouseHistory
+       timeSpan_ <- varGet vtimeSpan
+       flowFont  <- varGet vflowFont
+       flowText  <- varGet vflowText
+       flowLine  <- varGet vflowLine
 
        -- draw trace line
        when (flowLine) (polyline dc (map snd history) [penColor := lightgrey])
        -- draw the words
        set dc [font := flowFont ]
-       mapM_ drawWord (wordPositions history timeSpan time flowText)
+       mapM_ drawWord (wordPositions history timeSpan_ time flowText)
   where
     drawWord (pos,word)
       = do -- center word
-           sz <- getTextExtent dc word
-           let newX = pointX pos - (sizeW sz `div` 2)
-               newY = pointY pos - (sizeH sz `div` 2)
+           sz_ <- getTextExtent dc word
+           let newX = pointX pos - (sizeW sz_ `div` 2)
+               newY = pointY pos - (sizeH sz_ `div` 2)
            -- and draw it.
            drawText dc word (pt newX newY) []
 
            
 -- idle event handler
 onIdle :: Var History -> Var Time -> Window a -> IO Bool
-onIdle vmouseHistory vtimeSpan win
+onIdle vmouseHistory vtimeSpan win_
   = do history <- varGet vmouseHistory
        if (null (tail history))
         then do -- don't call idle again until some other event happens
                 return False
         else do time     <- getTime
                 timeSpan <- varGet vtimeSpan
-                repaint win
+                repaint win_
                 -- prune the history  
                 varSet vmouseHistory (prune (time - timeSpan) history)
                 return True
@@ -179,18 +189,21 @@ onIdle vmouseHistory vtimeSpan win
     -- prune the history: only remember time/position pairs up to a certain time span.
     prune time (h:hs)
       = h:takeWhile (after time) hs
+    prune _    []
+      = undefined
 
     after time (t,p)
       = time <= t
 
 
 -- mouse drag handler
-onDrag vmouseHistory mousePos
+-- onDrag :: [Var [(Time, b)]] -> b -> IO ()
+onDrag vmouseHistory mousePos_
   = do time <- getTime
        -- prepend a new time/position pair
-       varUpdate vmouseHistory ((time,mousePos):)
+       _    <- varUpdate vmouseHistory ((time,mousePos_):)
        return ()
-           
+
 
 {-------------------------------------------------------------------------
   Helper functions
@@ -208,16 +221,17 @@ wordPositionsAt history timedWords
 
 -- | Return the mouse position at a certain time.
 posAtTime :: Time -> History -> Point
-posAtTime time [(t,pos)]    = pos
-posAtTime time ((t,pos):xs) | t <= time  = pos
-                            | otherwise  = posAtTime time xs
+posAtTime _time [(_t,pos)]   = pos
+posAtTime time  ((t,pos):xs) | t <= time  = pos
+                             | otherwise  = posAtTime time xs
+posAtTime _     []           = undefined
 
 -- | Evenly assign times to the words in a string, given a timeSpan and current time.
 wordTimes :: Time -> Time -> [String] -> [(Time,String)]
-wordTimes timeSpan time words
-  = let n     = length words
-        delta = timeSpan / (fromIntegral n)
-    in zip (iterate (\t -> t-delta) time) words
+wordTimes timeSpan_ time words_
+  = let n     = length words_
+        delta = timeSpan_ / (fromIntegral n)
+    in zip (iterate (\t -> t-delta) time) words_
     
 -- Get the current Time
 getTime :: IO Time

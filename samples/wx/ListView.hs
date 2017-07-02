@@ -4,7 +4,6 @@
 module Main where
 
 import Graphics.UI.WX
-import Graphics.UI.WXCore 
 
 entries :: [Int]
 entries = [-1,1,-123,123]

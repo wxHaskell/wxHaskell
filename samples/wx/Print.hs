@@ -19,21 +19,21 @@ gui
        -- create file menu  
        file     <- menuPane [text := "&File"]
 
-       mprint   <- menuItem file 
+       _mprint  <- menuItem file 
                     [ text := "&Print..."
                     , help := "Print a test"
                     , on command := printDialog pageSetup "Test"  pageFun printFun
                     ]
-       mpreview <- menuItem file 
+       _mpreview <- menuItem file 
                     [ text := "P&rint preview"
                     , help := "Print preview"
                     , on command := printPreview pageSetup "Test" pageFun printFun 
                     ]
-       msetup   <- menuItem file
+       _msetup  <- menuItem file
                     [ text := "Page &setup...", help := "Setup the page"
                     , on command := pageSetupShowModal pageSetup
                     ]
-       quit     <- menuQuit file [help := "Quit the demo", on command := close f]
+       _quit    <- menuQuit file [help := "Quit the demo", on command := close f]
 
        -- create statusbar field
        status <- statusField   [text := "Welcome to the wxHaskell print demo"]
@@ -46,12 +46,12 @@ gui
   where
      -- Print a page
      printFun :: PrintFunction
-     printFun pageInfo printInfo printSize dc nr 
+     printFun _pageInfo _printInfo printSize dc nr 
         = do set dc [brush := brushTransparent]
              drawText dc ("Page " ++ show nr) (pt 0 0) [fontFamily := FontRoman, fontSize := 14]
-             let area = rectFromSize printSize
-                 mid  = rectCentralPoint area
-             drawRect dc area [color := grey]  -- draw a border around the printable area
+             let area_ = rectFromSize printSize
+                 mid   = rectCentralPoint area_
+             drawRect dc area_ [color := grey]  -- draw a border around the printable area
              circle dc mid 4  [color := red]   -- draw a center bullet
               
      -- Return the page range 

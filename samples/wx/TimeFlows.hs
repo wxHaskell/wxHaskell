@@ -30,18 +30,22 @@ timeSpan :: Time
 timeSpan = 1
 
 -- The flowing text
+flowText :: String
 flowText = "Time flows like a river"
 
 -- The font style
+flowFont :: FontStyle
 flowFont = fontSwiss{ _fontSize = 16 }
 
 
 {-------------------------------------------------------------------------
   The gui
 -------------------------------------------------------------------------}
+main :: IO ()
 main
   = start timeFlows
 
+timeFlows :: IO ()
 timeFlows
   = do -- mouse history as list of time/position pairs: is never null!
        vmouseHistory <- varCreate [(0,pt 0 0)]
@@ -60,13 +64,13 @@ timeFlows
        set f        [ layout      := fill $ widget p
                     , clientSize  := sz 300 300       -- initial size
                     ]
-       return ()
 
 {-------------------------------------------------------------------------
   Event handlers
 -------------------------------------------------------------------------}
 -- repaint handler
-onPaint vmouseHistory  dc viewArea
+onPaint :: Var [(Time, Point)] -> DC a -> p -> IO ()
+onPaint vmouseHistory  dc _viewArea
   = do history <- varGet vmouseHistory
        time    <- getTime
        -- draw trace line
@@ -77,9 +81,9 @@ onPaint vmouseHistory  dc viewArea
   where
     drawWord (pos,word)
       = do -- center word
-           sz <- getTextExtent dc word
-           let newX = pointX pos - (sizeW sz `div` 2)
-               newY = pointY pos - (sizeH sz `div` 2)
+           sz_ <- getTextExtent dc word
+           let newX = pointX pos - (sizeW sz_ `div` 2)
+               newY = pointY pos - (sizeH sz_ `div` 2)
            -- and draw it.
            drawText dc word (pt  newX newY) []
 

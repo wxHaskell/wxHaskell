@@ -6,6 +6,7 @@ module Main where
 import Graphics.UI.WX
 import Graphics.UI.WXCore hiding (Event)
 
+main :: IO ()
 main  
   = start gui
 
@@ -38,8 +39,8 @@ gui
        set f [visible := True]  -- reduce flicker at startup.
        return ()
   where
-    onGridKeyDown g (EventKey key mods pt)
-      = case key of
+    onGridKeyDown g (EventKey key_ _mods _pt)
+      = case key_ of
           KeyReturn ->          
             do logMessage "keyEnter"
                gridMoveNext g
@@ -47,17 +48,20 @@ gui
 
     onGrid ev
       = case ev of
-          GridCellChange row col veto
-            -> logMessage ("cell changed: " ++ show (row,col))
+          GridCellChange row_ col_ _veto
+            -> logMessage ("cell changed: " ++ show (row_, col_))
           _ -> propagateEvent
+
+names :: [[String]]
 names
   = [["First Name", "Last Name"]
     ,["Daan","Leijen"],["Arjan","van IJzendoorn"]
     ,["Martijn","Schrage"],["Andres","Loh"]]
 
 
-setRow g (row,values)
-  = mapM_ (\(col,value) -> gridSetCellValue g row col value) (zip [0..] values)
+setRow :: Grid a -> (Int, [String]) -> IO ()
+setRow g (row_, values)
+  = mapM_ (\(col,value_) -> gridSetCellValue g row_ col value_) (zip [0..] values)
 
 
 {--------------------------------------------------------------------------------
@@ -65,12 +69,12 @@ setRow g (row,values)
 --------------------------------------------------------------------------------}
 
 gridCtrl :: Window a -> [Prop (Grid ())] -> IO (Grid ())
-gridCtrl parent props
-  = feed2 props 0 $
-    initialWindow $ \id rect -> \props flags ->
-    do g <- gridCreate parent id rect flags
+gridCtrl parent_ props_
+  = feed2 props_ 0 $
+    initialWindow $ \id_ rect -> \props_ flags ->
+    do g <- gridCreate parent_ id_ rect flags
        gridCreateGrid g 0 0 0
-       set g props
+       set g props_
        return g
 
 gridEvent :: Event (Grid a) (EventGrid -> IO ())
@@ -80,33 +84,32 @@ gridEvent
 
 gridMoveNext :: Grid a -> IO ()
 gridMoveNext g
-  = do row <- gridGetGridCursorRow g
-       col <- gridGetGridCursorCol g
+  = do row_ <- gridGetGridCursorRow g
+       col_ <- gridGetGridCursorCol g
        rowCount <- gridGetNumberRows g
        colCount <- gridGetNumberCols g
-       let (r,c) = if (row+1 >= rowCount)
-                    then if (col+1 >= colCount)
-                     then (0,0)
-                     else (0,col+1)
-                    else (row+1,col)
+       let (r,c) = if (row_ + 1 >= rowCount)
+                    then if (col_ + 1 >= colCount)
+                     then (0, 0)
+                     else (0, col_ + 1)
+                    else (row_ + 1, col_)
        gridSetGridCursor g r c
        gridMakeCellVisible g r c
-       return ()
 
 
 appendColumns :: Grid a -> [String] -> IO ()
-appendColumns g []
+appendColumns _g []
   = return ()
 appendColumns g labels
   = do n <- gridGetNumberCols g
-       gridAppendCols g (length labels) True
-       mapM_ (\(i,label) -> gridSetColLabelValue g i label) (zip [n..] labels)
+       _ <- gridAppendCols g (length labels) True
+       mapM_ (\(i, label_) -> gridSetColLabelValue g i label_) (zip [n..] labels)
 
 appendRows :: Grid a -> [String] -> IO ()
-appendRows g []
+appendRows _g []
   = return ()
 appendRows g labels
   = do n <- gridGetNumberRows g
-       gridAppendRows g (length labels) True
-       mapM_ (\(i,label) -> gridSetRowLabelValue g i label) (zip [n..] labels)
+       _ <- gridAppendRows g (length labels) True
+       mapM_ (\(i, label_) -> gridSetRowLabelValue g i label_) (zip [n..] labels)
 

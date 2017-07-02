@@ -32,6 +32,7 @@ executable BouncingBalls
                        wx,
                        wxcore
   default-language:    Haskell2010
+  ghc-options:         -Wall
 
 
 executable ByeDemo
@@ -40,6 +41,7 @@ executable ByeDemo
                        wx,
                        wxcore
   default-language:    Haskell2010
+  ghc-options:         -Wall
 
 
 executable Controls
@@ -48,6 +50,7 @@ executable Controls
                        wx,
                        wxcore
   default-language:    Haskell2010
+  ghc-options:         -Wall
 
 
 executable CustomControl
@@ -56,6 +59,7 @@ executable CustomControl
                        wx,
                        wxcore
   default-language:    Haskell2010
+  ghc-options:         -Wall
 
 
 executable FileBrowse
@@ -67,6 +71,7 @@ executable FileBrowse
                        wxcore
   default-language:    Haskell2010
   other-modules:       Paths_samplesWx
+  ghc-options:         -Wall
 
 
 executable Grid
@@ -75,6 +80,7 @@ executable Grid
                        wx,
                        wxcore
   default-language:    Haskell2010
+  ghc-options:         -Wall
 
 
 executable HelloWorld
@@ -83,6 +89,7 @@ executable HelloWorld
                        wx,
                        wxcore
   default-language:    Haskell2010
+  ghc-options:         -Wall
 
 
 executable ImageViewer
@@ -91,6 +98,7 @@ executable ImageViewer
                        wx,
                        wxcore
   default-language:    Haskell2010
+  ghc-options:         -Wall
 
 
 executable Layout
@@ -99,6 +107,7 @@ executable Layout
                        wx,
                        wxcore
   default-language:    Haskell2010
+  ghc-options:         -Wall
 
 
 executable ListCtrl
@@ -107,6 +116,7 @@ executable ListCtrl
                        wx,
                        wxcore
   default-language:    Haskell2010
+  ghc-options:         -Wall
 
 
 executable ListView
@@ -115,6 +125,7 @@ executable ListView
                        wx,
                        wxcore
   default-language:    Haskell2010
+  ghc-options:         -Wall
 
 
 executable Minimal
@@ -123,6 +134,7 @@ executable Minimal
                        wx,
                        wxcore
   default-language:    Haskell2010
+  ghc-options:         -Wall
 
 
 executable Paint
@@ -131,6 +143,7 @@ executable Paint
                        wx,
                        wxcore
   default-language:    Haskell2010
+  ghc-options:         -Wall
 
 
 executable Print
@@ -139,6 +152,7 @@ executable Print
                        wx,
                        wxcore
   default-language:    Haskell2010
+  ghc-options:         -Wall
 
 
 executable Process
@@ -147,6 +161,7 @@ executable Process
                        wx,
                        wxcore
   default-language:    Haskell2010
+  ghc-options:         -Wall
 
 
 executable PropertyGrid
@@ -155,6 +170,7 @@ executable PropertyGrid
                        wx,
                        wxcore
   default-language:    Haskell2010
+  ghc-options:         -Wall
 
 
 executable TestTaskBarIcon
@@ -164,6 +180,7 @@ executable TestTaskBarIcon
                        wx,
                        wxcore
   default-language:    Haskell2010
+  ghc-options:         -Wall
 
 
 executable TimeFlows
@@ -172,6 +189,7 @@ executable TimeFlows
                        wx,
                        wxcore
   default-language:    Haskell2010
+  ghc-options:         -Wall
 
 
 executable TimeFlowsEx
@@ -180,3 +198,4 @@ executable TimeFlowsEx
                        wx,
                        wxcore
   default-language:    Haskell2010
+  ghc-options:         -Wall

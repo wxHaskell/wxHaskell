@@ -5,9 +5,11 @@ module Main where
 
 import Graphics.UI.WXCore
 
+main :: IO ()
 main
   = run ballsFrame
 
+ballsFrame :: IO ()
 ballsFrame
   = do -- a list of balls, where each ball is represented by a list of all future Y positions.
        vballs <- varCreate []
@@ -23,7 +25,7 @@ ballsFrame
                                   [ "Click to create more bouncing balls"
                                   , "Right-click to for a new window"
                                   , "<+/-> to change the speed" ]
-       windowSetBackgroundColour f $ colorSystem Color3DFace
+       _ <- windowSetBackgroundColour f $ colorSystem Color3DFace
        windowSetLayout f (column 1 [ minsize (sz maxX maxY) (widget p)
                                    , label instructions ])
 
@@ -41,42 +43,43 @@ ballsFrame
        windowOnKeyChar p (onKey t)
 
        -- show the frame
-       windowShow f
+       _ <- windowShow f
        windowRaise f
 
        -- and start the timer (25 msec).
-       timerStart t 25 False {- one-shot timer? -}
+       _ <- timerStart t 25 False {- one-shot timer? -}
        return ()
+
   where
     -- react on mouse events
     onMouse w vballs mouse
       = case mouse of
-          MouseLeftDown pt mods  -> dropBall w vballs pt  -- new ball
-          MouseRightDown pt mods -> ballsFrame            -- new window with bouncing balls
-          other                  -> skipCurrentEvent      -- unprocessed event: send up the window chain
+          MouseLeftDown  pt_ _mods -> dropBall w vballs pt_ -- new ball
+          MouseRightDown _pt _mods -> ballsFrame            -- new window with bouncing balls
+          _other                   -> skipCurrentEvent      -- unprocessed event: send up the window chain
 
     -- react on the keyboard
     onKey t keyboard
       = case keyKey keyboard of
           KeyChar '-'   -> updateInterval t (\i -> i+5)
           KeyChar '+'   -> updateInterval t (\i -> max 1 (i-5))
-          other         -> skipCurrentEvent
+          _other        -> skipCurrentEvent
 
     updateInterval t f
       = do i <- timerGetInterval t
            timerStop t
-           timerStart t (f i) False
+           _ <- timerStart t (f i) False
            return ()
 
     -- advance all the balls to their next position
     nextBalls w vballs
-      = do varUpdate vballs (filter (not.null) . map (drop 1))
-           windowRefresh w False
+      = varUpdate vballs (filter (not.null) . map (drop 1)) >>
+        windowRefresh w False
 
     -- add a new ball
-    dropBall w vballs pt
-      = do varUpdate vballs (bouncing pt:)
-           windowRefresh w False
+    dropBall w vballs pt_
+      = varUpdate vballs (bouncing pt_:) >>
+        windowRefresh w False
 
     -- calculate all future positions
     bouncing (Point x y)
@@ -89,14 +92,14 @@ ballsFrame
 
 
     -- paint the balls
-    paintBalls vballs dc viewRect updateAreas
+    paintBalls vballs dc _viewRect _updateAreas
       = do dcClear dc
            balls <- varGet vballs
            dcWithBrushStyle dc (BrushStyle BrushSolid red) $
              mapM_ (drawBall dc) (map head (filter (not.null) balls))
 
-    drawBall dc pt
-      = dcDrawCircle dc pt radius
+    drawBall dc pt_
+      = dcDrawCircle dc pt_ radius
 
 
 -- radius the ball, and the maximal x and y coordinates

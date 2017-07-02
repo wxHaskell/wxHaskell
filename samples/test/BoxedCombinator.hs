@@ -1,6 +1,7 @@
 module Main where
 import Graphics.UI.WX
 
+bugtext :: String
 bugtext = unlines [ "Former bug: these buttons should react when clicked"
                   , "but the boxed one does not"
                   , ""
@@ -8,6 +9,7 @@ bugtext = unlines [ "Former bug: these buttons should react when clicked"
                   , "Working in: Linux and Windows"
                   ]
 
+main :: IO ()
 main = start $ do
          f <- frame [ text := "program" ]
          b1 <- button f [ text := "click me" ]

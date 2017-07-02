@@ -32,32 +32,32 @@ gui =
       logMessage "logging enabled"              
 
       -- button page
-      ok   <- buttonRes f "ok" [on command := logMessage "ok button pressed"]
-      quit <- buttonRes f "ok" [on command := close f]
+      _ok   <- buttonRes f "ok" [on command := logMessage "ok button pressed"]
+      _quit <- buttonRes f "ok" [on command := close f]
 
       -- radio box page
-      r1   <- radioBoxRes f "r1" [on select ::= logSelect]
-      r2   <- radioBoxRes f "r2" [on select ::= logSelect]
-      rb1  <- buttonRes f "rb1" [on command ::= onEnable r1]
+      r1    <- radioBoxRes f "r1" [on select ::= logSelect]
+      _r2   <- radioBoxRes f "r2" [on select ::= logSelect]
+      _rb1  <- buttonRes f "rb1" [on command ::= onEnable r1]
 
       -- choice page
-      c1   <- choiceRes f "c1" [on select ::= logSelect]
-      c2   <- choiceRes f "c2" [on select ::= logSelect]
-      cb1  <- buttonRes f "cb1" [on command ::= onEnable c1]
+      c1    <- choiceRes f "c1" [on select ::= logSelect]
+      _c2   <- choiceRes f "c2" [on select ::= logSelect]
+      _cb1  <- buttonRes f "cb1" [on command ::= onEnable c1]
 
       -- list box page
-      sl1  <- singleListBoxRes f "sl1" [on select ::= logSelect]
-      sl2  <- singleListBoxRes f "sl2" [on select ::= logSelect]
-      sc1  <- checkBoxRes f "sc1" [on command ::= onEnable sl1]
+      sl1   <- singleListBoxRes f "sl1" [on select ::= logSelect]
+      _sl2  <- singleListBoxRes f "sl2" [on select ::= logSelect]
+      _sc1  <- checkBoxRes f "sc1" [on command ::= onEnable sl1]
 
       -- slider/gauge page
-      s    <- sliderRes f "s" []
-      g    <- gaugeRes f "g" []
+      s     <- sliderRes f "s" []
+      g     <- gaugeRes f "g" []
       set s [on command := do { i <- get s selection; set g [selection := i] } ]
 
       -- specify layout
       set f [ clientSize := sz 400 300 ]
-      windowShow f
+      _ <- windowShow f
       return ()
 
   where

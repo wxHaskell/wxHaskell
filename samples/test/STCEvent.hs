@@ -2,8 +2,10 @@
 import Graphics.UI.WX
 import Graphics.UI.WXCore
 
+calltiptext :: String
 calltiptext = "I can write whatever I want here"
 
+main :: IO ()
 main = start $ do
          f <- frame [text := "Scintilla Test"]
          p <- panel f []
@@ -29,7 +31,7 @@ handler stc e = do logMessage $ show e
                     (STCDwellStart xy) -> do
                       pos <- styledTextCtrlPositionFromPoint stc xy
                       styledTextCtrlCallTipShow stc pos calltiptext
-                    (STCDwellEnd xy) -> do
+                    (STCDwellEnd _xy) -> do
                       active <- styledTextCtrlCallTipActive stc
                       when active $ styledTextCtrlCallTipCancel stc
                     _ -> return ()

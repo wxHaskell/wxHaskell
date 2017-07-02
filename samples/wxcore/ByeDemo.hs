@@ -23,7 +23,7 @@ gui :: IO ()
 gui
   = do -- create top frame
        f <- frameCreateTopFrame "Bye demo"
-       windowSetBackgroundColour f white
+       _ <- windowSetBackgroundColour f white
 
        -- panel for automatic tab management and the nice background
        p <- panelCreate f idAny rectNull 0
@@ -42,7 +42,7 @@ gui
        buttonOnCommand b (onCommand1 f t b)
 
        -- show the frame
-       windowShow f
+       _ <- windowShow f
        windowRaise f
        return ()
   where
@@ -54,5 +54,5 @@ gui
 
     -- call on the second click
     onCommand2 f
-      = do windowClose f False {- can veto -}
+      = do _ <- windowClose f False {- can veto -}
            return ()

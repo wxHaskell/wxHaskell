@@ -30,7 +30,7 @@ gui
        windowOnPaint s (\dc -> onPaint mouseXY dc)
 
        -- show the frame
-       windowShow f
+       _ <- windowShow f
        windowRaise f
        return ()
   where
@@ -40,7 +40,7 @@ gui
            windowRefresh w False {- erase background -}
 
     -- do some painting.
-    onPaint mouseXY dc view
+    onPaint mouseXY dc _view
       = -- first create some brushes and pens.
         withBrushStyle (BrushStyle (BrushHatch HatchCross) red) $ \brushRedHatch ->
         withBrushStyle (BrushStyle BrushSolid red)  $ \brushRed ->

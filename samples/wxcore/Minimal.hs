@@ -10,6 +10,6 @@ gui :: IO ()
 gui
   = do frame <- frameCreate objectNull idAny "Hello world" rectZero frameDefaultStyle
        windowSetClientSize frame (sz 600 250)
-       windowShow frame
+       _ <- windowShow frame
        windowRaise frame
        return ()

@@ -24,6 +24,7 @@ executable Camels
                        wxcore,
                        wx
   default-language:    Haskell2010
+  ghc-options:         -Wall
 
 
 executable GLCanvas
@@ -33,6 +34,7 @@ executable GLCanvas
                        wx,
                        OpenGL 
   default-language:    Haskell2010
+  ghc-options:         -Wall
 
 
 executable GLMultiCanvas
@@ -42,6 +44,7 @@ executable GLMultiCanvas
                        wx,
                        OpenGL 
   default-language:    Haskell2010
+  ghc-options:         -Wall
 
 
 executable NotebookRight
@@ -50,6 +53,7 @@ executable NotebookRight
                        wxcore,
                        wx
   default-language:    Haskell2010
+  ghc-options:         -Wall
 
 
 executable PaintDirect
@@ -58,3 +62,4 @@ executable PaintDirect
                        wxcore,
                        wx
   default-language:    Haskell2010
+  ghc-options:         -Wall

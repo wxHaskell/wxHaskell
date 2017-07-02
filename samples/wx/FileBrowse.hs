@@ -26,23 +26,31 @@ main
 {--------------------------------------------------------------------------------
    Images
 --------------------------------------------------------------------------------}
+imgComputer   :: FilePath
 imgComputer   = "computer"
+imgDisk       :: FilePath
 imgDisk       = "disk"
+imgFile       :: FilePath
 imgFile       = "file"
+imgHFile      :: FilePath
 imgHFile      = "hsicon"
+imgFolder     :: FilePath
 imgFolder     = "f_closed"
+imgFolderOpen :: FilePath
 imgFolderOpen = "f_open"
 
 -- plain names of images
+imageNames :: [FilePath]
 imageNames    
   = [imgComputer,imgDisk,imgFile,imgHFile,imgFolder,imgFolderOpen]
 
 -- file names of the images
+imageFiles :: [FilePath]
 imageFiles
   = map (\name -> "bitmaps/" ++ name ++ ".ico") imageNames
 
 -- get the index of an image
-imageIndex :: String -> Int
+imageIndex :: FilePath -> Int
 imageIndex name 
   = case lookup name (zip imageNames [0..]) of
       Just idx  -> idx
@@ -57,12 +65,12 @@ imageNone     = (-1)
    tree node. Here we wrap the "unsafe" basic calls into safe wrappers.
 --------------------------------------------------------------------------------}
 treeCtrlSetItemPath :: TreeCtrl a -> TreeItem -> FilePath -> IO ()
-treeCtrlSetItemPath t item path
-  = treeCtrlSetItemClientData t item (return ()) path
+treeCtrlSetItemPath t item_ path
+  = treeCtrlSetItemClientData t item_ (return ()) path
 
 treeCtrlGetItemPath :: TreeCtrl a -> TreeItem -> IO FilePath 
-treeCtrlGetItemPath t item
-  = do mbpath <- unsafeTreeCtrlGetItemClientData t item
+treeCtrlGetItemPath t item_
+  = do mbpath <- unsafeTreeCtrlGetItemClientData t item_
        case mbpath of
          Just path -> return path
          Nothing   -> return ""
@@ -128,29 +136,29 @@ gui
 onTreeEvent :: TreeCtrl a -> ListCtrl b -> StatusField -> EventTree -> IO ()
 onTreeEvent t l status event
   = case event of
-      TreeItemExpanding item veto  | treeItemIsOk item
+      TreeItemExpanding item_ _veto | treeItemIsOk item_
         -> do wxcBeginBusyCursor
-              treeCtrlChildrenAddSubDirs t item
+              treeCtrlChildrenAddSubDirs t item_
               wxcEndBusyCursor
               propagateEvent
-      TreeSelChanged item olditem  | treeItemIsOk item
+      TreeSelChanged item_ _olditem  | treeItemIsOk item_
         -> do wxcBeginBusyCursor
-              path <- treeCtrlGetItemPath t item
+              path <- treeCtrlGetItemPath t item_
               set status [text := path]
               listCtrlShowDir l path
               wxcEndBusyCursor
               propagateEvent
-      other
+      _other
         -> propagateEvent
 
 onListEvent :: ListCtrl a -> StatusField -> EventList -> IO ()
 onListEvent l status event
   = case event of
-      ListItemSelected item
+      ListItemSelected _item
         -> do count <- listCtrlGetSelectedItemCount l
               set status [text := (show count ++ " item" ++ (if count /= 1 then "s" else "") ++ " selected") ]
               propagateEvent
-      other
+      _other
         -> propagateEvent
 
 ioExceptionHandler :: a -> IOException -> IO a
@@ -164,29 +172,32 @@ swallowIOExceptions def act =
    View directory files
 --------------------------------------------------------------------------------}
 listCtrlShowDir :: ListCtrl a -> FilePath -> IO ()
-listCtrlShowDir listCtrl path
+listCtrlShowDir listCtrl_ path
   = swallowIOExceptions () $
-    do itemsDelete listCtrl
+    do itemsDelete listCtrl_
        contents <- getDirectoryContents path
        let paths = map (\cont -> path ++ cont) contents
-       mapM_ (listCtrlAddFile listCtrl) (zip3 [0..] contents paths)
+       mapM_ (listCtrlAddFile listCtrl_) (zip3 [0..] contents paths)
 
+listCtrlAddFile :: ListCtrl a -> (Int, String, FilePath) -> IO ()
 listCtrlAddFile l (idx,fname,fpath)
   = do isdir <- swallowIOExceptions False $ doesDirectoryExist fpath
        perm  <- getPermissions fpath
        time  <- getModificationTime fpath
-       let image = imageIndex (if isdir
-                                then imgFolder 
-                                else if (extension fname == "hs")
-                                      then imgHFile
-                                      else imgFile)
-       listCtrlInsertItemWithLabel l idx fpath image        -- use this instead of 'items' so we can set the image.
+       let image_ = imageIndex (if isdir
+                                 then imgFolder 
+                                 else if (extension fname == "hs")
+                                       then imgHFile
+                                       else imgFile)
+       _ <- listCtrlInsertItemWithLabel l idx fpath image_  -- use this instead of 'items' so we can set the image_.
        set l [item idx := [fname,showPerm perm,show time]]
 
+extension :: String -> String
 extension fname
   | elem '.' fname  = reverse (takeWhile (/='.') (reverse fname))
   | otherwise       = ""
 
+showPerm :: Permissions -> [Char]
 showPerm perm
   = [if readable perm then 'r' else '-'
     ,if writable perm then 'w' else '-'
@@ -198,21 +209,21 @@ showPerm perm
    Directory tree helpers
 --------------------------------------------------------------------------------}
 treeCtrlChildrenAddSubDirs :: TreeCtrl a -> TreeItem -> IO ()
-treeCtrlChildrenAddSubDirs t parent
-  = do children <- treeCtrlGetChildren t parent
-       mapM_ (treeCtrlAddSubDirs t) children
+treeCtrlChildrenAddSubDirs t parent_
+  = do children_ <- treeCtrlGetChildren t parent_
+       mapM_ (treeCtrlAddSubDirs t) children_
 
 treeCtrlAddSubDirs :: TreeCtrl a -> TreeItem -> IO ()
-treeCtrlAddSubDirs t parent
-  = do fpath <- treeCtrlGetItemPath t parent
+treeCtrlAddSubDirs t parent_
+  = do fpath <- treeCtrlGetItemPath t parent_
        dirs  <- getSubdirs fpath
-       treeCtrlDeleteChildren t parent
+       treeCtrlDeleteChildren t parent_
        mapM_ addChild dirs
-       treeCtrlSetItemHasChildren t parent (not (null dirs))
+       treeCtrlSetItemHasChildren t parent_ (not (null dirs))
   where
     addChild (path,name)
-      = do item <- treeCtrlAppendItem t parent name (imageIndex imgFolder) (imageIndex imgFolderOpen) objectNull
-           treeCtrlSetItemPath t item path
+      = do item_ <- treeCtrlAppendItem t parent_ name (imageIndex imgFolder) (imageIndex imgFolderOpen) objectNull
+           treeCtrlSetItemPath t item_ path
 
 {--------------------------------------------------------------------------------
    General directory operations

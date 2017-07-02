@@ -28,17 +28,17 @@ gui
        pg  <- propertyGrid p [on propertyGridEvent := onPropertyGridEvent]
 
        -- add test data
-       propertyCategoryCreate "alpha" >>= propertyGridAppend pg
-       stringPropertyCreate "Name" "name" "Bob" >>= propertyGridAppend pg 
-       propertyGridDisableProperty pg "name"
+       _ <- propertyCategoryCreate "alpha" >>= propertyGridAppend pg
+       _ <- stringPropertyCreate "Name" "name" "Bob" >>= propertyGridAppend pg 
+       _ <- propertyGridDisableProperty pg "name"
 
-       intPropertyCreate "Age" "age" 32 >>= propertyGridAppend pg 
-       boolPropertyCreate "Is member?" "bool" True >>= propertyGridAppend pg 
+       _ <- intPropertyCreate "Age" "age" 32 >>= propertyGridAppend pg 
+       _ <- boolPropertyCreate "Is member?" "bool" True >>= propertyGridAppend pg 
 
-       propertyCategoryCreate "beta" >>= propertyGridAppend pg
-       floatPropertyCreate "Score" "float" 3.14 >>= propertyGridAppend pg 
-       dateTimeCreate >>= \d -> dateTimeNow d >> datePropertyCreate "Join date" "date" d >>= propertyGridAppend pg 
-       filePropertyCreate "Data file" "file" "/home/" >>= propertyGridAppend pg 
+       _ <- propertyCategoryCreate "beta" >>= propertyGridAppend pg
+       _ <- floatPropertyCreate "Score" "float" 3.14 >>= propertyGridAppend pg 
+       _ <- dateTimeCreate >>= \d -> dateTimeNow d >> datePropertyCreate "Join date" "date" d >>= propertyGridAppend pg 
+       _ <- filePropertyCreate "Data file" "file" "/home/" >>= propertyGridAppend pg 
 
        -- specify layout
        set f [layout     := container p $ margin 10 $ 
@@ -47,7 +47,6 @@ gui
                                      ]
              ,clientSize := sz 600 400
              ]
-       return ()
 
   where
     onPropertyGridEvent eventPropertyGrid
@@ -59,14 +58,14 @@ gui
             let propStr = show `fmap` (showProp `Traversable.mapM` maybeProp)
               in propStr >>= logMessage . (++) "PropertyGrid highlighted "
 
-          other -> 
+          _other -> 
               logMessage ("Other propertyGrid event.")
 
     showProp p = do
-      label <- pGPropertyGetLabel p
-      typeString <- pGPropertyGetValueType p
+      label_      <- pGPropertyGetLabel p
+      typeString  <- pGPropertyGetValueType p
       valueString <- pGPropertyGetValueAsString p
-      return $ label ++ " " ++ show (readAny typeString valueString)
+      return $ label_ ++ " " ++ show (readAny typeString valueString)
 
 data Any
   = IsString String

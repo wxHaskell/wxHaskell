@@ -8,5 +8,5 @@ main
 
 gui :: IO ()
 gui
-  = do frame [text := "Hello world!"]
+  = do _ <- frame [text := "Hello world!"]
        return ()

@@ -30,14 +30,17 @@ main :: IO()
 main = start gui
 
 
+defaultWidth :: Int
 defaultWidth  = 320
+defaultHeight :: Int
 defaultHeight = 200
 
+gui :: IO()
 gui = do
    f <- frame [ text := "Simple OpenGL" ]
    glCanvas <- glCanvasCreateEx f 0 (Rect 0 0 defaultWidth defaultHeight) 0 "GLCanvas" [GL_RGBA] nullPalette
    glContext <- glContextCreateFromNull glCanvas
-   glCanvasSetCurrent glCanvas glContext
+   _ <- glCanvasSetCurrent glCanvas glContext
    let glWidgetLayout = fill $ widget glCanvas
    WX.set f [ layout := glWidgetLayout
 -- you have to use the paintRaw event. Otherwise the OpenGL window won't
@@ -46,17 +49,20 @@ gui = do
             ]
    repaint f
 
+convWG :: Size2D Int -> GL.Size
 convWG (WX.Size w h) = (GL.Size (convInt32  w) (convInt32  h))
+
+convInt32 :: Int -> GLsizei
 convInt32 = fromInteger . toInteger
 
 -- This paint function gets the current glCanvas for knowing where to draw in.
 -- It is possible to have multiple GL windows in your application.
 paintGL :: GLCanvas a -> DC b -> WX.Rect -> [WX.Rect]-> IO ()
-paintGL glWindow dc myrect _ = do
+paintGL glWindow _dc myrect _ = do
    myInit
    reshape $ convWG $ rectSize myrect
    display
-   glCanvasSwapBuffers glWindow
+   _ <- glCanvasSwapBuffers glWindow
    return ()
 
 
@@ -93,6 +99,7 @@ myInit = do
    mapGrid2 GL.$= ((20, (0, 1)), (20, (0, 1 :: GL.GLfloat)))
    initlights  -- for lighted version only
 
+display :: IO ()
 display = do
    GL.clear [ GL.ColorBuffer, GL.DepthBuffer ]
    GL.preservingMatrix $ do
@@ -100,6 +107,7 @@ display = do
      evalMesh2 Fill (0, 20) (0, 20)
    GL.flush
 
+reshape :: GL.Size -> IO ()
 reshape mysize@(GL.Size w h) = do
    GL.viewport GL.$= (GL.Position 0 0, mysize)
    GL.matrixMode GL.$= GL.Projection

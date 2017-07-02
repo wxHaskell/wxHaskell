@@ -8,9 +8,9 @@
 module Main where
 
 import Graphics.UI.WX
-import Graphics.UI.WXCore
 
 -- main gui.
+main :: IO ()
 main 
   = start $ 
     do f    <- frame [text := "Custom color box controls"]
@@ -29,20 +29,20 @@ data CColorBox a = CColorBox
 -- all normal window attributes; this means that one has to define
 -- the type signature of "colorBox" carefully.
 colorBox :: Window a -> [Prop (ColorBox ())] -> IO (ColorBox ())
-colorBox parent props
+colorBox parent_ props
   = do let defaults  = [clientSize := sz 20 20, border := BorderStatic]
            cboxprops = castProps cast props -- cast properties to colorbox properties
-       w <- window parent (defaults ++ cboxprops)
+       w <- window parent_ (defaults ++ cboxprops)
        let cbox = cast w                    -- cast to our new color box type
        set cbox [on click := selectColor cbox]
        return cbox
   where
     -- select a new color for the colorbox control.
-    selectColor cbox pt
+    selectColor cbox _pt
       = do c   <- get cbox boxcolor
            mbc <- colorDialog cbox c
            case mbc of
-             Just c  -> set cbox [boxcolor := c]                        
+             Just c_  -> set cbox [boxcolor := c_]
              Nothing -> return ()
 
     -- our casting operator: type signature is necessary!
