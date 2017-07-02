@@ -60,4 +60,4 @@ Library
 
  Hs-Source-Dirs: src
 
- ghc-options: -Wall
+ ghc-options: -Wall -Wno-orphans

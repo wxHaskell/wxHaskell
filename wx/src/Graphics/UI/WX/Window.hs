@@ -33,7 +33,6 @@ import Graphics.UI.WXCore
 
 import Graphics.UI.WX.Types
 import Graphics.UI.WX.Attributes
--- import Graphics.UI.WX.Layout
 import Graphics.UI.WX.Classes
 import Graphics.UI.WX.Events
 
@@ -190,20 +189,20 @@ initialArea cont props_
       Nothing 
         -> case findProperty position pointNull props_ of
              Just (p,props') -> case findProperty outerSize sizeNull props_ of
-                                  Just (sz,props'') -> cont (rect p sz) props''
+                                  Just (sz_,props'') -> cont (rect p sz_) props''
                                   Nothing           -> cont (rect p sizeNull) props'
              Nothing         -> case findProperty outerSize sizeNull props_ of
-                                  Just (sz,props')  -> cont (rect pointNull sz) props'
+                                  Just (sz_,props')  -> cont (rect pointNull sz_) props'
                                   Nothing           -> cont rectNull props_
 
 
 
 instance Colored (Window a) where
   bgcolor
-    = newAttr "bgcolor" windowGetBackgroundColour (\w x -> do{ windowSetBackgroundColour w x; return ()})
+    = newAttr "bgcolor" windowGetBackgroundColour (\w x -> do _ <- windowSetBackgroundColour w x; return ())
 
   color
-    = newAttr "color" windowGetForegroundColour (\w x -> do windowSetForegroundColour w x; return ())
+    = newAttr "color"   windowGetForegroundColour (\w x -> do _ <- windowSetForegroundColour w x; return ())
 
 
 instance Literate (Window a) where
@@ -229,10 +228,10 @@ instance Literate (Window a) where
                                  (textAttrDelete)
                                  (\attr -> withFontStyle info $ \fnt ->
                                            do textAttrSetFont attr fnt
-                                              textCtrlSetDefaultStyle textCtrl attr
+                                              _ <- textCtrlSetDefaultStyle textCtrl attr
                                               return ()))
            (withFontStyle info $ \fnt ->
-            do windowSetFont w fnt
+            do _ <- windowSetFont w fnt
                return ())
 
   textColor
@@ -251,8 +250,8 @@ instance Literate (Window a) where
         = ifInstanceOf w classTextCtrl
            (\textCtrl -> bracket (textAttrCreateDefault)
                                  (textAttrDelete)
-                                 (\attr -> do textAttrSetTextColour attr c
-                                              textCtrlSetDefaultStyle textCtrl attr
+                                 (\attr -> do _ <- textAttrSetTextColour attr c
+                                              _ <- textCtrlSetDefaultStyle textCtrl attr
                                               return ()))
            (set w [color := c])
 
@@ -273,7 +272,7 @@ instance Literate (Window a) where
            (\textCtrl -> bracket (textAttrCreateDefault)
                                  (textAttrDelete)
                                  (\attr -> do textAttrSetBackgroundColour attr c
-                                              textCtrlSetDefaultStyle textCtrl attr
+                                              _ <- textCtrlSetDefaultStyle textCtrl attr
                                               return ()))
            (set w [bgcolor := c])
 
@@ -298,8 +297,8 @@ instance Visible (Window a) where
         = do s <- get w style
              return (not (bitsSet wxNO_FULL_REPAINT_ON_RESIZE s))
 
-      setFlag w repaint
-        = set w [style :~ \stl -> if repaint 
+      setFlag w repaint_
+        = set w [style :~ \stl -> if repaint_ 
                                    then stl .-. wxNO_FULL_REPAINT_ON_RESIZE 
                                    else stl .+. wxNO_FULL_REPAINT_ON_RESIZE]
 
@@ -418,6 +417,8 @@ instance Bordered (Window a) where
       setter w b
         = set w [style :~ \stl -> setBitMask b stl]
 
+initialBorder :: Bordered w =>
+                 ([Prop w] -> Int -> p) -> [Prop w] -> Int -> p
 initialBorder cont props_ style_
   = case filterProperty border props_ of
       (PropValue x, ps)  -> cont ps (setBitMask x style_) 

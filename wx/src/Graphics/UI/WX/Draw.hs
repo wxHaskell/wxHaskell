@@ -31,14 +31,14 @@ module Graphics.UI.WX.Draw
     , dcWith, dcClear
     ) where
 
-import Graphics.UI.WXCore
+import Graphics.UI.WXCore  hiding (center, point)
 
 
-import Graphics.UI.WX.Types
+-- import Graphics.UI.WX.Types
 import Graphics.UI.WX.Attributes
-import Graphics.UI.WX.Layout
-import Graphics.UI.WX.Classes
-import Graphics.UI.WX.Window
+-- import Graphics.UI.WX.Layout
+import Graphics.UI.WX.Classes    hiding (text)
+-- import Graphics.UI.WX.Window
 
 
 
@@ -75,7 +75,7 @@ instance Drawn (DC a) where
     = mapAttr _penJoin (\pstyle x -> pstyle{ _penJoin = x }) pen
 
   penColor
-    = mapAttr _penColor (\pstyle color -> pstyle{ _penColor = color }) pen
+    = mapAttr _penColor (\pstyle color_ -> pstyle{ _penColor = color_ }) pen
 
 instance Brushed (DC a) where
   brush
@@ -85,7 +85,7 @@ instance Brushed (DC a) where
     = mapAttr _brushKind (\bstyle x -> bstyle{ _brushKind = x }) brush
 
   brushColor
-    = mapAttr _brushColor (\bstyle color -> bstyle{ _brushColor = color }) brush
+    = mapAttr _brushColor (\bstyle color_ -> bstyle{ _brushColor = color_ }) brush
 
 instance Literate (DC a) where
   font
@@ -139,8 +139,8 @@ arc dc center radius start end props
 
 -- | Draw an ellipse, bounded by a certain rectangle.
 ellipse :: DC a -> Rect -> [Prop (DC a)] -> IO ()
-ellipse dc rect props
-  = dcWith dc props (dcDrawEllipse dc rect)
+ellipse dc rect_ props
+  = dcWith dc props (dcDrawEllipse dc rect_)
 
 -- | Draw an elliptic arc. Takes the bounding rectangle, 
 -- and a starting and ending point relative to the
@@ -149,8 +149,8 @@ ellipse dc rect props
 -- values denote a counter clockwise motion. If the angles are
 -- equal, an entire ellipse is drawn.
 ellipticArc :: DC a -> Rect -> Double -> Double -> [Prop (DC a)] -> IO ()
-ellipticArc dc rect start end props
-  = dcWith dc props (dcDrawEllipticArc dc rect start end)
+ellipticArc dc rect_ start end props
+  = dcWith dc props (dcDrawEllipticArc dc rect_ start end)
 
 -- | Draw a line.
 line :: DC a -> Point -> Point -> [Prop (DC a)] -> IO ()
@@ -176,8 +176,8 @@ drawPoint dc center props
 
 -- | Draw a rectangle.
 drawRect :: DC a -> Rect -> [Prop (DC a)] -> IO ()
-drawRect dc rect props
-  = dcWith dc props (dcDrawRectangle dc rect)
+drawRect dc rect_ props
+  = dcWith dc props (dcDrawRectangle dc rect_)
 
 -- | Draw a rectangle with rounded corners. The corners are
 -- quarter circles with the given radius.
@@ -187,8 +187,8 @@ drawRect dc rect props
 -- the size of the rectangle, and also avoids the strange effects X produces when the corners 
 -- are too big for the rectangle.
 roundedRect :: DC a -> Rect -> Double -> [Prop (DC a)] -> IO ()
-roundedRect dc rect radius props
-  = dcWith dc props (dcDrawRoundedRectangle dc rect radius)
+roundedRect dc rect_ radius props
+  = dcWith dc props (dcDrawRoundedRectangle dc rect_ radius)
 
 -- | Draw text.
 drawText :: DC a -> String -> Point -> [Prop (DC a)] -> IO ()
@@ -214,7 +214,7 @@ drawBitmap dc bitmap point transparent props
 
 -- | Draw an image. 
 drawImage :: DC a -> Image b -> Point -> [Prop (DC a)] -> IO ()
-drawImage dc image pt props
+drawImage dc image pt_ props
   = do bm <- bitmapCreateFromImage image (-1)
-       drawBitmap dc bm pt False props
+       drawBitmap dc bm pt_ False props
        bitmapDelete bm

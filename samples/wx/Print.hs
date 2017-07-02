@@ -56,5 +56,5 @@ gui
               
      -- Return the page range 
      pageFun :: PageFunction
-     pageFun pageInfo printInfo printSize 
+     pageFun _pageInfo _printInfo _printSize 
         = (2,5) 

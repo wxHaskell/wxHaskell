@@ -46,15 +46,10 @@ module Graphics.UI.WX.Menu
     , menuList, menubar, statusbar
     ) where
 
--- import Data.Char( toUpper )
--- import Data.List( partition, intersperse )
 import System.IO.Unsafe (unsafePerformIO)
--- import Foreign.Ptr( nullPtr )
 import Graphics.UI.WXCore hiding (Event)
 
--- import Graphics.UI.WX.Types
 import Graphics.UI.WX.Attributes
--- import Graphics.UI.WX.Layout
 import Graphics.UI.WX.Classes
 import Graphics.UI.WX.Events
 

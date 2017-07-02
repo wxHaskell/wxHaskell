@@ -92,19 +92,22 @@ timeFlows
 {-------------------------------------------------------------------------
   Dialogs
 -------------------------------------------------------------------------}
-showFontDialog frame vflowFont
+showFontDialog :: Window a -> Var FontStyle -> IO ()
+showFontDialog frame_ vflowFont
   = do flowFont <- varGet vflowFont
-       mbfont   <- fontDialog frame flowFont
+       mbfont   <- fontDialog frame_ flowFont
        case mbfont of
          Nothing    -> return ()
          Just font_ -> varSet vflowFont font_
 
-showOptionDialog frame vtimeSpan vflowText status
+showOptionDialog :: (Textual w, RealFrac a) =>
+                    Window b -> Var a -> Var String -> w -> IO ()
+showOptionDialog frame_ vtimeSpan vflowText status
   = do flowText <- varGet vflowText
        timeSpan <- varGet vtimeSpan
       
        -- create dialog
-       d     <- dialog frame [text := "Options", resizeable := True]
+       d     <- dialog frame_ [text := "Options", resizeable := True]
        p     <- panel d []
        ntry  <- textEntry  p [text := flowText]
        delay <- spinCtrl  p 1 10 [selection := round timeSpan]
@@ -192,12 +195,12 @@ onIdle vmouseHistory vtimeSpan win_
     prune _    []
       = undefined
 
-    after time (t,p)
+    after time (t, _p)
       = time <= t
 
 
 -- mouse drag handler
--- onDrag :: [Var [(Time, b)]] -> b -> IO ()
+onDrag :: Var [(Time, b)] -> b -> IO ()
 onDrag vmouseHistory mousePos_
   = do time <- getTime
        -- prepend a new time/position pair

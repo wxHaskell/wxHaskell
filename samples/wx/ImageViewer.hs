@@ -37,8 +37,8 @@ imageFiles
 imageViewer :: IO ()
 imageViewer
   = do -- the main frame, we use 'fullRepaintOnResize' to prevent flicker on resize
-       image  <- getDataFileName "bitmaps/eye.ico"
-       f      <- frame [text := "ImageViewer", picture := image, fullRepaintOnResize := False]
+       image_ <- getDataFileName "bitmaps/eye.ico"
+       f      <- frame [text := "ImageViewer", picture := image_, fullRepaintOnResize := False]
 
        -- use a mutable variable to hold the image
        vbitmap <- variable [value := Nothing]
@@ -117,7 +117,7 @@ imageViewer
            repaint sw
        `onException` repaint sw
 
-    onPaint vbitmap dc viewArea
+    onPaint vbitmap dc _viewArea
       = do mbBitmap <- get vbitmap value
            case mbBitmap of
              Nothing -> return () 

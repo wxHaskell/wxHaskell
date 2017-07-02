@@ -35,16 +35,16 @@ module Graphics.UI.WX.Frame
     -- * Internal
     ) where
 
-import Graphics.UI.WXCore
+import Prelude                hiding (id)
+import Graphics.UI.WXCore     hiding (rect)
 
-import Graphics.UI.WX.Types
+import Graphics.UI.WX.Types   hiding (rect)
 import Graphics.UI.WX.Attributes
-import Graphics.UI.WX.Layout
-import Graphics.UI.WX.Classes
+import Graphics.UI.WX.Classes hiding (parent, style)
 import Graphics.UI.WX.Window
 import Graphics.UI.WX.TopLevelWindow
-import Graphics.UI.WX.Events
 
+defaultStyle :: Style
 defaultStyle 
   = frameDefaultStyle -- .+. wxTAB_TRAVERSAL -- .+. wxNO_FULL_REPAINT_ON_RESIZE
 
@@ -66,16 +66,16 @@ frameTool props parent
 
 -- | Create a top-level frame window in a custom style.
 frameEx :: Style -> [Prop (Frame ())]  -> Window a -> IO (Frame ())
-frameEx style props parent
-  = feed2 props style $
-    initialFrame $ \id rect txt -> \props style ->
-    do f <- frameCreate parent id txt rect style
-       let initProps = (if (containsProperty visible props)
+frameEx style_ props_ parent
+  = feed2 props_ style_ $
+    initialFrame $ \id rect txt -> \props' style' ->
+    do f <- frameCreate parent id txt rect style'
+       let initProps = (if (containsProperty visible props')
                         then [] else [visible := True]) ++
-                       (if (containsProperty bgcolor props)
+                       (if (containsProperty bgcolor props')
                         then [] else [bgcolor := colorSystem Color3DFace])
        set f initProps
-       set f props
+       set f props'
        return f
      
 -- | Complete the construction of a top level frame which has been loaded
@@ -120,14 +120,14 @@ mdiParentFrame props
 mdiParentFrameEx :: Window a -> Style -> [Prop (MDIParentFrame ())] -> IO (MDIParentFrame ())
 mdiParentFrameEx parent stl props
   = feed2 props stl $
-    initialFrame $ \id rect txt -> \props stl ->
-    do f <- mdiParentFrameCreate parent id txt rect stl
-       let initProps = (if (containsProperty visible props)
+    initialFrame $ \id rect txt -> \props' stl' ->
+    do f <- mdiParentFrameCreate parent id txt rect stl'
+       let initProps = (if (containsProperty visible props')
                         then [] else [visible := True]) ++
-                       (if (containsProperty bgcolor props)
+                       (if (containsProperty bgcolor props')
                         then [] else [bgcolor := colorSystem Color3DFace])
        set f initProps
-       set f props
+       set f props'
        return f
 
 
@@ -140,14 +140,14 @@ mdiChildFrame parent props
 mdiChildFrameEx :: MDIParentFrame a -> Style -> [Prop (MDIChildFrame ())] -> IO (MDIChildFrame ())
 mdiChildFrameEx parent stl props
   = feed2 props stl $
-    initialFrame $ \id rect txt -> \props stl ->
-    do f <- mdiChildFrameCreate parent id txt rect stl
-       let initProps = (if (containsProperty visible props)
+    initialFrame $ \id rect txt -> \props' stl' ->
+    do f <- mdiChildFrameCreate parent id txt rect stl'
+       let initProps = (if (containsProperty visible props')
                          then [] else [visible := True]) ++
-                       (if (containsProperty bgcolor props)
+                       (if (containsProperty bgcolor props')
                          then [] else [bgcolor := colorSystem Color3DFace])
        set f initProps
-       set f props
+       set f props'
        return f
   
 

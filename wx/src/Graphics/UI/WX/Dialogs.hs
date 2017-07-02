@@ -41,9 +41,7 @@ import Graphics.UI.WXCore
 import Graphics.UI.WX.Types
 import Graphics.UI.WX.Attributes
 import Graphics.UI.WX.Layout
-import Graphics.UI.WX.Classes
-import Graphics.UI.WX.Window
-import Graphics.UI.WX.Events  -- just for haddock
+import Graphics.UI.WX.Events()  -- just for haddock
 import Graphics.UI.WX.Frame  
 
 instance Form (Dialog a) where
@@ -60,9 +58,9 @@ dialog parent props
 dialogEx :: Window a -> Style -> [Prop (Dialog ())] -> IO (Dialog ())
 dialogEx parent style props
   = feed2 props style $
-    initialFrame $ \id rect txt -> \props flags -> 
-    do d <- dialogCreate parent id txt rect flags
-       set d props
+    initialFrame $ \id_ rect_ txt -> \props_ flags -> 
+    do d <- dialogCreate parent id_ txt rect_ flags
+       set d props_
        return d
 
 -- | Show a modal dialog. Take a function as argument that takes a function itself
@@ -76,8 +74,8 @@ dialogEx parent style props
 -- > result <- showModal d (\stop -> set ok [on command := stop (Just 42)])
 --
 showModal :: Dialog b -> ((Maybe a -> IO ()) -> IO ()) -> IO (Maybe a)
-showModal dialog f
+showModal dialog_ f
   = do ret <- varCreate Nothing
-       f (\x -> do{ varSet ret x; dialogEndModal dialog 0} )
-       dialogShowModal dialog
+       f (\x -> do{ varSet ret x; dialogEndModal dialog_ 0} )
+       _ <- dialogShowModal dialog_
        varGet ret

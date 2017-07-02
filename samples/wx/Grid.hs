@@ -71,10 +71,10 @@ setRow g (row_, values)
 gridCtrl :: Window a -> [Prop (Grid ())] -> IO (Grid ())
 gridCtrl parent_ props_
   = feed2 props_ 0 $
-    initialWindow $ \id_ rect -> \props_ flags ->
-    do g <- gridCreate parent_ id_ rect flags
+    initialWindow $ \id_ rect' -> \props' flags ->
+    do g <- gridCreate parent_ id_ rect' flags
        gridCreateGrid g 0 0 0
-       set g props_
+       set g props'
        return g
 
 gridEvent :: Event (Grid a) (EventGrid -> IO ())

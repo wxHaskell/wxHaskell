@@ -43,7 +43,7 @@ gui
            count <- comboBoxGetCount input
            appendText input txt_
            set input [selection := count]
-           send txt_
+           _ <- send txt_
            return ()
 
 
