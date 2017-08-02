@@ -45,6 +45,7 @@ executable ImageViewer
   main-is:             ImageViewer.hs
   build-depends:       base,
                        wxcore
+  other-modules:       Paths_samplesWxcore
   default-language:    Haskell2010
   ghc-options:         -Wall
 

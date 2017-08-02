@@ -23,6 +23,7 @@ executable Camels
   build-depends:       base,
                        wxcore,
                        wx
+  other-modules:       Paths_samplesContrib
   default-language:    Haskell2010
   ghc-options:         -Wall
 
@@ -52,6 +53,7 @@ executable NotebookRight
   build-depends:       base,
                        wxcore,
                        wx
+  other-modules:       Paths_samplesContrib
   default-language:    Haskell2010
   ghc-options:         -Wall
 

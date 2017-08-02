@@ -76,6 +76,8 @@ executable STCLexer
   build-depends:       base,
                        wxcore,
                        wx
+  other-modules:       Paths_samplesTest,
+                       UTF8
   default-language:    Haskell2010
   ghc-options:         -Wall
 
@@ -86,6 +88,13 @@ executable TreeCtrlTest
                        wxcore,
                        wx,
                        HUnit
+  other-modules:       Paths_samplesTest
+  default-language:    Haskell2010
+  ghc-options:         -Wall
+
+
+library UTF8
+  build-depends:       base
   default-language:    Haskell2010
   ghc-options:         -Wall
 
@@ -95,6 +104,8 @@ executable UTF8Sampler
   build-depends:       base,
                        wxcore,
                        wx
+  other-modules:       Paths_samplesTest,
+                       UTF8
   default-language:    Haskell2010
   ghc-options:         -Wall
 
@@ -104,6 +115,7 @@ executable XRCMenu
   build-depends:       base,
                        wxcore,
                        wx
+  other-modules:       Paths_samplesTest
   default-language:    Haskell2010
   ghc-options:         -Wall
 
@@ -113,5 +125,6 @@ executable XRCControls
   build-depends:       base,
                        wxcore,
                        wx
+  other-modules:       Paths_samplesTest
   default-language:    Haskell2010
   ghc-options:         -Wall
