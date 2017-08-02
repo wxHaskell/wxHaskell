@@ -121,10 +121,7 @@ module Graphics.UI.WX.Events
 
 import Graphics.UI.WXCore hiding (Event)
 
-import Graphics.UI.WX.Types
 import Graphics.UI.WX.Attributes
-import Graphics.UI.WX.Layout
-import Graphics.UI.WX.Classes
 
 {--------------------------------------------------------------------
    Basic events
@@ -139,8 +136,8 @@ on (Event attr)
 
 -- | Change the event type.
 mapEvent :: (a -> b) -> (a -> b -> a) -> Event w a -> Event w b
-mapEvent get set (Event attr)
-  = Event (mapAttr get set attr)
+mapEvent get' set' (Event attr)
+  = Event (mapAttr get' set' attr)
 
 {--------------------------------------------------------------------
    Event classes
@@ -198,76 +195,76 @@ class Paint w where
 --------------------------------------------------------------------}
 click :: Reactive w => Event w (Point -> IO ())
 click
-  = mouseFilter "click" filter
+  = mouseFilter "click" filter'
   where
-    filter (MouseLeftDown point mod)  = isNoShiftAltControlDown mod
-    filter other                      = False
+    filter' (MouseLeftDown _point mod') = isNoShiftAltControlDown mod'
+    filter' _other                      = False
 
 unclick :: Reactive w => Event w (Point -> IO ())
 unclick
-  = mouseFilter "unclick" filter
+  = mouseFilter "unclick" filter'
   where
-    filter (MouseLeftUp point mod)  = isNoShiftAltControlDown mod
-    filter other                    = False
+    filter' (MouseLeftUp _point mod') = isNoShiftAltControlDown mod'
+    filter' _other                    = False
 
 doubleClick :: Reactive w => Event w (Point -> IO ())
 doubleClick
-  = mouseFilter "doubleClick" filter
+  = mouseFilter "doubleClick" filter'
   where
-    filter (MouseLeftDClick point mod) = isNoShiftAltControlDown mod
-    filter other                       = False
+    filter' (MouseLeftDClick _point mod') = isNoShiftAltControlDown mod'
+    filter' _other                        = False
 
 drag :: Reactive w => Event w (Point -> IO ())
 drag
-  = mouseFilter "drag" filter
+  = mouseFilter "drag" filter'
   where
-    filter (MouseLeftDrag point mod)  = isNoShiftAltControlDown mod
-    filter other                      = False
+    filter' (MouseLeftDrag _point mod') = isNoShiftAltControlDown mod'
+    filter' _other                      = False
 
 motion :: Reactive w => Event w (Point -> IO ())
 motion
-  = mouseFilter "motion" filter
+  = mouseFilter "motion" filter'
   where
-    filter (MouseMotion point mod)  = isNoShiftAltControlDown mod
-    filter other                    = False
+    filter' (MouseMotion _point mod') = isNoShiftAltControlDown mod'
+    filter' _other                    = False
 
 clickRight :: Reactive w => Event w (Point -> IO ())
 clickRight
-  = mouseFilter "clickRight" filter
+  = mouseFilter "clickRight" filter'
   where
-    filter (MouseRightDown point mod)  = isNoShiftAltControlDown mod
-    filter other                       = False
+    filter' (MouseRightDown _point mod') = isNoShiftAltControlDown mod'
+    filter' _other                       = False
 
 unclickRight :: Reactive w => Event w (Point -> IO ())
 unclickRight
-  = mouseFilter "unclickRight" filter
+  = mouseFilter "unclickRight" filter'
   where
-    filter (MouseRightUp point mod)  = isNoShiftAltControlDown mod
-    filter other                     = False
+    filter' (MouseRightUp _point mod') = isNoShiftAltControlDown mod'
+    filter' _other                     = False
 
 enter :: Reactive w => Event w (Point -> IO ())
 enter
-  = mouseFilter "enter" filter
+  = mouseFilter "enter" filter'
   where
-    filter (MouseEnter point mod)  = True
-    filter other                   = False
+    filter' (MouseEnter _point _mod) = True
+    filter' _other                   = False
 
 leave :: Reactive w => Event w (Point -> IO ())
 leave
-  = mouseFilter "leave" filter
+  = mouseFilter "leave" filter'
   where
-    filter (MouseLeave point mod)  = True
-    filter other                   = False
+    filter' (MouseLeave _point _mod) = True
+    filter' _other                   = False
 
 mouseFilter :: Reactive w => String -> (EventMouse -> Bool) -> Event w (Point -> IO ())
-mouseFilter name filter
-  = mapEvent get set mouse
+mouseFilter name filter'
+  = mapEvent get' set' mouse
   where
-    get prev x
+    get' _prev _x
       = ioError (userError ("WX.Events: the " ++ name ++ " event is write-only."))
 
-    set prev new mouseEvent
-      = if (filter mouseEvent) 
+    set' prev new mouseEvent
+      = if (filter' mouseEvent) 
          then new (mousePos mouseEvent)
          else prev mouseEvent
 
@@ -276,12 +273,12 @@ mouseFilter name filter
 --------------------------------------------------------------------}
 rebind :: Event w (IO ()) -> Event w (IO ())
 rebind event
-  = mapEvent get set event
+  = mapEvent get' set' event
   where
-    get prev
+    get' prev
       = prev
 
-    set new prev
+    set' new _prev
       = new
 
 enterKey,tabKey,escKey,helpKey,delKey,homeKey,endKey :: Reactive w => Event w (IO ())
@@ -306,9 +303,9 @@ charKey c
 
 key :: Reactive w => Key -> Event w (IO ())
 key k
-  = keyboardFilter "key" filter
+  = keyboardFilter "key" filter'
   where
-    filter (EventKey x mod pt)  = k==x
+    filter' (EventKey x _mod _pt)  = k==x
 
 
 anyKey :: Reactive w => Event w (Key -> IO ())
@@ -317,25 +314,25 @@ anyKey
 
 
 keyboardFilter :: Reactive w => String -> (EventKey -> Bool) -> Event w (IO ())
-keyboardFilter name filter
-  = mapEvent get set keyboard
+keyboardFilter name filter'
+  = mapEvent get' set' keyboard
   where
-    get prev
+    get' _prev
       = ioError (userError ("WX.Events: the " ++ name ++ " event is write-only."))
 
-    set prev new keyboardEvent
-      = do when (filter keyboardEvent) new
+    set' prev new keyboardEvent
+      = do when (filter' keyboardEvent) new
            prev keyboardEvent
 
 keyboardFilter1 :: Reactive w => String -> (EventKey -> Bool) -> Event w (Key -> IO ())
-keyboardFilter1 name filter
-  = mapEvent get set keyboard
+keyboardFilter1 name filter'
+  = mapEvent get' set' keyboard
   where
-    get prev key
+    get' _prev _key
       = ioError (userError ("WX.Events: the " ++ name ++ " event is write-only."))
 
-    set prev new keyboardEvent
-      = if (filter keyboardEvent) 
+    set' prev new keyboardEvent
+      = if (filter' keyboardEvent) 
          then new (keyKey keyboardEvent)
          else prev keyboardEvent
 

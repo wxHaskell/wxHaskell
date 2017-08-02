@@ -74,6 +74,9 @@ module Graphics.UI.WX.Controls
       , StyledTextCtrl, stcEvent, styledTextCtrl, styledTextCtrlEx
       -- ** PropertyGrid
       , PropertyGrid, propertyGrid, propertyGridEvent
+      
+      , CSingleListBox(..) -- Just to prevent a "Defined but not used: data constructor..." message
+      , CMultiListBox(..)  -- Just to prevent a "Defined but not used: data constructor..." message
     ) where
 
 import Prelude            hiding (id)

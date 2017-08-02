@@ -38,7 +38,6 @@ the Unicode Transformation Format with 8-bit words.
 
 > import Data.Char (ord, chr)
 > import Data.Word (Word8, Word16, Word32)
-> -- import Data.Bits (Bits, shiftL, shiftR, (.&.), (.|.))
 > import Data.Bits (shiftL, shiftR, (.&.), (.|.))
 
 

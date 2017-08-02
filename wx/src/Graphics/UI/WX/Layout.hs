@@ -32,7 +32,6 @@ module Graphics.UI.WX.Layout
              ) where
 
 import Graphics.UI.WXCore.Layout
-import Graphics.UI.WX.Types
 import Graphics.UI.WX.Attributes
 
 {--------------------------------------------------------------------

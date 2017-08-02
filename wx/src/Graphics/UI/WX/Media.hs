@@ -29,7 +29,6 @@ module Graphics.UI.WX.Media
 
 import System.IO.Unsafe( unsafePerformIO )
 import Graphics.UI.WXCore 
-import Graphics.UI.WX.Types( Var, varGet, varSet, varCreate )
 import Graphics.UI.WX.Attributes
 import Graphics.UI.WX.Classes
 
@@ -51,8 +50,8 @@ instance Sized (Bitmap a) where
 
 -- | Create a bitmap from an image with the same color depth.
 bitmapFromImage :: Image a -> IO (Bitmap ())
-bitmapFromImage image
-  = bitmapCreateFromImage image (-1)
+bitmapFromImage image'
+  = bitmapCreateFromImage image' (-1)
 
 {--------------------------------------------------------------------
   Images
@@ -92,16 +91,16 @@ sound fname
   = unsafePerformIO $ soundCreate fname False
 
 instance Media (Sound a) where
-  play sound = unitIO (soundPlay sound wxSOUND_ASYNC)
+  play sound' = unitIO (soundPlay sound' wxSOUND_ASYNC)
   stop = soundStop
 
 -- | Play a sound fragment repeatedly (and asynchronously).
 playLoop :: Sound a -> IO ()
-playLoop sound
-  = unitIO (soundPlay sound $ wxSOUND_ASYNC .+. wxSOUND_LOOP)
+playLoop sound'
+  = unitIO (soundPlay sound' $ wxSOUND_ASYNC .+. wxSOUND_LOOP)
 
 -- | Play a sound fragment synchronously (i.e. wait till completion).
 playWait :: Sound a -> IO ()
-playWait sound
-  = unitIO (soundPlay sound wxSOUND_SYNC)
+playWait sound'
+  = unitIO (soundPlay sound' wxSOUND_SYNC)
 

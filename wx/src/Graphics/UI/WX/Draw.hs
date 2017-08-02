@@ -34,11 +34,8 @@ module Graphics.UI.WX.Draw
 import Graphics.UI.WXCore  hiding (center, point)
 
 
--- import Graphics.UI.WX.Types
 import Graphics.UI.WX.Attributes
--- import Graphics.UI.WX.Layout
 import Graphics.UI.WX.Classes    hiding (text)
--- import Graphics.UI.WX.Window
 
 
 
