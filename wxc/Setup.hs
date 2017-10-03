@@ -502,7 +502,7 @@ sharedLibName ver basename =
       OSX     -> "lib" ++ addExtension basename ".dylib"
       _       -> "lib" ++ basename ++ ".so." ++ full_ver
         where
-          full_ver = (concat . intersperse "." . map show . versionBranch) ver
+          full_ver = showVersion ver
 
 -- | Return any linker options required to support shared library creation
 linkCxxOpts :: Version  -- ^ Version information to be used for Unix shared libraries
