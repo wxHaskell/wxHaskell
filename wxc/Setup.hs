@@ -321,7 +321,7 @@ bitnessMismatch =
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
 -- A list of wxWidgets versions that can be handled by this version of wxHaskell
-wxCompatibleVersions = ["3.0", "3.1", "2.9"] -- Preferred version first
+wxCompatibleVersions = ["3.0", "2.9"] -- Preferred version first
 
 checkWxVersion :: IO String
 checkWxVersion =

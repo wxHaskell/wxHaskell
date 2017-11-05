@@ -10,10 +10,10 @@ Status
 
 Builds & compiles
 - against: wxWidgets (http://www.wxwidgets.org/) 2.9.3 up to and including 3.0.3
-- with: Haskell platform (http://www.haskell.org/platform/) 7.10.2-a, 7.10.3, 8.0.1 and 8.0.2
+- with: Haskell platform (http://www.haskell.org/platform/) 8.2.1
 - on: MacOSX 10.8.4, 64 bits Haskell platform; Windows 8.1 (32 and 64 bit)
 
-Patches until 2017-04-28 have been merged.
+Patches until 2017-11-05 have been merged.
 
 All packages have cabal version 0.93.0.0
 
