@@ -123,7 +123,7 @@ module Graphics.UI.WXCore.WxcTypes(
 
 import Control.Exception 
 import Data.Ix
-import Foreign.C
+import Foreign.C hiding (CBool)
 import Foreign.Ptr
 import Foreign.Storable
 import Foreign.Marshal.Alloc
