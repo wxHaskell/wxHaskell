@@ -3,7 +3,7 @@ Version:        0.93.0.0
 License:        OtherLicense
 License-file:   license.txt
 Homepage:       https://wiki.haskell.org/WxHaskell
-Bug-reports:    http://sourceforge.net/p/wxhaskell/bugs/
+Bug-reports:    https://sourceforge.net/p/wxhaskell/bugs/
 Author:         Daan Leijen
 Build-Type:     Simple
 Category:       GUI, User interfaces

@@ -12,7 +12,7 @@ description:
   major GUI platforms, including GTK, Windows, X11, and MacOS X. This version
   works with wxWidgets 2.9 and 3.0.
 homepage:      https://wiki.haskell.org/WxHaskell
-bug-reports:   http://sourceforge.net/p/wxhaskell/bugs/
+bug-reports:   https://sourceforge.net/p/wxhaskell/bugs/
 
 cabal-version: >= 1.2
 
