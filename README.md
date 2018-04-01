@@ -10,7 +10,7 @@ Status
 
 Builds & compiles
 - against: wxWidgets (http://www.wxwidgets.org/) 2.9.3 up to and including 3.0.3
-- with: Haskell platform (http://www.haskell.org/platform/) 8.2.1
+- with: Haskell platform (http://www.haskell.org/platform/) 8.2.1, GHC 8.4.1
 - on: MacOSX 10.8.4, 64 bits Haskell platform; Windows 8.1 (32 and 64 bit)
 
 Patches until 2017-11-05 have been merged.

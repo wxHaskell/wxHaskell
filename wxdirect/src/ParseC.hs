@@ -52,7 +52,7 @@ readHeaderFile fname =
         "cpp"
         ( includeDirectories ++ 
           [ "-C"              -- Keep the comments
-          , "-DWXC_TYPES_H"   -- Make sure wxc_types.h is not included, 
+          , "-DWXC_TYPES_H"   -- Make sure wxc_types.h is not preprocessed, 
                               -- so the type macros are not replaced 
                               -- (the parser scans for certain macros)
           , fname             -- The file to process
