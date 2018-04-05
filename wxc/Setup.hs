@@ -38,7 +38,7 @@ import System.Directory ( createDirectoryIfMissing, doesFileExist
                         )
 import System.Environment (lookupEnv, getEnvironment)
 import System.Exit (ExitCode (..), exitFailure)
-import System.FilePath ((</>), (<.>), replaceExtension, takeFileName, dropFileName, addExtension)
+import System.FilePath ((</>), (<.>), replaceExtension, takeFileName, dropFileName, addExtension, takeDirectory)
 import System.IO (hPutStrLn, readFile, stderr)
 import System.IO.Error (isDoesNotExistError)
 import System.IO.Unsafe (unsafePerformIO)
@@ -614,7 +614,7 @@ linkingNeeded output input =
 -- | The 'normalise' implementation in System.FilePath does not meet the requirements of
 -- calling and/or running external programs on Windows particularly well as it does not
 -- normalise the '/' character to '\\'. The problem is that some MinGW programs do not
--- like to see paths with a mixture of '/' and '\\'. Sine we are calling out to these,
+-- like to see paths with a mixture of '/' and '\\'. Since we are calling out to these,
 -- we require a stricter normalisation.
 normalisePath :: FilePath -> FilePath
 normalisePath = case buildOS of
@@ -635,7 +635,7 @@ dosifyFilePath = replace '/' '\\'
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
--- | Run ldconfig in `path` and return a list of all the links which were created
+-- | Run ldconfig in `path`, creating an appropriate `.so` file
 ldconfig :: FilePath -> IO ()
 ldconfig path = case buildOS of
     Windows -> return ()
@@ -646,6 +646,21 @@ ldconfig path = case buildOS of
             case ld_exit_code of
                 ExitSuccess -> return ()
                 otherwise -> error "Couldn't execute ldconfig, ensure it is on your path"
+
+-- | Create an additional symlink for Stack GHCi to work properly. See Github PR #33.
+mkSymlink :: FilePath -> IO ()
+mkSymlink path = case buildOS of
+    Windows -> return ()
+    OSX     -> return ()
+    _       ->
+          do
+            ln_exit_code <- system ("ln -sf " ++ target ++ " " ++ link_name)
+            case ln_exit_code of
+                ExitSuccess -> return ()
+                otherwise -> error "Couldn't execute ln, ensure that it is on your path."
+          where
+            target = path </> "libwxc.so"
+            link_name = takeDirectory path </> "libwxc.so"
 
 myCopyHook :: PackageDescription -> LocalBuildInfo -> UserHooks -> CopyFlags -> IO ()
 myCopyHook = hookHelper (fromFlag . copyVerbosity) (fromFlagOrDefault NoCopyDest . copyDest) (copyHook simpleUserHooks)
@@ -677,3 +692,4 @@ hookHelper verbosity copydest origHook pkg_descr local_bld_info user_hooks flags
 
     installOrdinaryFile (verbosity flags) (bld_dir </> lib_name) (inst_lib_dir </> lib_name)
     ldconfig inst_lib_dir
+    mkSymlink inst_lib_dir
