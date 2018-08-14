@@ -147,6 +147,11 @@ library
   default-language:
     Haskell2010
 
+--  exposed-modules:
+--    Dummy
+    
+  build-depends: base
+
   include-dirs:
     src/include
   
@@ -310,7 +315,7 @@ library
 custom-setup
   setup-depends: 
     base, 
-    Cabal >= 2.2 && < 2.3,
+    Cabal >= 2.2 && < 2.4,
     bytestring,
     split,
     process,
