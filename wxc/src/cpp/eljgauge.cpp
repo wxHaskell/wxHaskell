@@ -47,5 +47,10 @@ EWXWEXPORT(int, wxGauge_GetValue)(void* _obj)
 {
 	return ((wxGauge*)_obj)->GetValue();
 }
-	
+
+EWXWEXPORT(void, wxGauge_Pulse)(void* _obj)
+{
+	((wxGauge*)_obj)->Pulse();
+}
+
 }

@@ -2892,6 +2892,7 @@ void       wxGauge_SetBezelFace( TSelf(wxGauge) _obj, int w );
 void       wxGauge_SetRange( TSelf(wxGauge) _obj, int r );
 void       wxGauge_SetShadowWidth( TSelf(wxGauge) _obj, int w );
 void       wxGauge_SetValue( TSelf(wxGauge) _obj, int pos );
+void       wxGauge_Pulse( TSelf(wxGauge) _obj );
 
 /* wxGenericDirCtrl */
 TClassDefExtend(wxGenericDirCtrl,wxControl)
