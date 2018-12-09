@@ -315,7 +315,7 @@ library
 custom-setup
   setup-depends: 
     base, 
-    Cabal >= 2.2 && < 2.4,
+    Cabal >= 2.2 && < 2.5,
     bytestring,
     split,
     process,
