@@ -303,10 +303,7 @@ library
     
   if impl(ghc >= 8)
     cc-options: "-std=gnu++14" -Wno-deprecated-declarations
-
-  if os(darwin)
-      cc-options: "-stdlib=libstdc++"
-
+    
   x-dll-name: wxc
 
   x-dll-extra-libraries:
