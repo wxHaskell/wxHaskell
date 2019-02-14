@@ -5080,6 +5080,7 @@ TBool      wxStaticLine_IsVertical( TSelf(wxStaticLine) _obj );
 /* wxStaticText */
 TClassDefExtend(wxStaticText,wxControl)
 TClass(wxStaticText) wxStaticText_Create( TClass(wxWindow) _prt, int _id, TClass(wxString) _txt, TRect(_lft,_top,_wdt,_hgt), int _stl );
+void       wxStaticText_Wrap( TSelf(wxStaticText) _obj, int _width );
 
 /* wxStatusBar */
 TClassDefExtend(wxStatusBar,wxWindow)
@@ -5824,4 +5825,3 @@ TClassDefExtend(wxPropertyCategory,wxPGProperty)
 TClass(wxPropertyCategory) wxPropertyCategory_Create( TClass(wxString) label);
 
 #endif /* WXC_GLUE_H */
-
