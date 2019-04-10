@@ -98,6 +98,7 @@ extra-source-files:
     src/cpp/eljscrollbar.cpp
     src/cpp/eljscrolledwindow.cpp
     src/cpp/eljsingleinst.cpp
+    src/cpp/eljsimplebook.cpp
     src/cpp/eljsizer.cpp
     src/cpp/eljslider.cpp
     src/cpp/eljspinctrl.cpp
@@ -258,6 +259,7 @@ library
     src/cpp/eljsplash.cpp
     src/cpp/eljscrollbar.cpp
     src/cpp/eljscrolledwindow.cpp
+    src/cpp/eljsimplebook.cpp
     src/cpp/eljsingleinst.cpp
     src/cpp/eljsizer.cpp
     src/cpp/eljslider.cpp

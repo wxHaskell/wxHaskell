@@ -25,6 +25,7 @@ typedef int intptr_t;
 #include "wx/tabctrl.h"
 #endif
 #include "wx/notebook.h"
+#include "wx/simplebook.h"
 #include "wx/spinctrl.h"
 #include "wx/statline.h"
 #include "wx/checklst.h"

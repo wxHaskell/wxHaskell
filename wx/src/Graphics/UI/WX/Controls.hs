@@ -25,6 +25,7 @@ module Graphics.UI.WX.Controls
       , Panel, panel, panelEx
       , Notebook, notebook
       , focusOn
+      , Simplebook, simplebook
       -- * Controls
       -- ** Button
       , Button, button, buttonEx, smallButton, buttonRes
@@ -162,6 +163,21 @@ notebook parent props
     do nb <- notebookCreate parent id rect' flags
        set nb props_
        return nb
+
+
+-- | Create a 'Simplebook'. Layout is managed with the 'tabs' combinator.
+--
+-- * Instances: 'Dimensions', 'Colored', 'Visible', 'Child',
+--             'Able', 'Tipped', 'Identity', 'Styled',
+--             'Textual', 'Literate', 'Reactive', 'Paint'
+simplebook :: Window a -> [Prop (Simplebook ())] -> IO (Simplebook ())
+simplebook parent props
+  = feed2 props defaultStyle $
+    initialContainer $ \id rect' -> \props_ flags ->
+    do sb <- simplebookCreate parent id rect' flags
+       set sb props_
+       return sb
+
 
 {--------------------------------------------------------------------------------
   Button

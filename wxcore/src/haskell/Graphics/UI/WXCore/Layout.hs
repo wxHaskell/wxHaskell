@@ -124,7 +124,7 @@ according to a relative weight, but unfortunately, that entails implementing a b
 -----------------------------------------------------------------------------------------
 module Graphics.UI.WXCore.Layout( -- * Types
                                Layout, sizerFromLayout
-                             , TabPage
+                             , TabPage, SimplePage
                                -- * Window
                              , windowSetLayout, layoutFromWindow
                              , windowReFit, windowReFitMinimal
@@ -134,7 +134,7 @@ module Graphics.UI.WXCore.Layout( -- * Types
                              , Widget, widget, label, rule, hrule, vrule, sizer
                                -- ** Containers
                              , row, column
-                             , grid, boxed, container, tab, imageTab, tabs
+                             , grid, boxed, container, tab, imageTab, tabs, page, pages
                              , hsplit, vsplit
                                -- ** Glue
                              , glue, hglue, vglue
@@ -699,6 +699,27 @@ tabs notebook pages'
     hashstretch  = all stretchH [options layout | (_,_,layout) <- pages']
     hasfill      = if (hasvstretch || hashstretch) then Fill else FillNone
 
+-- | A page in a simplebook: a title and a layout.
+type SimplePage  = (String,Layout)
+
+-- | Create a simple page with a certain title and layout.
+page :: String -> Layout -> SimplePage
+page title layout
+  = (title,layout)
+
+-- | Create a simplebook layout.
+-- The pages /always/ need to be embedded inside a 'container' (normally a 'Panel').
+-- Just like a 'grid', the horizontal or vertical stretch of the child layout determines
+-- the stretch and expansion mode of the notebook.
+pages :: Simplebook a -> [SimplePage] -> Layout
+pages simplebook pages'
+  = Simplebook optionsDefault{ stretchV = hasvstretch, stretchH = hashstretch, fillMode = hasfill }
+               (downcastSimplebook simplebook) pages'
+  where
+    hasvstretch  = all stretchV [options layout | (_,layout) <- pages']
+    hashstretch  = all stretchH [options layout | (_,layout) <- pages']
+    hasfill      = if (hasvstretch || hashstretch) then Fill else FillNone
+
 -- | Add a horizontal sash bar between two windows. The two integer
 -- arguments specify the width of the sash bar (5) and the initial
 -- height of the top pane respectively.
@@ -738,7 +759,8 @@ data Layout = Grid      { options :: LayoutOptions, gap  :: Size, rows :: [[Layo
             | Line      { options :: LayoutOptions, linesize :: Size }
             | XSizer    { options :: LayoutOptions, xsizer :: Sizer () }
             | WidgetContainer{ options :: LayoutOptions, win :: Window (), content :: Layout }
-            | XNotebook { options :: LayoutOptions, nbook :: Notebook (), pages :: [(String,Bitmap (),Layout)] }
+            | XNotebook { options :: LayoutOptions, nbook :: Notebook (), npages :: [(String,Bitmap (),Layout)] }
+            | Simplebook { options :: LayoutOptions, sbook :: Simplebook (), spages :: [(String,Layout)] }
             | Splitter  { options :: LayoutOptions, splitter :: SplitterWindow ()
                         , pane1 :: Layout, pane2 :: Layout
                         , splitHorizontal :: Bool, sashWidth :: Int, paneWidth :: Int }
@@ -792,7 +814,10 @@ nullLayouts =
                     , content = nullLayout
                     }
   , XNotebook       { options = nullLayoutOptions, nbook = objectNull
-                    , pages = [("", objectNull, nullLayout)]
+                    , npages = [("", objectNull, nullLayout)]
+                    }
+  , Simplebook      { options = nullLayoutOptions, sbook = objectNull
+                    , spages = [("", nullLayout)]
                     }
   , Splitter        { options = nullLayoutOptions, splitter = objectNull
                     , pane1 = nullLayout, pane2 = nullLayout
@@ -986,6 +1011,22 @@ sizerFromLayout parent layout
                      return il'
              else imageListAddBitmap il bm objectNull >>
                   return il
+
+
+    insert container' (Simplebook options' sbook' pages')
+      = do mapM_ addPage pages'
+           sizerAddWindowWithOptions container' sbook' options'
+           return container'
+      where
+        addPage (title,WidgetContainer _options win' layout')
+          = do pagetitle <- if (null title)
+                               then windowGetLabel win'
+                               else return title
+               _ <- simplebookAddPage sbook' win' pagetitle False
+               windowSetLayout win' layout'  -- recursively set layout'
+
+        addPage (_title, _other)
+          = error "Graphics.UI.WXCore.sizerFromLayout: simplebook page needs to be a 'container' layout!"
 
 
     stretchRow g (i,stretch')
