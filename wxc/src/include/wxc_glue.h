@@ -4819,6 +4819,12 @@ void       wxShowEvent_CopyObject( TSelf(wxShowEvent) _obj, TClass(wxObject) obj
 TBool      wxShowEvent_IsShown( TSelf(wxShowEvent) _obj );
 void       wxShowEvent_SetShow( TSelf(wxShowEvent) _obj, TBool show );
 
+/* wxSimplebook */
+TClassDefExtend(wxSimplebook,wxControl)
+TBool      wxSimplebook_AddPage( TSelf(wxSimplebook) _obj, TClass(wxWindow) pPage, TClass(wxString) strText, TBool bSelect );
+TClass(wxSimplebook) wxSimplebook_Create( TClass(wxWindow) _prt, int _id, TRect(_lft,_top,_wdt,_hgt), int _stl );
+int        wxSimplebook_SetSelection( TSelf(wxSimplebook) _obj, int nPage );
+
 /* wxSimpleHelpProvider */
 TClassDefExtend(wxSimpleHelpProvider,wxHelpProvider)
 TClass(wxSimpleHelpProvider) wxSimpleHelpProvider_Create(  );
