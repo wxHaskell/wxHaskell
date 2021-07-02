@@ -22,8 +22,7 @@ import Distribution.Simple.Setup ( BuildFlags, ConfigFlags
                                  , InstallFlags, installVerbosity
                                  , fromFlag, fromFlagOrDefault, copyDest
                                  )
-import Distribution.Simple.Utils ( die
-                                 , installOrdinaryFile
+import Distribution.Simple.Utils ( installOrdinaryFile
                                  , IOData(..)
                                  , IODataMode(..)
                                  , rawSystemExitWithEnv
@@ -88,7 +87,12 @@ rawShellSystemStdInOut :: Verbosity                     -- Verbosity level
                        -> IO (String, String, ExitCode) -- (Command result, Errors, Command exit status)
 rawShellSystemStdInOut v f as =
     rawSystemStdInOut v "sh" (f:as) Nothing Nothing Nothing IODataModeText >>=
-    \(IODataText result, errors, exitStatus) -> return (result, errors, exitStatus)
+#if MIN_VERSION_Cabal(3,2,0)
+    \(result, errors, exitStatus)
+#else
+    \(IODataText result, errors, exitStatus)
+#endif
+        -> return (result, errors, exitStatus)
 
 isWindowsMsys :: IO Bool
 isWindowsMsys = (buildOS == Windows&&) . isJust <$> lookupEnv "MSYSTEM"
@@ -444,7 +448,12 @@ deMsysPaths bi = do
     if b
     then do
         let cor ph = do
-            (IODataText r, e, c ) <- rawSystemStdInOut normal "sh" ["-c", "cd " ++ ph ++ "; pwd -W"] Nothing Nothing Nothing IODataModeText
+#if MIN_VERSION_Cabal(3,2,0)
+            (r, e, c )
+#else
+            (IODataText r, e, c )
+#endif
+                <- rawSystemStdInOut normal "sh" ["-c", "cd " ++ ph ++ "; pwd -W"] Nothing Nothing Nothing IODataModeText
             unless (c == ExitSuccess) (putStrLn ("Error: failed to convert MSYS path to native path \n" ++ e) >> exitFailure)
             return . head . lines $ r
         elds  <- mapM cor (extraLibDirs bi)
