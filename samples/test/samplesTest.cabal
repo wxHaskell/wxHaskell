@@ -108,23 +108,3 @@ executable UTF8Sampler
                        UTF8
   default-language:    Haskell2010
   ghc-options:         -Wall
-
-
-executable XRCMenu
-  main-is:             XRCControls\XRCMenu.hs
-  build-depends:       base,
-                       wxcore,
-                       wx
-  other-modules:       Paths_samplesTest
-  default-language:    Haskell2010
-  ghc-options:         -Wall
-
-
-executable XRCControls
-  main-is:             XRCControls\XRCControls_Wx.hs
-  build-depends:       base,
-                       wxcore,
-                       wx
-  other-modules:       Paths_samplesTest
-  default-language:    Haskell2010
-  ghc-options:         -Wall
