@@ -24,6 +24,7 @@ module Classes( isClassName, isBuiltin, haskellClassDefs
 
 import qualified Data.Set as Set
 import qualified Data.Map as Map
+import System.FilePath ((</>))
 import Text.Parsec.Prim hiding ( try )
 import HaskellNames( haskellTypeName, isBuiltin )
 import Types
@@ -68,7 +69,7 @@ classes
     do 
        -- urk, ugly hack.
        wxcdir' <- getWxcDir
-       cs <- parseClassDefs (wxcdir' ++ "/include/wxc.h")
+       cs <- parseClassDefs (wxcdir' </> "wxc.h")
        return cs
 
 

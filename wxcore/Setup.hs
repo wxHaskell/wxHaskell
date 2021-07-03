@@ -58,7 +58,7 @@ myConfHook (pkg0, pbi) flags = do
 
     lbi <- confHook simpleUserHooks (pkg0, pbi) flags
     wxcDirectory <- wxcInstallDir lbi
-    let wxcoreIncludeFile  = "\"" ++ wxcDirectory </> "include" </> "wxc.h\""
+    let wxcoreIncludeFile  = "\"" ++ wxcDirectory </> "wxc.h\""
     let wxcDirectoryQuoted = "\"" ++ wxcDirectory ++ "\""
     let system' command    = putStrLn command >> system command
 

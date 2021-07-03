@@ -64,6 +64,13 @@ library
     Graphics.UI.WXCore.WxcObject
     Graphics.UI.WXCore.WxcTypes
 
+  autogen-modules:
+    Graphics.UI.WXCore.WxcClassInfo
+    Graphics.UI.WXCore.WxcClassTypes
+    Graphics.UI.WXCore.WxcClasses
+    Graphics.UI.WXCore.WxcClassesAL
+    Graphics.UI.WXCore.WxcClassesMZ
+
   other-modules:
     Graphics.UI.WXCore.GHCiSupport
 
