@@ -75,10 +75,13 @@ library
     filepath,
     parsec,
     stm,
-    wxc >= 0.92,
-    wxdirect >= 0.91,
     directory,
     time
+
+  build-tool-depends:
+    wxdirect:wxdirect >= 0.91
+
+  extra-libraries: wxc  
 
   if flag(splitBase)
     build-depends:
