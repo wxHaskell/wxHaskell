@@ -19,7 +19,7 @@ module Main where
 
 import System.Environment( getArgs )
 import System.Console.GetOpt
-import System.FilePath  ( pathSeparator )
+import System.FilePath  ( pathSeparator, (</>) )
 
 import CompileClasses   ( compileClasses)
 import CompileHeader    ( compileHeader )
@@ -85,17 +85,15 @@ getDefaultFiles = getDefaultHeaderFiles
 getDefaultHeaderFiles :: IO [FilePath]
 getDefaultHeaderFiles
   = do wxcdir <- getWxcDir
-       return [wxcdir ++ "/include/wxc.h"]
+       return [wxcdir </> "wxc.h"]
 
 getDefaultSTCHeaderFile :: IO [FilePath]
 getDefaultSTCHeaderFile
   = do wxcdir <- getWxcDir
-       return [wxcdir ++ "/wxSTC-D3/stc.h"]
+       return [wxcdir </> "stc.h"]
 
 getDefaultOutputDirWxc :: IO FilePath
-getDefaultOutputDirWxc
-  = do wxcdir <- getWxcDir
-       return (wxcdir ++ "/include/")
+getDefaultOutputDirWxc = getWxcDir
 
 {-----------------------------------------------------------------------------------------
   Options
