@@ -1,6 +1,5 @@
 packages:
   wxdirect/
-  wxc/
   wxcore/
   wx/
   samples/wxcore/
