@@ -1,3 +1,4 @@
+cabal-version: >= 1.8
 name:         wxdirect
 version:      0.93.0.0
 license:      BSD3
@@ -14,8 +15,6 @@ description:
 homepage:      https://wiki.haskell.org/WxHaskell
 bug-reports:   https://sourceforge.net/p/wxhaskell/bugs/
 
-cabal-version: >= 1.2
-
 build-type:    Simple
 
 flag splitBase
@@ -25,6 +24,9 @@ flag splitBase
 library
   hs-source-dirs:
     src
+
+  build-depends:
+    base
 
   exposed-modules:
     Application.Wxdirect
