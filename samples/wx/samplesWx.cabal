@@ -71,7 +71,6 @@ executable FileBrowse
                        wxcore
   other-modules:       Paths_samplesWx
   default-language:    Haskell2010
-  other-modules:       Paths_samplesWx
   ghc-options:         -Wall
 
 
