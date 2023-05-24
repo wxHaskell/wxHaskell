@@ -353,9 +353,9 @@ EWXWEXPORT(bool,wxGrid_DeleteCols)(wxGrid* self,int pos,int numCols,bool updateL
 	return self->DeleteCols(pos, numCols, updateLabels);
 }
 	
-EWXWEXPORT(void,wxGrid_DrawGridSpace)(wxGrid* self,wxDC* dc)
+EWXWEXPORT(void,wxGrid_DrawGridSpace)(wxGrid* self,wxDC* dc,wxGridWindow* gridWindow)
 {
-	self->DrawGridSpace(*dc);
+	self->DrawGridSpace(*dc, gridWindow);
 }
 	
 EWXWEXPORT(void,wxGrid_DrawCellBorder)(wxGrid* self,wxDC* dc,int _row,int _col)
@@ -363,9 +363,9 @@ EWXWEXPORT(void,wxGrid_DrawCellBorder)(wxGrid* self,wxDC* dc,int _row,int _col)
 	self->DrawCellBorder(*dc, wxGridCellCoords(_row, _col));
 }
 	
-EWXWEXPORT(void,wxGrid_DrawAllGridLines)(wxGrid* self,wxDC* dc,void* reg)
+EWXWEXPORT(void,wxGrid_DrawAllGridLines)(wxGrid* self)
 {
-	self->DrawAllGridLines(*dc,*((wxRegion*)reg));
+	self->DrawAllGridLines();
 }
 	
 EWXWEXPORT(void,wxGrid_DrawCell)(wxGrid* self,wxDC* dc,int _row,int _col)

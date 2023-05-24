@@ -1332,13 +1332,13 @@ EWXWEXPORT(int,wxAuiTabContainerButton_Location)(wxAuiTabContainerButton* self)
 }
 
 
-EWXWEXPORT(void,wxAuiTabContainerButton_Bitmap)(wxAuiTabContainerButton* self, wxBitmap* _bmp)
+EWXWEXPORT(void,wxAuiTabContainerButton_Bitmap)(wxAuiTabContainerButton* self, wxBitmapBundle* _bmp)
 {
    *_bmp = self->bitmap;
 }
 
 
-EWXWEXPORT(void,wxAuiTabContainerButton_DisBitmap)(wxAuiTabContainerButton* self, wxBitmap* _bmp)
+EWXWEXPORT(void,wxAuiTabContainerButton_DisBitmap)(wxAuiTabContainerButton* self, wxBitmapBundle* _bmp)
 {
    *_bmp = self->disBitmap;
 }
@@ -2978,9 +2978,9 @@ EWXWEXPORT(wxString*,wxAuiNotebookPage_Tooltip)(wxAuiNotebookPage* self)
   return result;
 }
 
-EWXWEXPORT(wxBitmap*,wxAuiNotebookPage_Bitmap)(wxAuiNotebookPage* self)
+EWXWEXPORT(wxBitmapBundle*,wxAuiNotebookPage_Bitmap)(wxAuiNotebookPage* self)
 {
-  wxBitmap *result = new wxBitmap();
+  wxBitmapBundle *result = new wxBitmapBundle();
   *result = self->bitmap;
   return result;
 }

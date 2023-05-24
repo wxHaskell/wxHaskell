@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # A list of wxWidgets versions that can be handled by this version of wxHaskell, preferred first
-COMPATIBLE_VERSIONS=("4.2" "3.0" "2.9")
+COMPATIBLE_VERSIONS=("3.2" "3.1")
 
 for V in ${COMPATIBLE_VERSIONS[@]}; do
 	if [[ $(wx-config --version=$V --version-full) = $V* ]]; then
