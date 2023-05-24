@@ -85,6 +85,9 @@ library
     directory,
     time
 
+  pkgconfig-depends:
+    wxc
+
   build-tool-depends:
     wxdirect:wxdirect >= 0.91
 
