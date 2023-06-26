@@ -69,7 +69,7 @@ classes
     do 
        -- urk, ugly hack.
        wxcdir' <- getWxcDir
-       cs <- parseClassDefs (wxcdir' </> "wxc.h")
+       cs <- parseClassDefs (wxcdir' </> "wxc/wxc.h")
        return cs
 
 

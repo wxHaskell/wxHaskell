@@ -1,4 +1,4 @@
-#include "wrapper.h"
+#include "wxc/wrapper.h"
 #include "wx/process.h"
 #include "wx/textctrl.h"
 #include "wx/progdlg.h"

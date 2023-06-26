@@ -1,4 +1,4 @@
-#include "wrapper.h"
+#include "wxc/wrapper.h"
 
 wxDragResult ELJTextDropTarget::OnData(wxCoord x, wxCoord y, wxDragResult def)
 {

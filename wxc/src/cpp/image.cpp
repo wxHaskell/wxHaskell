@@ -1,7 +1,7 @@
 #include <memory.h>
 #include <string.h>
 
-#include "wrapper.h"
+#include "wxc/wrapper.h"
 
 extern "C"
 {

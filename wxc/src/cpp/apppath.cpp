@@ -1,4 +1,4 @@
-#include "wrapper.h"
+#include "wxc/wrapper.h"
 #ifdef __WXMSW__
 # include <windows.h>
 #elif defined(__WXMAC__)

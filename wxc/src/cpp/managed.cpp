@@ -1,9 +1,9 @@
-#include "wrapper.h"
+#include "wxc/wrapper.h"
 
 /* safety */
 class wxManagedPtr;
-#include "wxc_types.h"
-#include "managed.h"
+#include "wxc/wxc_types.h"
+#include "wxc/managed.h"
 
 
 /*-----------------------------------------------------------------------------

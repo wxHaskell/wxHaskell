@@ -119,7 +119,7 @@ module Graphics.UI.WXCore.WxcTypes(
             , Ptr, ptrNull, ptrIsNull, ptrCast, ForeignPtr, FunPtr, toCFunPtr
             ) where
 
-#include "wxc_def.h"
+#include "wxc/wxc_def.h"
 
 import Control.Exception 
 import Data.Ix

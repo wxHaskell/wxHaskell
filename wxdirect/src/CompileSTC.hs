@@ -29,7 +29,7 @@ compileSTC verbose outputDir inputs = do
   let (_ds,fs) = unzip dfs
       -- d = concat ds --currently unused
       f = concat fs
-      h_target = outputDir ++ "include/stc_gen.h"
+      h_target = outputDir ++ "include/wxc/stc_gen.h"
       cpp_target = outputDir ++ "src/stc_gen.cpp"
   putStrLn $ "generating: " ++ h_target
   writeFileLazy h_target $ (glue "\n\n" $ map headerfunc f) ++ "\n"
