@@ -158,7 +158,7 @@ set_property(TARGET wxc PROPERTY
     CXX_STANDARD 14
     CXX_STANDARD_REQUIRED ON)
 
-find_package(wxWidgets REQUIRED gl base core richtext stc webview xrc
+find_package(wxWidgets REQUIRED gl base core richtext stc xrc
     propgrid qa html adv aui ribbon net)
 
 if(wxWidgets_FOUND)
