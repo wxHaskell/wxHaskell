@@ -1,4 +1,4 @@
-#include "wrapper.h"
+#include "wxc/wrapper.h"
 #if wxVERSION_NUMBER >= 2400
 #include "wx/cshelp.h"
 

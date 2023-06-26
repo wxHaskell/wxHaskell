@@ -1,6 +1,6 @@
 #include <wx/string.h>
 
-#include "wrapper.h"
+#include "wxc/wrapper.h"
 #include "wx/gizmos/dynamicsash.h"
 #include "wx/gizmos/editlbox.h"
 #include "wx/gizmos/ledctrl.h"

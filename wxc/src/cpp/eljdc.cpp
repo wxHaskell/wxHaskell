@@ -1,4 +1,4 @@
-#include "wrapper.h"
+#include "wxc/wrapper.h"
 #include <wx/metafile.h>
 #include <wx/dcmirror.h>
 #include <wx/dcbuffer.h>

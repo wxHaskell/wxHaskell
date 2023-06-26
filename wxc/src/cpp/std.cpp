@@ -1,4 +1,4 @@
-#include "wrapper.h"
+#include "wxc/wrapper.h"
 
 /*-----------------------------------------------------------------------------
   License: BSD-style (BSD3)

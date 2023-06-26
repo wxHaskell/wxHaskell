@@ -9,7 +9,7 @@
  * 
  *==============================================================================*/
 
-#include "wrapper.h"
+#include "wxc/wrapper.h"
 #ifdef wxUSE_MEDIACTRL
 #include "wx/mediactrl.h"
 #endif

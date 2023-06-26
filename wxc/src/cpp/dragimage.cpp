@@ -1,4 +1,4 @@
-#include "wrapper.h"
+#include "wxc/wrapper.h"
 #include <wx/dragimag.h>
 #include <wx/generic/dragimgg.h>
 

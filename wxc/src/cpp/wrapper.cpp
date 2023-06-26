@@ -1,4 +1,4 @@
-#include "wrapper.h"
+#include "wxc/wrapper.h"
 #include "wx/tooltip.h"
 #include "wx/dynlib.h"
 #include "wx/fs_zip.h"

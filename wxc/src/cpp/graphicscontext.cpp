@@ -1,4 +1,4 @@
-#include "wrapper.h"
+#include "wxc/wrapper.h"
 
 /* testing */
 // #define wxUSE_GRAPHICS_CONTEXT 0
