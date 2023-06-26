@@ -22,9 +22,4 @@ stdenv.mkDerivation {
   buildInputs = [
     libGL
   ];
-
-  # We shouldn't set this, but FindwxWidgets fails to properly fill it and
-  # configuration fails with
-  # "Could NOT find wxWidgets (missing: wxWidgets_LIBRARIES)"
-  cmakeFlags = [ "-DwxWidgets_LIBRARIES=-L${wxGTK32}/lib" ];
 }
