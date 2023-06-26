@@ -1,4 +1,4 @@
-#include "wrapper.h"
+#include "wxc/wrapper.h"
 
 #if !defined(__WXGTK__)
 # include <wx/dcprint.h>

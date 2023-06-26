@@ -123,27 +123,27 @@ add_library(wxc SHARED
 )
 
 set(wxc_PUBLIC_HEADERS
-                src/include/dragimage.h
-                src/include/eljgrid.h;
-                src/include/ewxw_def.h;
-                src/include/glcanvas.h;
-                src/include/graphicscontext.h;
-                src/include/hyperlinkctrl.h;
-                src/include/managed.h;
-                src/include/mediactrl.h;
-                src/include/pickerctrl.h;
-                src/include/previewframe.h;
-                src/include/printout.h;
-                src/include/sound.h;
-                src/include/stc.h;
-                src/include/stc_gen.h;
-                src/include/stream.h;
-                src/include/textstream.h;
-                src/include/wrapper.h;
-                src/include/wxc.h;
-                src/include/wxc_def.h;
-                src/include/wxc_glue.h;
-                src/include/wxc_types.h;
+                include/wxc/dragimage.h
+                include/wxc/eljgrid.h;
+                include/wxc/ewxw_def.h;
+                include/wxc/glcanvas.h;
+                include/wxc/graphicscontext.h;
+                include/wxc/hyperlinkctrl.h;
+                include/wxc/managed.h;
+                include/wxc/mediactrl.h;
+                include/wxc/pickerctrl.h;
+                include/wxc/previewframe.h;
+                include/wxc/printout.h;
+                include/wxc/sound.h;
+                include/wxc/stc.h;
+                include/wxc/stc_gen.h;
+                include/wxc/stream.h;
+                include/wxc/textstream.h;
+                include/wxc/wrapper.h;
+                include/wxc/wxc.h;
+                include/wxc/wxc_def.h;
+                include/wxc/wxc_glue.h;
+                include/wxc/wxc_types.h;
 )
 
 set_target_properties(wxc PROPERTIES
@@ -152,7 +152,7 @@ set_target_properties(wxc PROPERTIES
     PUBLIC_HEADER "${wxc_PUBLIC_HEADERS}"
 )
 
-target_include_directories(wxc PRIVATE src/include)
+target_include_directories(wxc PRIVATE include)
 
 set_property(TARGET wxc PROPERTY
     CXX_STANDARD 14

@@ -55,7 +55,7 @@ myConfHook (pkg0, pbi) flags = do
 
     lbi <- confHook simpleUserHooks (pkg0, pbi) flags
     wxcIncludeDir <- stripR <$> readProcess "pkg-config" ["--variable=includedir", "wxc"] ""
-    let wxcoreIncludeFile  = "\"" ++ wxcIncludeDir </> "wxc.h\""
+    let wxcoreIncludeFile  = "\"" ++ wxcIncludeDir </> "wxc/wxc.h\""
     let wxcIncludeDirQuoted = "\"" ++ wxcIncludeDir ++ "\""
     let system' command    = putStrLn command >> system command
 

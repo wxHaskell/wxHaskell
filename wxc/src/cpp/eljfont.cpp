@@ -1,4 +1,4 @@
-#include "wrapper.h"
+#include "wxc/wrapper.h"
 #include "wx/fontenum.h"
 #include "wx/fontmap.h"
 #include "wx/encconv.h"

@@ -49,7 +49,7 @@ main
                              (outputDir' ++ moduleClassInfoName ++ ".hs")
 
          ModeCHeader outputDir' inputFiles' verbose'
-          -> compileHeader verbose' (outputDir' ++ "wxc_glue.h") inputFiles'
+          -> compileHeader verbose' (outputDir' ++ "wxc/wxc_glue.h") inputFiles'
          ModeSTC outputDir' inputFiles' verbose'
           -> compileSTC verbose' outputDir' inputFiles'
        -- putStrLn "done."
@@ -85,12 +85,12 @@ getDefaultFiles = getDefaultHeaderFiles
 getDefaultHeaderFiles :: IO [FilePath]
 getDefaultHeaderFiles
   = do wxcdir <- getWxcDir
-       return [wxcdir </> "wxc.h"]
+       return [wxcdir </> "wxc/wxc.h"]
 
 getDefaultSTCHeaderFile :: IO [FilePath]
 getDefaultSTCHeaderFile
   = do wxcdir <- getWxcDir
-       return [wxcdir </> "stc.h"]
+       return [wxcdir </> "wxc/stc.h"]
 
 getDefaultOutputDirWxc :: IO FilePath
 getDefaultOutputDirWxc = getWxcDir

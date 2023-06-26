@@ -7,7 +7,7 @@
  * 
  *==============================================================================*/
 
-#include "wrapper.h"
+#include "wxc/wrapper.h"
 
 #ifdef wxUSE_STC
 # include "wx/stc/stc.h"

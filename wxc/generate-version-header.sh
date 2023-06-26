@@ -13,7 +13,7 @@ done
 if [[ -n $VERSION ]]; then
 	#TODO this is only correct if COMPATIBLE_VERSIONS entries are all 3 chars long with a dot in the middle
 	VERSION_FORMATTED=$(echo $VERSION | sed 's/\.//g')00
-	echo "#define wxVERSION_NUMBER $VERSION_FORMATTED" > src/include/wxc_def.h
+	echo "#define wxVERSION_NUMBER $VERSION_FORMATTED" > include/wxc/wxc_def.h
 else
 	echo "This version of wxc requires one of the following wxWidgets versions to be available:"
 	for value in ${COMPATIBLE_VERSIONS[@]}; do

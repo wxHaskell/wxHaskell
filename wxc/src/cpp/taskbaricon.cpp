@@ -9,7 +9,7 @@
  * 
  *==============================================================================*/
 
-#include "wrapper.h"
+#include "wxc/wrapper.h"
 #include <wx/taskbar.h>
 
 extern "C" {

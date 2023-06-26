@@ -1,5 +1,5 @@
-#include "wrapper.h"
-#include "eljgrid.h"
+#include "wxc/wrapper.h"
+#include "wxc/eljgrid.h"
 
 extern "C"
 {
