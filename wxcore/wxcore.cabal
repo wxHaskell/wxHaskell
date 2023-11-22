@@ -1,4 +1,4 @@
-cabal-version: 3.8
+cabal-version: 3.0
 name:         wxcore
 version:      0.93.0.0
 license-file: LICENSE

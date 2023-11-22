@@ -135,10 +135,7 @@ myConfHook (pkg0, pbi) flags = do
           { extraLibDirs = extraLibDirs libbi ++ extraLibDirs wx
           -- Remove wx libraries from here on windows because archive names differ from dlls
           -- causing GHCI to fail to load them
-          , extraLibs    = if buildOS == Windows then
-                                extraLibs libbi
-                           else
-                                extraLibs libbi ++ reverse (extraLibs    wx)
+          , extraLibs    = extraLibs libbi ++ reverse (extraLibs    wx)
           , ldOptions    = ldOptions    libbi ++ ldOptions    wx
           , frameworks   = frameworks   libbi ++ frameworks   wx
           , includeDirs  = includeDirs  libbi ++ includeDirs  wx
