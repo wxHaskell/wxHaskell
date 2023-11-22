@@ -42,6 +42,23 @@ stripR = reverse . dropWhile isSpace . reverse
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
+-- |This slightly dubious function obtains the install path for the wxc package we are using.
+-- It works by finding the wxc package's installation info, then finding the include directory
+-- which contains wxc's headers (amongst the wxWidgets include dirs) and then going up a level.
+-- It would be nice if the path was part of InstalledPackageInfo, but it isn't.
+wxcInstallDir :: LocalBuildInfo -> IO FilePath
+wxcInstallDir lbi =
+    case searchByName (installedPkgs lbi) "wxc" of
+        Unambiguous (wxc_pkg:_) -> do
+            wxc <-  filterM (doesFileExist . (</> "wxc" </> "wxc.h")) (includeDirs wxc_pkg)
+            case wxc of
+                [wxcIncludeDir] -> return wxcIncludeDir
+                [] -> error "wxcInstallDir: couldn't find wxc include dir"
+                _  -> error "wxcInstallDir: I'm confused. I see more than one wxc include directory from the same package"
+        Unambiguous [] -> error "wxcInstallDir: Cabal says wxc is installed but gives no package info for it"
+        _ -> error "wxcInstallDir: Couldn't find wxc package in installed packages"
+
+
 -- Comment out type signature because of a Cabal API change from 1.6 to 1.7
 myConfHook (pkg0, pbi) flags = do
     createDirectoryIfMissing True wxcoreDirectory
@@ -54,8 +71,8 @@ myConfHook (pkg0, pbi) flags = do
 #endif
 
     lbi <- confHook simpleUserHooks (pkg0, pbi) flags
-    wxcIncludeDir <- pure "/home/pranaysashank/src/wxHaskell/wxHaskell/wxc/include" --stripR <$> readProcess "pkg-config" ["--variable=includedir", "wxc"] ""
-    let wxcoreIncludeFile  = "\"" ++ wxcIncludeDir </> "wxc/wxc.h\""
+    wxcIncludeDir <-  wxcInstallDir lbi
+    let wxcoreIncludeFile  = "\"" ++ wxcIncludeDir </> "wxc" </> "wxc.h\""
     let wxcIncludeDirQuoted = "\"" ++ wxcIncludeDir ++ "\""
     let system' command    = putStrLn command >> system command
 
