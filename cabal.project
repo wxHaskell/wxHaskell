@@ -1,4 +1,5 @@
 packages:
+  wxc/
   wxdirect/
   wxcore/
   wx/

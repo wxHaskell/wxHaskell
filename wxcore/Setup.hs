@@ -45,7 +45,7 @@ stripR = reverse . dropWhile isSpace . reverse
 -- Comment out type signature because of a Cabal API change from 1.6 to 1.7
 myConfHook (pkg0, pbi) flags = do
     createDirectoryIfMissing True wxcoreDirectory
-    
+
 #if defined(freebsd_HOST_OS) || defined (netbsd_HOST_OS)
     -- Find GL/glx.h include path using pkg-config
     glIncludeDirs <- readProcess "pkg-config" ["--cflags", "gl"] "" `E.onException` return ""
@@ -54,7 +54,7 @@ myConfHook (pkg0, pbi) flags = do
 #endif
 
     lbi <- confHook simpleUserHooks (pkg0, pbi) flags
-    wxcIncludeDir <- stripR <$> readProcess "pkg-config" ["--variable=includedir", "wxc"] ""
+    wxcIncludeDir <- pure "/home/pranaysashank/src/wxHaskell/wxHaskell/wxc/include" --stripR <$> readProcess "pkg-config" ["--variable=includedir", "wxc"] ""
     let wxcoreIncludeFile  = "\"" ++ wxcIncludeDir </> "wxc/wxc.h\""
     let wxcIncludeDirQuoted = "\"" ++ wxcIncludeDir ++ "\""
     let system' command    = putStrLn command >> system command
@@ -76,7 +76,7 @@ myConfHook (pkg0, pbi) flags = do
     -- TODO ideally we'd let Cabal do this through pkgconfig-depends, and we'd
     -- use Setup.hs only to call wxdirect.
     let libbi' = libbi
-          { extraLibs      = extraLibs      libbi ++ ["wxc"]
+          { extraLibs      = extraLibs      libbi -- ++ ["wxc"]
           , PD.includeDirs = PD.includeDirs libbi ++ [wxcIncludeDir] ++ case glIncludeDirs of
                                                          ('-':'I':v) -> [v];
                                                          _           -> []
@@ -86,4 +86,3 @@ myConfHook (pkg0, pbi) flags = do
     let lpd' = lpd { library = Just lib' }
 
     return $ lbi { localPkgDescr = lpd' }
-

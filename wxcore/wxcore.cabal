@@ -1,6 +1,6 @@
+cabal-version: 3.8
 name:         wxcore
 version:      0.93.0.0
-license:      OtherLicense
 license-file: LICENSE
 author:       Daan Leijen
 maintainer:   wxhaskell-devel@lists.sourceforge.net
@@ -19,7 +19,6 @@ description:
 homepage:     https://wiki.haskell.org/WxHaskell
 bug-reports:  https://sourceforge.net/p/wxhaskell/bugs/
 
-cabal-version: 2.0
 build-type:    Custom
 
 extra-tmp-files:
@@ -83,15 +82,11 @@ library
     parsec,
     stm,
     directory,
-    time
-
-  pkgconfig-depends:
+    time,
     wxc
 
   build-tool-depends:
     wxdirect:wxdirect >= 0.91
-
-  extra-libraries: wxc  
 
   if flag(splitBase)
     build-depends:
