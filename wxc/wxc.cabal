@@ -180,6 +180,9 @@ library
 
   cxx-options: -pthread  -fPIC -std=gnu++14
 
+  if os(Windows)
+      ld-options: -Wl,--enable-auto-import,-no-undefined,--enable-runtime-pseudo-reloc
+
 custom-setup
   setup-depends:
     base,
