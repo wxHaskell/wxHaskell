@@ -320,8 +320,8 @@ bitnessMismatch =
 
     getDynamicLibraryName :: FilePath -> IO (Maybe String)
     getDynamicLibraryName path =
-      listToMaybe . filter isLibrary <$> getDirectoryContents path
-        `E.onException` return Nothing
+      (listToMaybe . filter isLibrary <$> getDirectoryContents path)
+        `E.catch` (\(_::E.SomeException) -> return Nothing)
         where
           isLibrary x = any (`isPrefixOf` x) ["libwx_base", "wxbase"] &&
                         any (`isInfixOf`  x) [".dll", ".dylib", ".so."]
@@ -330,7 +330,7 @@ bitnessMismatch =
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
 -- A list of wxWidgets versions that can be handled by this version of wxHaskell
-wxCompatibleVersions = ["3.2"] -- Preferred version first
+wxCompatibleVersions = ["3.2", "3.0"] -- Preferred version first
 
 checkWxVersion :: IO String
 checkWxVersion =
@@ -356,7 +356,7 @@ readWxConfig wxVersion =
 #if defined(freebsd_HOST_OS) || defined (netbsd_HOST_OS)
     putStrLn "defined(freebsd_HOST_OS) || defined (netbsd_HOST_OS)"
     -- find GL/glx.h on non-Linux systems
-    let glIncludeDirs = readProcess "pkg-config" ["--cflags", "gl"] "" `E.onException` return ""
+    let glIncludeDirs = readProcess "pkg-config" ["--cflags", "gl"] "" `E.catch` (\(_::E.SomeException) -> return "")
 #else
     let glIncludeDirs = return ""
 #endif
@@ -380,7 +380,7 @@ readWxConfig wxVersion =
 wx_config :: [String] -> IO String
 wx_config parms = do
   let runExecutable failureAction =
-        readProcess "wx-config" parms "" `E.onException` failureAction
+        readProcess "wx-config" parms "" `E.catch` (\(_::E.SomeException) -> failureAction)
 
   b <- isWindowsMsys
   if b

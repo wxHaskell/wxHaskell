@@ -1,0 +1,89 @@
+name: build-wxHaskell
+
+on:
+  push:
+  pull_request:
+    branches: [master]
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        ghc: ["9.4.8"]
+        os: [ ubuntu-latest, macOS-latest ]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - run: git config --global core.autocrlf input
+      - uses: actions/checkout@v4
+
+      - uses: haskell-actions/setup@v2
+        id: setup-haskell
+        with:
+          ghc-version: ${{ matrix.ghc }}
+
+      - name: Install wxWidgets on Ubuntu / macOS
+        run: |
+          if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
+            sudo apt-get install -y libwxgtk3.0-gtk3-dev libwxgtk-media3.0-gtk3-dev
+          elif [[ "${{ matrix.os }}" == "macOS-latest" ]]; then
+            brew install wxwidgets
+          fi
+
+      - name: Configure project
+        run: |
+            echo "$SHELL"
+            echo "$PATH"
+            cabal configure
+            cabal build all --dry-run
+
+      - name: Build
+        run: |
+            echo "$SHELL"
+            echo "$PATH"
+            cabal build all
+
+  build-on-windows:
+    strategy:
+      fail-fast: false
+      matrix:
+        ghc: ["9.4.8"]
+        os: [ windows-latest ]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - run: git config --global core.autocrlf input
+      - uses: actions/checkout@v4
+
+      - uses: haskell-actions/setup@v2
+        id: setup-haskell
+        with:
+          ghc-version: ${{ matrix.ghc }}
+
+      - name: Install wxWidgets on Windows
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: CLANG64
+          install: >-
+            mingw-w64-clang-x86_64-clang
+            mingw-w64-clang-x86_64-wxwidgets3.2-msw
+
+      - shell: msys2 {0}
+        name: Configure project
+        run: |
+            export PATH=$PATH:"/c/ghcup/msys64/bin":"/c/ghcup/usr/bin":"/c/ghcup/bin"
+            echo "$SHELL"
+            echo "$PATH"
+            cabal configure
+            cabal build all --dry-run
+
+      - shell: msys2 {0}
+        name: Build
+        run: |
+            export PATH=$PATH:"/c/ghcup/msys64/bin":"/c/ghcup/usr/bin":"/c/ghcup/bin"
+            echo "$SHELL"
+            echo "$PATH"
+            cabal build all
