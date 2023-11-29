@@ -62,7 +62,6 @@ wxcInstallDir lbi =
 -- Comment out type signature because of a Cabal API change from 1.6 to 1.7
 myConfHook (pkg0, pbi) flags = do
     createDirectoryIfMissing True wxcoreDirectory
-
 #if defined(freebsd_HOST_OS) || defined (netbsd_HOST_OS)
     -- Find GL/glx.h include path using pkg-config
     glIncludeDirs <- readProcess "pkg-config" ["--cflags", "gl"] "" `E.onException` return ""
@@ -71,7 +70,23 @@ myConfHook (pkg0, pbi) flags = do
 #endif
 
     lbi <- confHook simpleUserHooks (pkg0, pbi) flags
-    wxcIncludeDir <-  wxcInstallDir lbi
+    let lpd       = localPkgDescr lbi
+    let lib       = fromJust (library lpd)
+    let libbi     = libBuildInfo lib
+    let custom_bi = customFieldsBI libbi
+
+    putStrLn $ show  (pkgconfigDepends libbi)
+
+    let isWxcFromPkgConfig =
+          case Data.List.find (\(PkgconfigDependency pcn _) -> pcn == mkPkgconfigName "wxc") (pkgconfigDepends libbi) of
+              Just _ -> True
+              Nothing -> False
+
+    wxcIncludeDir <-
+        if isWxcFromPkgConfig
+        then stripR <$> readProcess "pkg-config" ["--variable=includedir", "wxc"] ""
+        else wxcInstallDir lbi
+
     let wxcoreIncludeFile  = "\"" ++ wxcIncludeDir </> "wxc" </> "wxc.h\""
     let wxcIncludeDirQuoted = "\"" ++ wxcIncludeDir ++ "\""
     let system' command    = putStrLn command >> system command
@@ -85,10 +100,6 @@ myConfHook (pkg0, pbi) flags = do
     putStrLn "Generating class method definitions from .h files"
     system' $ "wxdirect -c --wxc " ++ wxcIncludeDirQuoted ++ " -o " ++ wxcoreDirectoryQuoted ++ " " ++ wxcoreIncludeFile
 
-    let lpd       = localPkgDescr lbi
-    let lib       = fromJust (library lpd)
-    let libbi     = libBuildInfo lib
-    let custom_bi = customFieldsBI libbi
 
     -- TODO ideally we'd let Cabal do this through pkgconfig-depends, and we'd
     -- use Setup.hs only to call wxdirect.

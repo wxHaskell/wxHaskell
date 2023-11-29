@@ -32,6 +32,11 @@ flag splitBase
   description:  use new split base
   default:      True
 
+flag UseSystemWxc
+  description: Use wxc package from the system obtained from pkg-config
+  default: False
+  manual: True
+
 library
   default-language:
     Haskell2010
@@ -83,7 +88,12 @@ library
     stm,
     directory,
     time,
-    wxc
+
+  if flag(UseSystemWxc)
+    pkgconfig-depends: wxc
+    extra-libraries: wxc
+  else
+    build-depends: wxc
 
   build-tool-depends:
     wxdirect:wxdirect >= 0.91
