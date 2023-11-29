@@ -17,41 +17,48 @@ EWXWEXPORT(bool,wxValidator_Validate)(wxValidator* self,wxWindow* parent)
 {
 	return self->Validate(parent);
 }
-	
+
 EWXWEXPORT(bool,wxValidator_TransferToWindow)(wxValidator* self)
 {
 	return self->TransferToWindow();
 }
-	
+
 EWXWEXPORT(bool,wxValidator_TransferFromWindow)(wxValidator* self)
 {
 	return self->TransferFromWindow();
 }
-	
+
 EWXWEXPORT(void*,wxValidator_GetWindow)(void* self)
 {
 	return (void*)((wxValidator*)self)->GetWindow();
 }
-	
+
+#if wxCHECK_VERSION(3, 1, 1)
 EWXWEXPORT(void,wxValidator_SetWindow)(void* self,wxWindow* win)
 {
 	((wxValidator*)self)->SetWindow(win);
 }
-	
-#if (wxVERSION_NUMBER < 2800)	
+#else
+EWXWEXPORT(void,wxValidator_SetWindow)(void* self,wxWindowBase* win)
+{
+	((wxValidator*)self)->SetWindow(win);
+}
+#endif
+
+#if (wxVERSION_NUMBER < 2800)
 EWXWEXPORT(bool,wxValidator_IsSilent)()
 {
 	return wxValidator::IsSilent();
 }
 #endif
-	
+
 // EWXWEXPORT(void,wxValidator_SetBellOnError)(bool doIt)
 EWXWEXPORT(void,wxValidator_SuppressBellOnError)(bool doIt)
 {
 //	wxValidator::SetBellOnError(doIt);
 	wxValidator::SuppressBellOnError(doIt);
 }
-	
+
 EWXWEXPORT(void*,wxTextValidator_Create)(int style,void* val)
 {
 	return (void*)new wxTextValidator((long)style, new wxString);
@@ -61,27 +68,27 @@ EWXWEXPORT(int,wxTextValidator_GetStyle)(wxTextValidator* self)
 {
 	return (int)self->GetStyle();
 }
-	
+
 EWXWEXPORT(void,wxTextValidator_SetStyle)(void* self,int style)
 {
 	((wxTextValidator*)self)->SetStyle((long) style);
 }
-	
-#if (wxVERSION_NUMBER < 2800)	
+
+#if (wxVERSION_NUMBER < 2800)
 EWXWEXPORT(void,wxTextValidator_SetIncludeList)(void* self,void* list,int count)
 {
 #if (wxVERSION_NUMBER <= 2600)
 	wxStringList str;
-	
+
 	for (int i = 0; i < count; i++)
 		str.Add(((wxChar**)list)[i]);
-		
+
 	((wxTextValidator*)self)->SetIncludeList(str);
 #else
 	((wxTextValidator*)self)->SetIncludes((const wxArrayString&)list);
 #endif
 }
-	
+
 EWXWEXPORT(int,wxTextValidator_GetIncludeList)(void* self,void* _ref)
 {
 #if (wxVERSION_NUMBER <= 2600)
@@ -101,21 +108,21 @@ EWXWEXPORT(int,wxTextValidator_GetIncludeList)(void* self,void* _ref)
 	return arr.GetCount();
 #endif
 }
-	
+
 EWXWEXPORT(void,wxTextValidator_SetExcludeList)(void* self,void* list,int count)
 {
 #if (wxVERSION_NUMBER <= 2600)
 	wxStringList str;
-	
+
 	for (int i = 0; i < count; i++)
 		str.Add(((wxChar**)list)[i]);
-		
+
 	((wxTextValidator*)self)->SetExcludeList(str);
 #else
 	((wxTextValidator*)self)->SetExcludes((const wxArrayString&)list);
 #endif
 }
-	
+
 EWXWEXPORT(int,wxTextValidator_GetExcludeList)(void* self,void* _ref)
 {
 #if (wxVERSION_NUMBER <= 2600)
@@ -139,10 +146,10 @@ EWXWEXPORT(int,wxTextValidator_GetExcludeList)(void* self,void* _ref)
 EWXWEXPORT(void,wxTextValidator_SetIncludes)(void* self,void* list,int count)
 {
   wxArrayString str;
-  
+
   for (int i = 0; i < count; i++)
     str.Add(((wxChar**)list)[i]);
-  
+
   ((wxTextValidator*)self)->SetIncludes(str);
 }
 
@@ -164,17 +171,17 @@ EWXWEXPORT(void*,wxTextValidator_GetIncludes)(void* self,int* _nitems)
   }
   return retval;
 }
-	
+
 EWXWEXPORT(void,wxTextValidator_SetExcludes)(void* self,void* list,int count)
 {
 	wxArrayString str;
-	
+
 	for (int i = 0; i < count; i++)
 		str.Add(((wxChar**)list)[i]);
-		
+
 	((wxTextValidator*)self)->SetExcludes(str);
 }
-	
+
 EWXWEXPORT(void*,wxTextValidator_GetExcludes)(void* self,int* _nitems)
 {
   void* retval = NULL;
@@ -203,12 +210,12 @@ EWXWEXPORT(bool,wxTextValidator_TransferToWindow)(wxTextValidator* self)
 {
 	return self->TransferToWindow();
 }
-	
+
 EWXWEXPORT(bool,wxTextValidator_TransferFromWindow)(wxTextValidator* self)
 {
 	return self->TransferFromWindow();
 }
-	
+
 #endif
 
 EWXWEXPORT(void,wxTextValidator_OnChar)(void* self,wxKeyEvent* event)

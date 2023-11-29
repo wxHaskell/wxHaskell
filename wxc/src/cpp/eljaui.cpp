@@ -1331,17 +1331,29 @@ EWXWEXPORT(int,wxAuiTabContainerButton_Location)(wxAuiTabContainerButton* self)
    return self->location;
 }
 
-
-EWXWEXPORT(void,wxAuiTabContainerButton_Bitmap)(wxAuiTabContainerButton* self, wxBitmapBundle* _bmp)
+#if wxCHECK_VERSION(3, 1, 6)
+EWXWEXPORT(void,wxAuiTabContainerButton_Bitmap)(wxAuiTabContainerButton* self, wxBitmapBundle * _bmp)
 {
    *_bmp = self->bitmap;
 }
 
-
-EWXWEXPORT(void,wxAuiTabContainerButton_DisBitmap)(wxAuiTabContainerButton* self, wxBitmapBundle* _bmp)
+EWXWEXPORT(void,wxAuiTabContainerButton_DisBitmap)(wxAuiTabContainerButton* self, wxBitmapBundle * _bmp)
 {
    *_bmp = self->disBitmap;
 }
+#else
+EWXWEXPORT(void,wxAuiTabContainerButton_Bitmap)(wxAuiTabContainerButton* self, wxBitmap* _bmp)
+{
+   *_bmp = self->bitmap;
+}
+
+EWXWEXPORT(void,wxAuiTabContainerButton_DisBitmap)(wxAuiTabContainerButton* self, wxBitmap* _bmp)
+{
+   *_bmp = self->disBitmap;
+}
+#endif
+
+
 
 EWXWEXPORT(wxRect*,wxAuiTabContainerButton_Rect)(wxAuiTabContainerButton* self)
 {
@@ -2093,7 +2105,7 @@ EWXWEXPORT(void*,wxAuiManager_GetManager)(wxWindow* _window)
 {
  return wxAuiManager::GetManager(_window);
 }
- 
+
 
 /* wxAuiDockArt */
 
@@ -2608,7 +2620,7 @@ EWXWEXPORT(wxAuiPaneInfo*,wxAuiPaneInfo_ToolbarPane)(wxAuiPaneInfo* self)
 
 EWXWEXPORT(wxAuiPaneInfo*,wxAuiPaneInfo_Top)(wxAuiPaneInfo* self)
 {
-   
+
   wxAuiPaneInfo* out = new wxAuiPaneInfo();
   *out = self->Top();
   return out;
@@ -2803,7 +2815,7 @@ EWXWEXPORT(void,wxAuiManagerEvent_SetDC)(wxAuiManagerEvent* self, wxDC* pdc)
 {
     self->SetDC(pdc);
 }
- 
+
 
 EWXWEXPORT(void,wxAuiManagerEvent_SetManager)(wxAuiManagerEvent* self, wxAuiManager* _manager)
 {
@@ -2978,12 +2990,21 @@ EWXWEXPORT(wxString*,wxAuiNotebookPage_Tooltip)(wxAuiNotebookPage* self)
   return result;
 }
 
+#if wxCHECK_VERSION(3, 1, 6)
 EWXWEXPORT(wxBitmapBundle*,wxAuiNotebookPage_Bitmap)(wxAuiNotebookPage* self)
 {
   wxBitmapBundle *result = new wxBitmapBundle();
   *result = self->bitmap;
   return result;
 }
+#else
+EWXWEXPORT(wxBitmap*,wxAuiNotebookPage_Bitmap)(wxAuiNotebookPage* self)
+{
+  wxBitmap *result = new wxBitmap();
+  *result = self->bitmap;
+  return result;
+}
+#endif
 
 EWXWEXPORT(wxRect*,wxAuiNotebookPage_Rect)(wxAuiNotebookPage* self)
 {
@@ -3070,5 +3091,3 @@ EWXWEXPORT(wxAuiPaneInfo*,wxAuiPaneInfoArray_Item)(wxAuiPaneInfoArray* self,int 
   return info;
 }
 }
-
-
