@@ -240,7 +240,13 @@ EWXWEXPORT(wxClosure*,wxEvtHandler_GetClosure)(wxEvtHandler* evtHandler,int id,i
   getCallback = &callback;
 
 #if wxCHECK_VERSION(3, 1, 0)
-  #pragma GCC warning "wxEvtHandler_GetClosure must be studied carefully for wxWidgets >= 3.1.0, 'class wxEvtHandler' has no member named 'GetDynamicEventTable' anymore"
+
+  size_t cookie;
+
+  if (evtHandler->GetFirstDynamicEntry(cookie) != NULL) {
+    found = evtHandler->SearchDynamicEventTable( event );
+  }
+
 #else
   // Bugfix: see www.mail-archive.com/wxhaskell-devel@lists.sourceforge.net/msg00577.html
   // On entry, Dynamic event table may have no bound events
@@ -294,7 +300,7 @@ EWXWEXPORT(void,wxObject_SetClientClosure)(wxObject* _obj,wxClosure* closure)
   _obj->UnRef();
   wxASSERT(_obj->GetRefData() == NULL);
   refData = new wxcClosureRefData( closure );
-  _obj->SetRefData( refData );    //set new data -- ref count must be 1 as setRefData doesn't increase it.  
+  _obj->SetRefData( refData );    //set new data -- ref count must be 1 as setRefData doesn't increase it.
 }
 
 /*-----------------------------------------------------------------------------
