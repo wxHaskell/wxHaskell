@@ -74,7 +74,7 @@ onPaint vmouseHistory  dc _viewArea
   = do history <- varGet vmouseHistory
        time    <- getTime
        -- draw trace line
-       polyline dc (map snd history) [penColor := lightgrey]
+       when (length history > 1) $ polyline dc (map snd history) [penColor := lightgrey]
        -- draw the words
        set dc [font := flowFont ]
        mapM_ drawWord (wordPositions history timeSpan time flowText)
