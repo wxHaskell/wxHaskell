@@ -4209,9 +4209,10 @@ int        wxOutputStream_Tell( TSelf(wxOutputStream) _obj );
 void       wxOutputStream_Write( TSelf(wxOutputStream) _obj, void* buffer, int size );
 
 /* wxPageSetupDialog */
-TClassDefExtend(wxPageSetupDialog,wxDialog)
+TClassDefExtend(wxPageSetupDialog,wxObject)
 TClass(wxPageSetupDialog) wxPageSetupDialog_Create( TClass(wxWindow) parent, TClass(wxPageSetupDialogData) data );
 void       wxPageSetupDialog_GetPageSetupData( TSelf(wxPageSetupDialog) _obj, TClassRef(wxPageSetupDialogData) _ref );
+int        wxPageSetupDialog_ShowModal( TSelf(wxPageSetupDialog) _obj );
 
 /* wxPageSetupDialogData */
 TClassDefExtend(wxPageSetupDialogData,wxObject)
@@ -5824,4 +5825,3 @@ TClassDefExtend(wxPropertyCategory,wxPGProperty)
 TClass(wxPropertyCategory) wxPropertyCategory_Create( TClass(wxString) label);
 
 #endif /* WXC_GLUE_H */
-
