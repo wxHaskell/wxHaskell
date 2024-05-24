@@ -31,6 +31,8 @@ jobs:
           elif [[ "${{ matrix.os }}" == "macOS-latest" ]]; then
             brew install wxwidgets
           fi
+          wx-config --libs all --cppflags
+
 
       - name: Configure project
         run: |
