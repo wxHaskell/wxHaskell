@@ -17,10 +17,6 @@ bug-reports:   https://sourceforge.net/p/wxhaskell/bugs/
 
 build-type:    Simple
 
-flag splitBase
-    description:    use new split base
-    default:        True
-
 library
   hs-source-dirs:
     src
@@ -50,21 +46,14 @@ executable wxdirect
     src
 
   build-depends:
+    base       >= 4     && < 5,
+    containers >= 0.2   && < 0.7,
     directory,
     parsec     >= 2.1.0 && < 4,
     strict,
     time       >= 1.0,
     filepath   <  1.5,
     process    >= 1.1   && < 1.7
-
-  if flag(splitBase)
-    build-depends:
-        base       >= 4     && < 5,
-        containers >= 0.2   && < 0.7
-  else
-    build-depends:
-        base       >= 3     && < 4,
-        containers >= 0.1   && < 0.3
 
   ghc-options: -Wall -O2
   if impl(ghc >= 6.8)
