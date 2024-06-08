@@ -20,7 +20,7 @@ homepage:     https://wiki.haskell.org/WxHaskell
 bug-reports:  https://sourceforge.net/p/wxhaskell/bugs/
 
 cabal-version: 2.0
-build-type:    Custom
+build-type:    Configure
 
 extra-tmp-files:
   src/haskell/Graphics/UI/WXCore/WxcClassInfo.hs
@@ -87,18 +87,13 @@ library
   pkgconfig-depends:
     wxc
 
+  -- Find GL/glx.h include path using pkg-config
+  if os(freebsd) || os(netbsd)
+    pkgconfig-depends: gl
+
   build-tool-depends:
     wxdirect:wxdirect >= 0.91
 
   extra-libraries: wxc
 
   ghc-options: -Wall
-
-
-custom-setup
-  setup-depends:
-    base,
-    Cabal,
-    process,
-    directory,
-    filepath

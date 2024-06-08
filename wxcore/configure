@@ -1,0 +1,20 @@
+#!/bin/sh
+
+set -eu
+
+wxcoreDirectory=src/haskell/Graphics/UI/WXCore
+
+mkdir -p "$wxcoreDirectory"
+
+wxcIncludeDir="$(pkg-config --variable=includedir wxc)"
+
+wxcoreIncludeFile="$wxcIncludeDir/wxc/wxc.h"
+
+echo "Generating class type definitions from .h files"
+wxdirect -t --wxc "$wxcIncludeDir" -o "$wxcoreDirectory" "$wxcoreIncludeFile"
+
+echo "Generating class info definitions"
+wxdirect -i --wxc "$wxcIncludeDir" -o "$wxcoreDirectory" "$wxcoreIncludeFile"
+
+echo "Generating class method definitions from .h files"
+wxdirect -c --wxc "$wxcIncludeDir" -o "$wxcoreDirectory" "$wxcoreIncludeFile"
