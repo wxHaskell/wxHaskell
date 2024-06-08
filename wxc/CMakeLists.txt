@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
 
 # set the project name
-project(wxc VERSION 1.0.0.1 DESCRIPTION "A cwrapper library around wxWidgets."
+project(wxc VERSION 1.0.0.1 DESCRIPTION "A C wrapper library around wxWidgets."
     LANGUAGES CXX)
 include(GNUInstallDirs)
 
